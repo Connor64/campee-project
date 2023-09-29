@@ -15,7 +15,7 @@ public class StarshipGame extends ApplicationAdapter {
 	public void create () {
 		batch = new SpriteBatch();
 		Pixmap pix_big = new Pixmap(Gdx.files.internal("connor_apple.jpg"));
-		Pixmap pix_small = new Pixmap(400, 400, pix_big.getFormat());
+		Pixmap pix_small = new Pixmap(500, 100, pix_big.getFormat());
 		pix_small.drawPixmap(pix_big,
 				0, 0, pix_big.getWidth(), pix_big.getHeight(),
 				0, 0, pix_small.getWidth(), pix_small.getHeight()
