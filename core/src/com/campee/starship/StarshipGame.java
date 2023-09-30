@@ -28,7 +28,7 @@ public class StarshipGame extends ApplicationAdapter {
 
 	@Override
 	public void render () {
-		ScreenUtils.clear(50, 50, 0, 1);
+		ScreenUtils.clear(255, 165, 0, 1);
 		batch.begin();
 		batch.draw(img, 400 - (img.getWidth() / 2), 300 - (img.getHeight() / 2));
 		batch.end();
