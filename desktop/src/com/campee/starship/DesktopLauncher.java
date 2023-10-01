@@ -2,7 +2,6 @@ package com.campee.starship;
 
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
-import com.campee.starship.StarshipGame;
 
 // Please note that on macOS your application needs to be started with the -XstartOnFirstThread JVM argument
 public class DesktopLauncher {
@@ -12,6 +11,6 @@ public class DesktopLauncher {
 		config.useVsync(true);
 		config.setWindowedMode(800, 600);
 		config.setTitle("Starship Game!");
-		new Lwjgl3Application(new StarshipGame(), config);
+		new Lwjgl3Application(new MoonshipGame(), config);
 	}
 }

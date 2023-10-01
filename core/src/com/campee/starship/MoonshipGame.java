@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
 
-public class StarshipGame extends ApplicationAdapter {
+public class MoonshipGame extends ApplicationAdapter {
 	SpriteBatch batch;
 	Texture img;
 	
