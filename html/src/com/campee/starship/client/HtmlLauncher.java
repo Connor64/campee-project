@@ -3,7 +3,7 @@ package com.campee.starship.client;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.backends.gwt.GwtApplication;
 import com.badlogic.gdx.backends.gwt.GwtApplicationConfiguration;
-import com.campee.starship.StarshipGame;
+import com.campee.starship.MoonshipGame;
 
 public class HtmlLauncher extends GwtApplication {
 
@@ -17,6 +17,6 @@ public class HtmlLauncher extends GwtApplication {
 
         @Override
         public ApplicationListener createApplicationListener () {
-                return new StarshipGame();
+                return new MoonshipGame();
         }
 }
