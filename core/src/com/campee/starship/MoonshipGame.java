@@ -32,7 +32,7 @@ public class MoonshipGame extends ApplicationAdapter {
 
 	@Override
 	public void render () {
-		ScreenUtils.clear(255, 0, 255, 0);
+		ScreenUtils.clear(0, 255, 255, 0);
 		batch.begin();
 		batch.draw(img, 400 - (img.getWidth() / 2), 300 - (img.getHeight() / 2));
 		batch.end();
