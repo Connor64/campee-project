@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
 
-public class StarshipGame extends ApplicationAdapter {
+public class MoonshipGame extends ApplicationAdapter {
 	SpriteBatch batch;
 	Texture img;
 	
@@ -28,7 +28,7 @@ public class StarshipGame extends ApplicationAdapter {
 
 	@Override
 	public void render () {
-		ScreenUtils.clear(50, 50, 0, 1);
+		ScreenUtils.clear(255, 0, 255, 0);
 		batch.begin();
 		batch.draw(img, 400 - (img.getWidth() / 2), 300 - (img.getHeight() / 2));
 		batch.end();
