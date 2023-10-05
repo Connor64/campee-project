@@ -15,26 +15,30 @@ public class MoonshipGame extends ApplicationAdapter {
 	SpriteBatch batch;
 	Texture img;
 
+	Coin coin;
+
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
-		Pixmap pix_big = new Pixmap(Gdx.files.internal("connor_apple.jpg"));
-		Pixmap pix_small = new Pixmap(400, 400, pix_big.getFormat());
-		pix_small.drawPixmap(pix_big,
-				0, 0, pix_big.getWidth(), pix_big.getHeight(),
-				0, 0, pix_small.getWidth(), pix_small.getHeight()
-		);
-		img = new Texture(pix_small);
-		pix_small.dispose();
-		pix_big.dispose();
+//		Pixmap pix_big = new Pixmap(Gdx.files.internal("connor_apple.jpg"));
+//		Pixmap pix_small = new Pixmap(400, 400, pix_big.getFormat());
+//		pix_small.drawPixmap(pix_big,
+//				0, 0, pix_big.getWidth(), pix_big.getHeight(),
+//				0, 0, pix_small.getWidth(), pix_small.getHeight()
+//		);
+//		img = new Texture(pix_small);
+//		pix_small.dispose();
+//		pix_big.dispose();
 
+		coin = new Coin();
 	}
 
 	@Override
 	public void render () {
 		ScreenUtils.clear(255, 0, 255, 0);
 		batch.begin();
-		batch.draw(img, 400 - (img.getWidth() / 2), 300 - (img.getHeight() / 2));
+//		batch.draw(img, 400 - (img.getWidth() / 2), 300 - (img.getHeight() / 2));
+		coin.render(batch);
 		batch.end();
 	}
 
