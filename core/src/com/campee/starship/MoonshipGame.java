@@ -58,16 +58,13 @@ public class MoonshipGame extends ApplicationAdapter {
 		if (keyProcessor.upPressed) {
 			y += SPEED * deltaTime;
 			move = 0;
-		}
-		if (keyProcessor.downPressed) {
+		} else if (keyProcessor.downPressed) {
 			y -= SPEED * deltaTime;
 			move = 1;
-		}
-		if (keyProcessor.leftPressed) {
+		} else if (keyProcessor.leftPressed) {
 			x -= SPEED * deltaTime;
 			move = 2;
-		}
-		if (keyProcessor.rightPressed) {
+		} else if (keyProcessor.rightPressed) {
 			x += SPEED * deltaTime;
 			move = 3;
 		}

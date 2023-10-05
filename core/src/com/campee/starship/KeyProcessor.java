@@ -14,16 +14,21 @@ public class KeyProcessor implements InputProcessor {
     public boolean keyDown(int keycode) {
         if (keycode == Input.Keys.UP || keycode == Input.Keys.W) {
             upPressed = true;
+            downPressed = false;
         }
         if (keycode == Input.Keys.DOWN || keycode == Input.Keys.S) {
             downPressed = true;
+            upPressed = false;
         }
         if (keycode == Input.Keys.LEFT || keycode == Input.Keys.A) {
             leftPressed = true;
+            rightPressed = false;
         }
         if (keycode == Input.Keys.RIGHT || keycode == Input.Keys.D) {
             rightPressed = true;
+            leftPressed = false;
         }
+
         return false;
     }
 
@@ -34,6 +39,7 @@ public class KeyProcessor implements InputProcessor {
         }
         if (keycode == Input.Keys.DOWN || keycode == Input.Keys.S) {
             downPressed = false;
+
         }
         if (keycode == Input.Keys.LEFT || keycode == Input.Keys.A) {
             leftPressed = false;
