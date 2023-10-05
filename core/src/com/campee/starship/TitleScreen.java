@@ -16,26 +16,32 @@ public class TitleScreen {
     public TitleScreen () {
         stage = new Stage();
         Gdx.input.setInputProcessor(stage);
-        BitmapFont font = new BitmapFont();
-        TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
-        textButtonStyle.font = font;
+        ScreenUtils.clear(1, 0.8f, 1, 1);
+        //BitmapFont font = new BitmapFont();
+        //TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
+        //textButtonStyle.font = font;
 
-        textButtonStyle.fontColor = Color.BLACK;
-        TextButton button = new TextButton("poke the button!", textButtonStyle);
-        button.setColor(Color.WHITE);
-        button.setX(250);
-        button.setY(250);
-        button.addListener(new InputListener() {
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                System.out.println("oop! you poked me!");
-                return true;
-            }
-        });
+        //textButtonStyle.fontColor = Color.BLACK;
+        //TextButton button = new TextButton("poke the button!", textButtonStyle);
+        //button.setColor(Color.WHITE);
+        //button.setX(250);
+        //button.setY(250);
+        //button.addListener(new InputListener() {
+        //    public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+        //        System.out.println("oop! you poked me!");
+        //        return true;
+        //    }
+        //});
 
-        stage.addActor(button);
+        //stage.addActor(button);
     }
 
     public void render() {
+        stage.act(Gdx.graphics.getDeltaTime());
         stage.draw();
+    }
+
+    public void dispose() {
+        stage.dispose();
     }
 }
