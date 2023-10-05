@@ -1,7 +1,7 @@
 package com.campee.starship;
 
 import java.util.Queue;
-
+//please work
 public class Player {
     public boolean orderInProgress;
     public int highScore;
