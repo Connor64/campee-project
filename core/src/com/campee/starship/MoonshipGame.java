@@ -14,6 +14,7 @@ import java.util.List;
 public class MoonshipGame extends ApplicationAdapter {
 	SpriteBatch batch;
 	Texture img;
+	TitleScreen titleScreen;
 
 	@Override
 	public void create () {
@@ -28,6 +29,8 @@ public class MoonshipGame extends ApplicationAdapter {
 		pix_small.dispose();
 		pix_big.dispose();
 
+		titleScreen = new TitleScreen();
+
 	}
 
 	@Override
@@ -35,9 +38,8 @@ public class MoonshipGame extends ApplicationAdapter {
 		ScreenUtils.clear(255, 0, 255, 0);
 		batch.begin();
 		batch.draw(img, 400 - (img.getWidth() / 2), 300 - (img.getHeight() / 2));
-		TitleScreen titleScreen = new TitleScreen();
-		titleScreen.render();
 		batch.end();
+		titleScreen.render();
 	}
 
 	@Override
