@@ -19,6 +19,7 @@ public class MoonshipGame extends ApplicationAdapter {
 	TitleScreen titleScreen;
 	BitmapFont font;
 	GlyphLayout glyphLayout;
+	//Texture img;
 
 	@Override
 	public void create () {
@@ -57,7 +58,11 @@ public class MoonshipGame extends ApplicationAdapter {
 		float textX = (Gdx.graphics.getWidth() - glyphLayout.width) / 2;
 		float textY = Gdx.graphics.getHeight() * 2 / 3 + glyphLayout.height;
 		font.draw(batch, glyphLayout, textX, textY);
+		//ScreenUtils.clear(255, 0, 255, 0);
+		//batch.begin();
+		//batch.draw(img, 400 - (img.getWidth() / 2), 300 - (img.getHeight() / 2));
 		batch.end();
+		//titleScreen.render();
 	}
 
 	@Override
