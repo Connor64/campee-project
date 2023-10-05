@@ -23,6 +23,8 @@ public class MoonshipGame extends ApplicationAdapter {
 	Coin coin;
 	float x;
 	float y;
+	float screenWidth;
+	float screenHeight;
 	int SPEED = 150;
 	int move = 0;
 
@@ -43,6 +45,8 @@ public class MoonshipGame extends ApplicationAdapter {
 //		pix_small.dispose();
 //		pix_big.dispose();
 
+		screenWidth = Gdx.graphics.getWidth();
+		screenHeight = Gdx.graphics.getHeight();
 		x = 100;
 		y = 100;
 		player = new Player();
@@ -68,9 +72,25 @@ public class MoonshipGame extends ApplicationAdapter {
 			x += SPEED * deltaTime;
 			move = 3;
 		}
-//		batch.draw(img, 400 - (img.getWidth() / 2), 300 - (img.getHeight() / 2));
+
+
+		//batch.draw(img, 400 - (img.getWidth() / 2), 300 - (img.getHeight() / 2));
 		batch.begin();
 		player.render(batch, x, y, move);
+
+		//ensure sprite stays within screen bounds
+		if (x < 0) {
+			x = 0;
+		} else if (x > screenWidth - player.getWidth()) {
+			x = screenWidth - player.getWidth();
+		}
+
+		if (y < 0) {
+			y = 0;
+		} else if (y > screenHeight - player.getHeight()) {
+			y = screenHeight - player.getHeight();
+		}
+
 		if (!coin.collected) {
 			coin.render(batch, 0, 0);
 		}

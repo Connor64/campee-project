@@ -73,4 +73,15 @@ public class Player extends GameObject {
         float y = sprite.getY();
         return y;
     }
+
+    public float getWidth() {
+        float w = sprite.getWidth();
+        return w;
+    }
+
+    public float getHeight() {
+        float h = sprite.getHeight();
+        return h;
+    }
+
 }
