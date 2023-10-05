@@ -35,6 +35,8 @@ public class MoonshipGame extends ApplicationAdapter {
 		ScreenUtils.clear(255, 0, 255, 0);
 		batch.begin();
 		batch.draw(img, 400 - (img.getWidth() / 2), 300 - (img.getHeight() / 2));
+		TitleScreen titleScreen = new TitleScreen();
+		titleScreen.render();
 		batch.end();
 	}
 
