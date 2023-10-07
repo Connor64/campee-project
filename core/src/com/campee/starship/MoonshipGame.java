@@ -28,8 +28,6 @@ public class MoonshipGame extends ApplicationAdapter {
 	int SPEED = 150;
 	int move = 0;
 
-
-
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
@@ -103,6 +101,5 @@ public class MoonshipGame extends ApplicationAdapter {
 	@Override
 	public void dispose () {
 		batch.dispose();
-		img.dispose();
 	}
 }
