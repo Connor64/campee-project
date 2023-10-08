@@ -33,15 +33,6 @@ public class MoonshipGame extends ApplicationAdapter {
 		batch = new SpriteBatch();
 		keyProcessor = new KeyProcessor();
 		Gdx.input.setInputProcessor(keyProcessor);
-//		Pixmap pix_big = new Pixmap(Gdx.files.internal("connor_apple.jpg"));
-//		Pixmap pix_small = new Pixmap(400, 400, pix_big.getFormat());
-//		pix_small.drawPixmap(pix_big,
-//				0, 0, pix_big.getWidth(), pix_big.getHeight(),
-//				0, 0, pix_small.getWidth(), pix_small.getHeight()
-//		);
-//		img = new Texture(pix_small);
-//		pix_small.dispose();
-//		pix_big.dispose();
 
 		screenWidth = Gdx.graphics.getWidth();
 		screenHeight = Gdx.graphics.getHeight();
@@ -56,25 +47,30 @@ public class MoonshipGame extends ApplicationAdapter {
 		ScreenUtils.clear(155f/255f, 150f/255f, 10f/25f, 0);
 		float deltaTime =  Gdx.graphics.getDeltaTime();
 
+		boolean accelerating = false;
 		//implement KeyProcessor
 		if (keyProcessor.upPressed) {
 			y += SPEED * deltaTime;
 			move = 0;
+			accelerating = true;
 		} else if (keyProcessor.downPressed) {
 			y -= SPEED * deltaTime;
 			move = 1;
+			accelerating = true;
 		} else if (keyProcessor.leftPressed) {
 			x -= SPEED * deltaTime;
 			move = 2;
+			accelerating = true;
 		} else if (keyProcessor.rightPressed) {
 			x += SPEED * deltaTime;
 			move = 3;
+			accelerating = true;
 		}
 
 
 		//batch.draw(img, 400 - (img.getWidth() / 2), 300 - (img.getHeight() / 2));
 		batch.begin();
-		player.render(batch, x, y, move);
+		player.render(batch, x, y, move, accelerating);
 
 		//ensure sprite stays within screen bounds
 		if (x < 0) {
