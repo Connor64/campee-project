@@ -20,7 +20,7 @@ public class TestScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        ScreenUtils.clear(Color.GREEN);
+        ScreenUtils.clear(Color.PURPLE);
         // Render your game elements and logic here
     }
 

@@ -31,7 +31,7 @@ public class Order implements Screen {
         button.addListener(new InputListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 // Switch to the GameScreen when the button is clicked
-                game.setScreen(new TestScreen(game));
+                game.setScreen(new TitleScreen(game));
                 return true;
             }
         });
