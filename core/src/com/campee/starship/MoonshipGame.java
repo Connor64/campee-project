@@ -18,9 +18,9 @@ public class MoonshipGame extends Game {
 
 	@Override
 	public void create() {
-		//titleScreen = new TitleScreen(this);
+		titleScreen = new TitleScreen(this);
 		order = new Order(this);
-		setScreen(order);
+		setScreen(titleScreen);
 	}
 
 }

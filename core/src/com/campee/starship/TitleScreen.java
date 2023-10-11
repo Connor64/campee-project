@@ -105,7 +105,13 @@ public class TitleScreen implements Screen {
         float textY = Gdx.graphics.getHeight() * 3 / 4 + glyphLayout.height;
         font.draw(batch, glyphLayout, textX, textY);
 
-        // ... Drawing your image
+        float scaleFactor = 0.7f;
+        float imgWidth = img.getWidth() * scaleFactor;
+        float imgHeight = img.getHeight() * scaleFactor;
+        float imgX = (Gdx.graphics.getWidth() - imgWidth) / 2;
+        float imgY = 30; // Adjust this value to move the image up or down
+        batch.draw(img, imgX, imgY, imgWidth, imgHeight);
+
 
         batch.end();
         stage.act(delta);
