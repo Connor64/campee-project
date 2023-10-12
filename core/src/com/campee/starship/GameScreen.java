@@ -76,7 +76,7 @@ public class GameScreen extends ApplicationAdapter implements Screen {
             xMove = 1;
             move = 3;
         } else {
-            float linearDamping = 5;
+            float linearDamping = 1;
             player.body.setLinearDamping(linearDamping);
         }
 
@@ -114,6 +114,8 @@ public class GameScreen extends ApplicationAdapter implements Screen {
         // float for new position (for screen collisions)
         float newX = player.sprite.getX();
         float newY = player.sprite.getY();
+
+
 
         // testing to make sure the player can't leave bounds
         // TODO: fix bouncing :/

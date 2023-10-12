@@ -1,12 +1,10 @@
 package com.campee.starship;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.physics.box2d.*;
 
 public class Player extends GameObject {
@@ -24,6 +22,8 @@ public class Player extends GameObject {
     private Texture[] textures;
 
     String spritePath = "";
+    private float speedBoostX;
+    private float speedBoostY;
 
     public Player (World world, float x, float y) {
         // constructor for new player object
@@ -31,6 +31,9 @@ public class Player extends GameObject {
         // set bounds for collision detection
         dimension.set(0.5f, 0.5f);
         setBounds(0, 0, dimension.x, dimension.y);
+
+        speedBoostX = 0;
+        speedBoostY = 0;
 
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
@@ -89,8 +92,24 @@ public class Player extends GameObject {
 
 
     public void render(SpriteBatch batch, float moveX, float moveY, int spriteNum) {
-        // pushes the player
-        body.applyForceToCenter(1000 * moveX, 1000 * moveY,  true);
+//        if (moveX != 0) {
+//            speedBoostX = speedBoostX + 50;
+//        } else {
+//            speedBoostX = 0;
+//        }
+//        if (moveY != 0) {
+//            speedBoostY = speedBoostY + 50;
+//        } else {
+//            speedBoostY = 0;
+//        }
+        speedBoostX = moveX * (speedBoostX + 50);
+        speedBoostY = moveY * (speedBoostY + 50);
+
+        System.out.println("speedX: " + speedBoostX);
+        System.out.println("speedY: " + speedBoostY);
+        body.applyForceToCenter((1000 * moveX) +(50 * speedBoostX), (1000 * moveY) + (50 * speedBoostY),  true);
+//        body.setLinearVelocity(speedBoostX, speedBoostY);
+
         // re-render sprite using movement indicator (spriteNum)
         setSprite(spriteNum);
 
