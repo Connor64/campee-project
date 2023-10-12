@@ -18,13 +18,14 @@ import com.badlogic.gdx.utils.ScreenUtils;
 
 public class Popup {
     private Stage stage;
-    private boolean visible;
+    public boolean visible;
     private ShapeRenderer shapeRenderer;
     private BitmapFont font;
 
     public Popup() {
         stage = new Stage();
         shapeRenderer = new ShapeRenderer();
+        visible = false;
 
         font = new BitmapFont();
 

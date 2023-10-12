@@ -13,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 
 
 public class GameScreen extends ApplicationAdapter implements Screen {
+    int test;
     SpriteBatch batch;
     Texture img;
     private Game game;
@@ -20,6 +21,9 @@ public class GameScreen extends ApplicationAdapter implements Screen {
     private Skin skin;
     private ShapeRenderer shapeRenderer;
     private Popup popup;
+    private boolean screenClicked = false; // Add this variable
+    private boolean prevClickState = false; // Add this variable to track the previous click state
+
 
     Player player;
     KeyProcessor keyProcessor;
@@ -33,6 +37,7 @@ public class GameScreen extends ApplicationAdapter implements Screen {
     int move = 0;
 
     public GameScreen(final Game game) {
+        test = 0;
         popup = new Popup();
         stage = new Stage();
         this.game = game;
@@ -46,7 +51,7 @@ public class GameScreen extends ApplicationAdapter implements Screen {
         player = new Player();
         orderScreen = new OrderScreen();
         coin = new Coin();
-        orderScreen.visible = true;
+        orderScreen.visible = false;
     }
 
 
@@ -58,10 +63,10 @@ public class GameScreen extends ApplicationAdapter implements Screen {
 
     @Override
     public void render(float delta) {
+
+        orderScreen.visible = false;
         ScreenUtils.clear(Color.PINK);
         float deltaTime =  Gdx.graphics.getDeltaTime();
-
-        //implement KeyProcessor
 
         // Handle player movement
         if (!popup.isVisible()) {
@@ -83,14 +88,6 @@ public class GameScreen extends ApplicationAdapter implements Screen {
         batch.begin();
         player.render(batch, x, y, move);
 
-
-
-
-
-
-
-
-
         //ensure sprite stays within screen bounds
         if (x < 0) {
             x = 0;
@@ -109,17 +106,18 @@ public class GameScreen extends ApplicationAdapter implements Screen {
             coin.render(batch, 0, 0);
         }
 
-
-
-
         if (Intersector.overlaps(player.getBounds(), coin.getBounds())) {
             coin.setCollected(true);
         }
         // Gdx.input.setInputProcessor(keyProcessor);
 
-        if (Gdx.input.isTouched()) {
-            popup.show();
-            Gdx.input.setInputProcessor(popup.getStage());
+        if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
+            test++;
+            System.out.println(test);
+            if (test == 2) {
+                popup.show();
+                Gdx.input.setInputProcessor(popup.getStage());
+            }
         }
 
         if (popup.isVisible()) {
