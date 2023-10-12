@@ -100,8 +100,8 @@ public class OrderScreen extends Actor {
     public void draw(Batch batch, float parentAlpha) {
         // Draw your popup's content here.
         if (visible) {
-                stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
-                stage.draw();
+            stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
+            stage.draw();
         }
     }
 

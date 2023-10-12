@@ -32,30 +32,22 @@ public class TestScreen implements Screen  {
         batch = new SpriteBatch();
         //font = new BitmapFont(Gdx.files.internal("myFont.fnt"), Gdx.files.internal("myFont.png"), false);
         font = new BitmapFont();
-
         // Set font color and scale
         font.setColor(1, 1, 0, 1);
         font.getData().setScale(3);
-
         img = new Texture(Gdx.files.internal("IMG_0339.PNG"));
-
         glyphLayout = new GlyphLayout();
         stage = new Stage();
         Gdx.input.setInputProcessor(stage);
-
         ScreenUtils.clear(1, 0.8f, 1, 1);
-
         BitmapFont font = new BitmapFont();
         TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
-
         font.getData().setScale(1.5f);
         textButtonStyle.font = font;
         textButtonStyle.fontColor = Color.BLACK;
-
         Gdx.input.setInputProcessor(stage);
         //TitleScreen titleScreen = new TitleScreen(game);
         Pixmap backgroundPixmap = createRoundedRectanglePixmap(300, 120, 15, Color.valueOf("98FF98")); // Light green color
-
         textButtonStyle.up = new TextureRegionDrawable(new TextureRegion(new Texture(backgroundPixmap)));
 
         TextButton button = new TextButton("Select Level", textButtonStyle);

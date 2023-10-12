@@ -4,8 +4,10 @@ import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.ScreenUtils;
 import java.util.concurrent.TimeUnit;
 
@@ -15,6 +17,9 @@ public class GameScreen extends ApplicationAdapter implements Screen {
     Texture img;
     private Game game;
     private Stage stage;
+    private Skin skin;
+    private ShapeRenderer shapeRenderer;
+    private Popup popup;
 
     Player player;
     KeyProcessor keyProcessor;
@@ -28,6 +33,7 @@ public class GameScreen extends ApplicationAdapter implements Screen {
     int move = 0;
 
     public GameScreen(final Game game) {
+        popup = new Popup();
         stage = new Stage();
         this.game = game;
         batch = new SpriteBatch();
@@ -56,22 +62,34 @@ public class GameScreen extends ApplicationAdapter implements Screen {
         float deltaTime =  Gdx.graphics.getDeltaTime();
 
         //implement KeyProcessor
-        if (keyProcessor.upPressed) {
-            y += SPEED * deltaTime;
-            move = 0;
-        } else if (keyProcessor.downPressed) {
-            y -= SPEED * deltaTime;
-            move = 1;
-        } else if (keyProcessor.leftPressed) {
-            x -= SPEED * deltaTime;
-            move = 2;
-        } else if (keyProcessor.rightPressed) {
-            x += SPEED * deltaTime;
-            move = 3;
+
+        // Handle player movement
+        if (!popup.isVisible()) {
+            if (keyProcessor.upPressed) {
+                y += SPEED * deltaTime;
+                move = 0;
+            } else if (keyProcessor.downPressed) {
+                y -= SPEED * deltaTime;
+                move = 1;
+            } else if (keyProcessor.leftPressed) {
+                x -= SPEED * deltaTime;
+                move = 2;
+            } else if (keyProcessor.rightPressed) {
+                x += SPEED * deltaTime;
+                move = 3;
+            }
         }
 
         batch.begin();
         player.render(batch, x, y, move);
+
+
+
+
+
+
+
+
 
         //ensure sprite stays within screen bounds
         if (x < 0) {
@@ -86,18 +104,7 @@ public class GameScreen extends ApplicationAdapter implements Screen {
             y = screenHeight - player.getHeight();
         }
 
-        if (Gdx.input.isTouched()) {
-            // For example, show the popup when the screen is touched
-            orderScreen.setVisible(true);
-            //Gdx.input.setInputProcessor(keyProcessor);
-        }
-        if (orderScreen.isVisible()) {
-            //Gdx.input.setInputProcessor();
-            orderScreen.draw(batch, 1.0f); // 1.0f is the alpha (opacity)
-        } else {
-            Gdx.input.setInputProcessor(keyProcessor);
 
-        }
         if (!coin.collected) {
             coin.render(batch, 0, 0);
         }
@@ -110,7 +117,16 @@ public class GameScreen extends ApplicationAdapter implements Screen {
         }
         // Gdx.input.setInputProcessor(keyProcessor);
 
+        if (Gdx.input.isTouched()) {
+            popup.show();
+            Gdx.input.setInputProcessor(popup.getStage());
+        }
 
+        if (popup.isVisible()) {
+            popup.render();
+        } else {
+            Gdx.input.setInputProcessor(keyProcessor); // Enable arrow key input
+        }
 
         batch.end();
 
