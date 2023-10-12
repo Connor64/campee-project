@@ -68,7 +68,7 @@ public class TitleScreen implements Screen {
         button.addListener(new InputListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 // Switch to another screen when the button is clicked
-                game.setScreen(new TestScreen(game)); // Change to the screen you want
+                game.setScreen(new GameScreen(game)); // Change to the screen you want
                 return true;
             }
         });
@@ -97,16 +97,16 @@ public class TitleScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        ScreenUtils.clear(1, 0.8f, 1, 1);
-
+        //ScreenUtils.clear(1, 0.8f, 1, 1);
+        ScreenUtils.clear(Color.PINK);
         batch.begin();
         glyphLayout.setText(font, "MOONSHIPS");
         float textX = (Gdx.graphics.getWidth() - glyphLayout.width) / 2;
         float textY = Gdx.graphics.getHeight() * 3 / 4 + glyphLayout.height;
         font.draw(batch, glyphLayout, textX, textY);
 
-        float scaleFactor = 0.7f;
-        float imgWidth = img.getWidth() * scaleFactor;
+        float scaleFactor = 0.2f;
+        float imgWidth = img.getWidth()  * scaleFactor;
         float imgHeight = img.getHeight() * scaleFactor;
         float imgX = (Gdx.graphics.getWidth() - imgWidth) / 2;
         float imgY = 30; // Adjust this value to move the image up or down
