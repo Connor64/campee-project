@@ -28,7 +28,7 @@ public class GameScreen extends ApplicationAdapter implements Screen {
     int move = 0;
 
     public GameScreen(final Game game) {
-        //stage = new Stage();
+        stage = new Stage();
         this.game = game;
         batch = new SpriteBatch();
         keyProcessor = new KeyProcessor();
@@ -40,8 +40,7 @@ public class GameScreen extends ApplicationAdapter implements Screen {
         player = new Player();
         orderScreen = new OrderScreen();
         coin = new Coin();
-        //orderScreen.visible = true;
-        orderScreen.setVisible(true);
+        orderScreen.visible = true;
     }
 
 
@@ -73,7 +72,6 @@ public class GameScreen extends ApplicationAdapter implements Screen {
 
         batch.begin();
         player.render(batch, x, y, move);
-        //coin.render(batch, 0, 0);
 
         //ensure sprite stays within screen bounds
         if (x < 0) {
@@ -110,15 +108,11 @@ public class GameScreen extends ApplicationAdapter implements Screen {
         if (Intersector.overlaps(player.getBounds(), coin.getBounds())) {
             coin.setCollected(true);
         }
-       // Gdx.input.setInputProcessor(keyProcessor);
+        // Gdx.input.setInputProcessor(keyProcessor);
 
 
 
         batch.end();
-
-        if (orderScreen.isVisible()) {
-            orderScreen.draw(batch, 1.0f);
-        }
 
         stage.act(delta);
         stage.draw();
