@@ -23,9 +23,12 @@ public class OrderScreen extends Actor {
     private Stage stage;
     private Table table;
     private TextButton acceptButton;
+    KeyProcessor keyProcessor;
+
     //public PlayerAttributes playerAttributes;
 
     public OrderScreen() {
+        keyProcessor = new KeyProcessor();
 
         //visible = false;
 
@@ -65,6 +68,9 @@ public class OrderScreen extends Actor {
         acceptButton.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y) {
                 visible = false;
+                Gdx.input.setInputProcessor(keyProcessor);
+
+
             }
         });
 
