@@ -24,10 +24,9 @@ public class GameScreen extends ApplicationAdapter implements Screen {
     Coin coin;
     float x;
     float y;
+    int move = 0;
     float screenWidth;
     float screenHeight;
-    int SPEED = 150;
-    int move = 0;
 
     public GameScreen(final Game game) {
         world = new World(new Vector2(0, -10), true);
@@ -58,23 +57,34 @@ public class GameScreen extends ApplicationAdapter implements Screen {
         float deltaTime =  Gdx.graphics.getDeltaTime();
         world.step(1 / 60f, 6, 2);
 
+        int xMove = 0;
+        int yMove = 0;
+
         //implement KeyProcessor
         if (keyProcessor.upPressed) {
-            y += SPEED * deltaTime;
+//            y += SPEED * deltaTime;
+            yMove = 1;
             move = 0;
         } else if (keyProcessor.downPressed) {
-            y -= SPEED * deltaTime;
+//            y -= SPEED * deltaTime;
+            yMove = -1;
             move = 1;
         } else if (keyProcessor.leftPressed) {
-            x -= SPEED * deltaTime;
+//            x -= SPEED * deltaTime;
+            xMove = -1;
             move = 2;
         } else if (keyProcessor.rightPressed) {
-            x += SPEED * deltaTime;
+//            x += SPEED * deltaTime;
+            xMove = 1;
             move = 3;
+        } else {
+            float linearDamping = 2;
+            player.body.setLinearDamping(linearDamping);
+//            player.body.setLinearVelocity(0, 0);
         }
 
         batch.begin();
-        player.render(batch, x, y, move);
+        player.render(batch, xMove, yMove, move);
 
         //ensure sprite stays within screen bounds
         if (x < 0) {
@@ -92,8 +102,7 @@ public class GameScreen extends ApplicationAdapter implements Screen {
         if (!coin.collected) {
             coin.render(batch, 5, 5);
         }
-        System.out.println("player: \n" + player.getBounds());
-        System.out.println("coin: \n" + coin.getBounds());
+
         if (Intersector.overlaps(player.getBounds(), coin.getBounds())) {
             coin.setCollected(true);
         }
