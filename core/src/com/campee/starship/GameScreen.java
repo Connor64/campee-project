@@ -88,20 +88,30 @@ public class GameScreen extends ApplicationAdapter implements Screen {
             y = screenHeight - player.getHeight();
         }
 
+        if (Gdx.input.isTouched()) {
+            // For example, show the popup when the screen is touched
+            orderScreen.setVisible(true);
+            //Gdx.input.setInputProcessor(keyProcessor);
+        }
+        if (orderScreen.isVisible()) {
+            //Gdx.input.setInputProcessor();
+            orderScreen.draw(batch, 1.0f); // 1.0f is the alpha (opacity)
+        } else {
+            Gdx.input.setInputProcessor(keyProcessor);
+
+        }
         if (!coin.collected) {
             coin.render(batch, 0, 0);
         }
 
-        if (Gdx.input.isTouched()) {
-            // For example, show the popup when the screen is touched
-            orderScreen.setVisible(true);
-        }
-        if (orderScreen.isVisible()) {
-            orderScreen.draw(batch, 1.0f); // 1.0f is the alpha (opacity)
-        }
+
+
+
         if (Intersector.overlaps(player.getBounds(), coin.getBounds())) {
             coin.setCollected(true);
         }
+       // Gdx.input.setInputProcessor(keyProcessor);
+
 
 
         batch.end();
