@@ -76,7 +76,7 @@ public class TitleScreen implements Screen {
         stage.addActor(button);
     }
 
-    private Pixmap createRoundedRectanglePixmap(int width, int height, int cornerRadius, Color color) {
+    public Pixmap createRoundedRectanglePixmap(int width, int height, int cornerRadius, Color color) {
         Pixmap pixmap = new Pixmap(width, height, Pixmap.Format.RGBA8888);
         pixmap.setColor(color);
 
@@ -111,7 +111,6 @@ public class TitleScreen implements Screen {
         float imgX = (Gdx.graphics.getWidth() - imgWidth) / 2;
         float imgY = 30; // Adjust this value to move the image up or down
         batch.draw(img, imgX, imgY, imgWidth, imgHeight);
-
 
         batch.end();
         stage.act(delta);

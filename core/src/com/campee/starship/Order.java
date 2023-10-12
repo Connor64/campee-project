@@ -25,7 +25,7 @@ public class Order implements Screen {
         textButtonStyle.font = font;
 
         textButtonStyle.fontColor = Color.BLACK;
-        TextButton button = new TextButton("Click to turn green", textButtonStyle);
+        TextButton button = new TextButton("POKE ME", textButtonStyle);
         button.setColor(Color.WHITE);
         button.setPosition(250, 250);
         button.addListener(new InputListener() {
