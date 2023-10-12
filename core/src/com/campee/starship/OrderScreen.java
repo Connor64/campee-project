@@ -15,20 +15,22 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
 public class OrderScreen extends Actor {
     public boolean visible;
     private Stage stage;
     private Table table;
-    public PlayerAttributes playerAttributes;
+    private TextButton acceptButton;
+    //public PlayerAttributes playerAttributes;
 
     public OrderScreen() {
 
-        visible = false;
+        //visible = false;
 
         // Create a stage with a FitViewport for managing UI elements
-        stage = new Stage(new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
+        stage = new Stage(new FitViewport((float)Gdx.graphics.getWidth(), (float)Gdx.graphics.getHeight()));
 
         // Create a table to organize UI elements
         table = new Table();
@@ -48,23 +50,28 @@ public class OrderScreen extends Actor {
 
         // Create a NinePatch from the background texture
         NinePatchDrawable backgroundDrawable = new NinePatchDrawable(new NinePatch(backgroundTexture, 10, 10, 10, 10));
-        table.setBackground(backgroundDrawable);
+        this.table.setBackground(backgroundDrawable);
 
         // Create and configure your popup's content, buttons, and options.
-        TextButton closeButton = new TextButton("Accept", textButtonStyle); // Replace 'skin' with your skin instance.
-        table.add(closeButton).pad(10);
+        TextButton.TextButtonStyle acceptButtonStyle = new TextButton.TextButtonStyle();
+        acceptButtonStyle.font = new BitmapFont();
+        acceptButtonStyle.fontColor = Color.BLACK;
 
-        closeButton.addListener(new ClickListener() {
-            @Override
+        Pixmap buttonBackground = createRoundedRectanglePixmap(200, 80, 15, Color.LIGHT_GRAY);
+
+        acceptButtonStyle.up = new TextureRegionDrawable(new Texture(buttonBackground));
+
+        acceptButton = new TextButton("Accept", acceptButtonStyle); // Replace 'skin' with your skin instance.
+        acceptButton.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y) {
-                // Handle the close button click.
                 visible = false;
             }
         });
 
+        this.table.add(acceptButton).pad(10.0F);
+        Gdx.input.setInputProcessor(this.stage);
+        this.stage.addActor(this.table);
 
-        Gdx.input.setInputProcessor(stage);
-        stage.addActor(table);
     }
 
     public Pixmap createRoundedRectanglePixmap(int width, int height, int cornerRadius, Color color) {
