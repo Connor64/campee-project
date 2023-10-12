@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.physics.box2d.World;
 
 public class Player extends GameObject {
     private TextureRegion region;
@@ -20,12 +21,12 @@ public class Player extends GameObject {
 
     String spritePath = "";
 
-    public Player () {
+    public Player (World world, float x, float y) {
         // constructor for new player object
-//        dimension.set(0.5f, 0.5f);
-
+        super(world, x, y);
         // set bounds for collision detection
-        bounds.set(0, 0, dimension.x, dimension.y);
+        dimension.set(0.5f, 0.5f);
+        setBounds(0, 0, dimension.x, dimension.y);
 
         upTexture = new Texture(Gdx.files.internal("moonship_up.PNG"));
         downTexture = new Texture(Gdx.files.internal("moonship_down.PNG"));
@@ -45,10 +46,11 @@ public class Player extends GameObject {
         texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         TextureRegion region = new TextureRegion(texture, 0, 0, 32, 32);
         sprite = new Sprite(region);
-//        sprite.setOrigin(16,16);
         sprite.setSize(125, 125);
         sprite.setOrigin(sprite.getX() / 2,sprite.getY() / 2);
         sprite.setPosition(0, 0);
+        this.setHeight(sprite.getHeight());
+        this.setWidth(sprite.getWidth());
     }
 
     public void render(SpriteBatch batch, float x, float y, int spriteNum) {
@@ -56,29 +58,8 @@ public class Player extends GameObject {
         setSprite(spriteNum);
         // render position of player
         sprite.setPosition(x, y);
-        bounds.set(sprite.getX(), sprite.getY(), sprite.getWidth(), sprite.getHeight());
+        sprite.setBounds(sprite.getX(), sprite.getY(), sprite.getWidth(), sprite.getHeight());
+        setBounds(x, y, getWidth(), getHeight());
         sprite.draw(batch);
-    }
-
-    public Rectangle getBounds() {
-        return bounds;
-    }
-
-    public float getX() {
-        float x = sprite.getX();
-        return x;
-    }
-
-    public float getY() {
-        float y = sprite.getY();
-        return y;
-    }
-
-    public float getHeight() {
-        return sprite.getHeight();
-    }
-
-    public float getWidth() {
-        return sprite.getWidth();
     }
 }

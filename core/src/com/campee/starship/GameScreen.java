@@ -5,6 +5,9 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Intersector;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.ScreenUtils;
 
@@ -13,6 +16,8 @@ public class GameScreen extends ApplicationAdapter implements Screen {
     Texture img;
     private Game game;
     private Stage stage;
+    private World world;
+    private Box2DDebugRenderer debugRenderer;
 
     Player player;
     KeyProcessor keyProcessor;
@@ -25,6 +30,11 @@ public class GameScreen extends ApplicationAdapter implements Screen {
     int move = 0;
 
     public GameScreen(final Game game) {
+        world = new World(new Vector2(0, -10), true);
+        debugRenderer = new Box2DDebugRenderer();
+        x = 100;
+        y = 100;
+
         stage = new Stage();
         this.game = game;
         batch = new SpriteBatch();
@@ -32,13 +42,10 @@ public class GameScreen extends ApplicationAdapter implements Screen {
         Gdx.input.setInputProcessor(keyProcessor);
         screenWidth = Gdx.graphics.getWidth();
         screenHeight = Gdx.graphics.getHeight();
-        x = 100;
-        y = 100;
-        player = new Player();
-        coin = new Coin();
+
+        player = new Player(world, x, y);
+        coin = new Coin(world, x, y);
     }
-
-
 
     @Override
     public void show() {
@@ -49,6 +56,7 @@ public class GameScreen extends ApplicationAdapter implements Screen {
     public void render(float delta) {
         ScreenUtils.clear(Color.PINK);
         float deltaTime =  Gdx.graphics.getDeltaTime();
+        world.step(1 / 60f, 6, 2);
 
         //implement KeyProcessor
         if (keyProcessor.upPressed) {
@@ -82,8 +90,10 @@ public class GameScreen extends ApplicationAdapter implements Screen {
         }
 
         if (!coin.collected) {
-            coin.render(batch, 0, 0);
+            coin.render(batch, 5, 5);
         }
+        System.out.println("player: \n" + player.getBounds());
+        System.out.println("coin: \n" + coin.getBounds());
         if (Intersector.overlaps(player.getBounds(), coin.getBounds())) {
             coin.setCollected(true);
         }
