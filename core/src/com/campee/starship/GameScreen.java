@@ -7,6 +7,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.ScreenUtils;
+import java.util.concurrent.TimeUnit;
+
 
 public class GameScreen extends ApplicationAdapter implements Screen {
     SpriteBatch batch;
@@ -16,6 +18,7 @@ public class GameScreen extends ApplicationAdapter implements Screen {
 
     Player player;
     KeyProcessor keyProcessor;
+    OrderScreen orderScreen;
     Coin coin;
     float x;
     float y;
@@ -35,7 +38,9 @@ public class GameScreen extends ApplicationAdapter implements Screen {
         x = 100;
         y = 100;
         player = new Player();
+        orderScreen = new OrderScreen();
         coin = new Coin();
+        orderScreen.visible = true;
     }
 
 
@@ -84,10 +89,20 @@ public class GameScreen extends ApplicationAdapter implements Screen {
         if (!coin.collected) {
             coin.render(batch, 0, 0);
         }
+
+        if (Gdx.input.isTouched()) {
+            // For example, show the popup when the screen is touched
+            orderScreen.setVisible(true);
+        }
         if (Intersector.overlaps(player.getBounds(), coin.getBounds())) {
             coin.setCollected(true);
         }
+
+
         batch.end();
+        if (orderScreen.isVisible()) {
+            orderScreen.draw(batch, 1.0f); // 1.0f is the alpha (opacity)
+        }
         stage.act(delta);
         stage.draw();
 
@@ -95,7 +110,7 @@ public class GameScreen extends ApplicationAdapter implements Screen {
 
     @Override
     public void hide() {
-
+        orderScreen.setVisible(false);
     }
 
     @Override

@@ -13,17 +13,17 @@ import com.badlogic.gdx.utils.ScreenUtils;
 
 public class MoonshipGame extends Game {
     //GameScreen gameScreen;
-	//private Order order;
-	private TitleScreen titleScreen;
-	//private TestScreen testScreen;
+	//private OrderScreen order;
+	//private TitleScreen titleScreen;
+	private TestScreen testScreen;
 
 	@Override
 	public void create() {
-		titleScreen = new TitleScreen(this);
-		//testScreen = new TestScreen(this);
-		//order = new Order(this);
+		//titleScreen = new TitleScreen(this);
+		testScreen = new TestScreen(this);
+		//order = new OrderScreen(this);
 		//gameScreen = new GameScreen(this);
-		setScreen(titleScreen);
+		setScreen(testScreen);
 	}
 
 }
