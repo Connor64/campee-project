@@ -29,6 +29,7 @@ public class GameScreen extends ApplicationAdapter implements Screen {
     KeyProcessor keyProcessor;
     OrderScreen orderScreen;
     Coin coin;
+    Order order;
     float x;
     float y;
     float screenWidth;
@@ -38,7 +39,8 @@ public class GameScreen extends ApplicationAdapter implements Screen {
 
     public GameScreen(final Game game) {
         test = 0;
-        popup = new Popup();
+
+
         stage = new Stage();
         this.game = game;
         batch = new SpriteBatch();
@@ -52,6 +54,8 @@ public class GameScreen extends ApplicationAdapter implements Screen {
         orderScreen = new OrderScreen();
         coin = new Coin();
         orderScreen.visible = false;
+        order = new Order(stage, game, 0, null, null, 0 );
+        popup = new Popup(order.toString());
     }
 
 

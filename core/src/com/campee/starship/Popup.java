@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
@@ -21,8 +22,9 @@ public class Popup {
     public boolean visible;
     private ShapeRenderer shapeRenderer;
     private BitmapFont font;
+    private Label messageLabel;
 
-    public Popup() {
+    public Popup(String notificationMessage) {
         stage = new Stage();
         shapeRenderer = new ShapeRenderer();
         visible = false;
@@ -32,6 +34,11 @@ public class Popup {
         // Set font color and scale
         font.setColor(1, 1, 0, 1);
         font.getData().setScale(1.5f);
+
+        messageLabel = new Label(notificationMessage, new Label.LabelStyle(font, Color.WHITE));
+        messageLabel.setFontScale(1.5f);
+        messageLabel.setPosition(Gdx.graphics.getWidth() / 2 - messageLabel.getWidth() / 2, Gdx.graphics.getHeight() / 2 + 100);
+
 
 
         Pixmap acceptBackgroundPixmap = createRoundedRectanglePixmap(200, 50, 10, Color.GREEN); // Adjust size and color
@@ -83,6 +90,11 @@ public class Popup {
         // Add buttons to the stage
         stage.addActor(acceptButton);
         stage.addActor(declineButton);
+        stage.addActor(messageLabel);
+    }
+
+    public void setMessage(String message) {
+        messageLabel.setText(message);
     }
 
     public void show() {
