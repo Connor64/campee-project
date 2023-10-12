@@ -21,26 +21,34 @@ public class Popup {
     private boolean visible;
     private ShapeRenderer shapeRenderer;
     private BitmapFont font;
-    private GlyphLayout glyphLayout;
 
     public Popup() {
         stage = new Stage();
         shapeRenderer = new ShapeRenderer();
 
         font = new BitmapFont();
+
         // Set font color and scale
         font.setColor(1, 1, 0, 1);
-        font.getData().setScale(3);
-        glyphLayout = new GlyphLayout();
-
-        TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
         font.getData().setScale(1.5f);
-        textButtonStyle.font = font;
-        textButtonStyle.fontColor = Color.BLACK;
+
+
+        Pixmap acceptBackgroundPixmap = createRoundedRectanglePixmap(200, 50, 10, Color.GREEN); // Adjust size and color
+        TextButton.TextButtonStyle acceptButtonStyle = new TextButton.TextButtonStyle();
+        acceptButtonStyle.font = font;
+        acceptButtonStyle.fontColor = Color.BLACK;
+        acceptButtonStyle.up = new TextureRegionDrawable(new TextureRegion(new Texture(acceptBackgroundPixmap)));
+
+
+        Pixmap declineBackgroundPixmap = createRoundedRectanglePixmap(200, 50, 10, Color.RED); // Adjust size and color
+        TextButton.TextButtonStyle declineButtonStyle = new TextButton.TextButtonStyle();
+        declineButtonStyle.font = font;
+        declineButtonStyle.fontColor = Color.BLACK;
+        declineButtonStyle.up = new TextureRegionDrawable(new TextureRegion(new Texture(declineBackgroundPixmap)));
 
         // Create buttons
-        TextButton acceptButton = new TextButton("Accept", textButtonStyle);
-        TextButton declineButton = new TextButton("Decline", textButtonStyle);
+        TextButton acceptButton = new TextButton("Accept", acceptButtonStyle);
+        TextButton declineButton = new TextButton("Decline", declineButtonStyle);
 
         acceptButton.setWidth(100);
         acceptButton.setHeight(50);
@@ -105,5 +113,20 @@ public class Popup {
             stage.act();
             stage.draw();
         }
+    }
+
+    public Pixmap createRoundedRectanglePixmap(int width, int height, int cornerRadius, Color color) {
+        Pixmap pixmap = new Pixmap(width, height, Pixmap.Format.RGBA8888);
+        pixmap.setColor(color);
+
+        // Draw rounded rectangle
+        pixmap.fillRectangle(cornerRadius, 0, width - 2 * cornerRadius, height);
+        pixmap.fillRectangle(0, cornerRadius, width, height - 2 * cornerRadius);
+        pixmap.fillCircle(cornerRadius, cornerRadius, cornerRadius);
+        pixmap.fillCircle(cornerRadius, height - cornerRadius - 1, cornerRadius);
+        pixmap.fillCircle(width - cornerRadius - 1, cornerRadius, cornerRadius);
+        pixmap.fillCircle(width - cornerRadius - 1, height - cornerRadius - 1, cornerRadius);
+
+        return pixmap;
     }
 }
