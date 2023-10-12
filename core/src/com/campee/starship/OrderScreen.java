@@ -68,7 +68,8 @@ public class OrderScreen extends Actor {
         acceptButton.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y) {
                 visible = false;
-                Gdx.input.setInputProcessor(keyProcessor);
+                //Gdx.input.setInputProcessor(keyProcessor);
+
 
 
             }
