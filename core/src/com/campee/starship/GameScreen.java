@@ -15,9 +15,12 @@ public class GameScreen extends ApplicationAdapter implements Screen {
     private Stage stage;
 
     Player player;
+    KeyProcessor keyProcessor;
     Coin coin;
     float x;
     float y;
+    float screenWidth;
+    float screenHeight;
     int SPEED = 150;
     int move = 0;
 
@@ -25,6 +28,10 @@ public class GameScreen extends ApplicationAdapter implements Screen {
         stage = new Stage();
         this.game = game;
         batch = new SpriteBatch();
+        keyProcessor = new KeyProcessor();
+        Gdx.input.setInputProcessor(keyProcessor);
+        screenWidth = Gdx.graphics.getWidth();
+        screenHeight = Gdx.graphics.getHeight();
         x = 100;
         y = 100;
         player = new Player();
@@ -40,30 +47,40 @@ public class GameScreen extends ApplicationAdapter implements Screen {
 
     @Override
     public void render(float delta) {
-        //ScreenUtils.clear(Color.PINK);
-
-
         ScreenUtils.clear(Color.PINK);
+        float deltaTime =  Gdx.graphics.getDeltaTime();
 
-        if (Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W)) {
-            y += SPEED * Gdx.graphics.getDeltaTime();
+        //implement KeyProcessor
+        if (keyProcessor.upPressed) {
+            y += SPEED * deltaTime;
             move = 0;
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S)) {
-            y -= SPEED * Gdx.graphics.getDeltaTime();
+        } else if (keyProcessor.downPressed) {
+            y -= SPEED * deltaTime;
             move = 1;
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A)) {
-            x -= SPEED * Gdx.graphics.getDeltaTime();
+        } else if (keyProcessor.leftPressed) {
+            x -= SPEED * deltaTime;
             move = 2;
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D)) {
-            x += SPEED * Gdx.graphics.getDeltaTime();
+        } else if (keyProcessor.rightPressed) {
+            x += SPEED * deltaTime;
             move = 3;
         }
-//		batch.draw(img, 400 - (img.getWidth() / 2), 300 - (img.getHeight() / 2));
+
         batch.begin();
         player.render(batch, x, y, move);
+
+        //ensure sprite stays within screen bounds
+        if (x < 0) {
+            x = 0;
+        } else if (x > screenWidth - player.getWidth()) {
+            x = screenWidth - player.getWidth();
+        }
+
+        if (y < 0) {
+            y = 0;
+        } else if (y > screenHeight - player.getHeight()) {
+            y = screenHeight - player.getHeight();
+        }
+
         if (!coin.collected) {
             coin.render(batch, 0, 0);
         }
