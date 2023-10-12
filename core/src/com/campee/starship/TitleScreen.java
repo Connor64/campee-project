@@ -17,6 +17,8 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class TitleScreen implements Screen {
     private Game game;
@@ -25,6 +27,8 @@ public class TitleScreen implements Screen {
     private GlyphLayout glyphLayout;
     private Texture img;
     private Stage stage;
+    private ExtendViewport viewport;
+    private TextButton button;
 
     public TitleScreen(final Game game) {
         this.game = game;
@@ -39,16 +43,17 @@ public class TitleScreen implements Screen {
         img = new Texture(Gdx.files.internal("IMG_0339.PNG"));
 
         glyphLayout = new GlyphLayout();
-        stage = new Stage();
+        viewport = new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        stage = new Stage(viewport);
         Gdx.input.setInputProcessor(stage);
 
         ScreenUtils.clear(1, 0.8f, 1, 1);
 
-        BitmapFont font = new BitmapFont();
+        BitmapFont buttonFont = new BitmapFont();
         TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
 
-        font.getData().setScale(1.5f);
-        textButtonStyle.font = font;
+        buttonFont.getData().setScale(1.5f);
+        textButtonStyle.font = buttonFont;
         textButtonStyle.fontColor = Color.BLACK;
 
         // Create a pixmap for the background (rounded rectangle)
@@ -57,14 +62,17 @@ public class TitleScreen implements Screen {
         // Set the background of the button
         textButtonStyle.up = new TextureRegionDrawable(new TextureRegion(new Texture(backgroundPixmap)));
 
-        TextButton button = new TextButton("PLAY", textButtonStyle);
+        button = new TextButton("PLAY", textButtonStyle);
         button.setColor(Color.WHITE);
-        float buttonWidth = 200;
-        float buttonHeight = 80;
-        float buttonX = (Gdx.graphics.getWidth() - buttonWidth) / 2;
-        float buttonY = (Gdx.graphics.getHeight() - buttonHeight + 100) / 2;
-        button.setPosition(buttonX, buttonY);
-        button.setSize(buttonWidth, buttonHeight);
+
+        updateButtonPosition();
+
+        //float buttonWidth = 200;
+        //float buttonHeight = 80;
+        //float buttonX = (Gdx.graphics.getWidth() - buttonWidth) / 2;
+        //float buttonY = (Gdx.graphics.getHeight() - buttonHeight + 100) / 2;
+        //button.setPosition(buttonX, buttonY);
+        //button.setSize(buttonWidth, buttonHeight);
         button.addListener(new InputListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 // Switch to another screen when the button is clicked
@@ -74,6 +82,15 @@ public class TitleScreen implements Screen {
         });
 
         stage.addActor(button);
+    }
+
+    private void updateButtonPosition() {
+        float buttonWidth = 200;
+        float buttonHeight = 80;
+        float buttonX = (viewport.getWorldWidth() - buttonWidth) / 2;
+        float buttonY = (viewport.getWorldHeight() - buttonHeight + 100) / 2;
+        button.setPosition(buttonX, buttonY);
+        button.setSize(buttonWidth, buttonHeight);
     }
 
     public Pixmap createRoundedRectanglePixmap(int width, int height, int cornerRadius, Color color) {
@@ -99,16 +116,18 @@ public class TitleScreen implements Screen {
     public void render(float delta) {
         //ScreenUtils.clear(1, 0.8f, 1, 1);
         ScreenUtils.clear(Color.PINK);
+        batch.setProjectionMatrix(viewport.getCamera().combined);
+
         batch.begin();
         glyphLayout.setText(font, "MOONSHIPS");
-        float textX = (Gdx.graphics.getWidth() - glyphLayout.width) / 2;
-        float textY = Gdx.graphics.getHeight() * 3 / 4 + glyphLayout.height;
+        float textX = (viewport.getWorldWidth() - glyphLayout.width) / 2;
+        float textY = viewport.getWorldHeight() * 3 / 4 + glyphLayout.height;
         font.draw(batch, glyphLayout, textX, textY);
 
         float scaleFactor = 0.2f;
         float imgWidth = img.getWidth()  * scaleFactor;
         float imgHeight = img.getHeight() * scaleFactor;
-        float imgX = (Gdx.graphics.getWidth() - imgWidth) / 2;
+        float imgX = (viewport.getWorldWidth() - imgWidth) / 2;
         float imgY = 30; // Adjust this value to move the image up or down
         batch.draw(img, imgX, imgY, imgWidth, imgHeight);
 
@@ -119,6 +138,8 @@ public class TitleScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
+        viewport.update(width, height, true);
+        updateButtonPosition();
     }
 
     @Override
