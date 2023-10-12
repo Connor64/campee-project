@@ -29,8 +29,8 @@ public class TitleScreen implements Screen {
     public TitleScreen(final Game game) {
         this.game = game;
         batch = new SpriteBatch();
-        //font = new BitmapFont(Gdx.files.internal("myFont.fnt"), Gdx.files.internal("myFont.png"), false);
-        font = new BitmapFont();
+        font = new BitmapFont(Gdx.files.internal("moonships_font.fnt"), Gdx.files.internal("moonships_font.png"), false);
+        //font = new BitmapFont();
 
         // Set font color and scale
         font.setColor(1, 1, 0, 1);
