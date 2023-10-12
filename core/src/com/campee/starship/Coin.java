@@ -34,9 +34,8 @@ public class Coin extends GameObject {
     }
 
     public void render(SpriteBatch batch, int x, int y) {
-        // render sprite in x,y position
+        // render sprite in x, y position
         sprite.setPosition(x, y);
-//        bounds.set(sprite.getX(), sprite.getY(), sprite.getWidth(), sprite.getHeight());
         setBounds(x, y, getWidth(), getHeight());
         sprite.draw(batch);
     }

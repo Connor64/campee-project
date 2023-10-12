@@ -12,7 +12,7 @@ import com.badlogic.gdx.physics.box2d.*;
 public class Player extends GameObject {
     public Body body;
     private TextureRegion region;
-    private Sprite sprite;
+    public Sprite sprite;
     private int xMove;
     private int yMove;
     private int move;
@@ -46,8 +46,8 @@ public class Player extends GameObject {
         body.createFixture(fixtureDef);
 
         body.setUserData(this);
-        System.out.println("gravity: " + body.getGravityScale());
         body.setGravityScale(0);
+
 
         shape.dispose();
 
@@ -56,11 +56,18 @@ public class Player extends GameObject {
         leftTexture = new Texture(Gdx.files.internal("moonship_left.PNG"));
         rightTexture = new Texture(Gdx.files.internal("moonship_right.PNG"));
 
+
+
         textures = new Texture[4];
         textures[0] = upTexture;
         textures[1] = downTexture;
         textures[2] = leftTexture;
         textures[3] = rightTexture;
+
+        texture = textures[2];
+        texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        TextureRegion region = new TextureRegion(texture, 0, 0, 32, 32);
+        sprite = new Sprite(region);
     }
 
     public void setLinearDamping(float damping) {
@@ -81,10 +88,9 @@ public class Player extends GameObject {
     }
 
 
-    public void render(SpriteBatch batch, float x, float y, int spriteNum) {
+    public void render(SpriteBatch batch, float moveX, float moveY, int spriteNum) {
         // pushes the player
-        body.applyForceToCenter(1000 * x, 1000 * y,  true);
-
+        body.applyForceToCenter(1000 * moveX, 1000 * moveY,  true);
         // re-render sprite using movement indicator (spriteNum)
         setSprite(spriteNum);
 

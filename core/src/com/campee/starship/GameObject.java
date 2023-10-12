@@ -81,4 +81,5 @@ public class GameObject {
     public float getWidth() {
         return width;
     }
+
 }
