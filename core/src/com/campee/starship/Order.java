@@ -14,6 +14,9 @@ import com.badlogic.gdx.utils.ScreenUtils;
 public class Order implements Screen {
     private Stage stage;
     private Game game;
+    private int orderID;
+    private String pickupLocation;
+    private String dropoffLocation;
 
     public Order(final Game game) {
         this.game = game;
