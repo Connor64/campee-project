@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Intersector;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
@@ -54,38 +55,30 @@ public class GameScreen extends ApplicationAdapter implements Screen {
     @Override
     public void render(float delta) {
         ScreenUtils.clear(Color.PINK);
-        float deltaTime =  Gdx.graphics.getDeltaTime();
         world.step(1 / 60f, 6, 2);
 
-        int xMove = 0;
-        int yMove = 0;
+        float xMove = 0;
+        float yMove = 0;
 
         //implement KeyProcessor
         if (keyProcessor.upPressed) {
-//            y += SPEED * deltaTime;
             yMove = 1;
             move = 0;
         } else if (keyProcessor.downPressed) {
-//            y -= SPEED * deltaTime;
             yMove = -1;
             move = 1;
         } else if (keyProcessor.leftPressed) {
-//            x -= SPEED * deltaTime;
             xMove = -1;
             move = 2;
         } else if (keyProcessor.rightPressed) {
-//            x += SPEED * deltaTime;
             xMove = 1;
             move = 3;
         } else {
             float linearDamping = 2;
             player.body.setLinearDamping(linearDamping);
-//            player.body.setLinearVelocity(0, 0);
         }
 
-        batch.begin();
-        player.render(batch, xMove, yMove, move);
-
+        // player still goes out of bounds, this  code no work now :(
         //ensure sprite stays within screen bounds
         if (x < 0) {
             x = 0;
@@ -98,6 +91,10 @@ public class GameScreen extends ApplicationAdapter implements Screen {
         } else if (y > screenHeight - player.getHeight()) {
             y = screenHeight - player.getHeight();
         }
+
+        batch.begin();
+        player.render(batch, xMove, yMove, move);
+
 
         if (!coin.collected) {
             coin.render(batch, 5, 5);

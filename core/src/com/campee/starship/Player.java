@@ -82,7 +82,8 @@ public class Player extends GameObject {
 
 
     public void render(SpriteBatch batch, float x, float y, int spriteNum) {
-        body.applyForceToCenter(1000 * x, 1000 * y,  true); // pushes the player
+        // pushes the player
+        body.applyForceToCenter(1000 * x, 1000 * y,  true);
 
         // re-render sprite using movement indicator (spriteNum)
         setSprite(spriteNum);
