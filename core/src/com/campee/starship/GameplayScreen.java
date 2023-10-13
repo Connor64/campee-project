@@ -16,6 +16,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.Screen;
 
+import java.util.ArrayList;
+
 public class GameplayScreen implements Screen {
 
     private TextButton backButton;
@@ -52,7 +54,7 @@ public class GameplayScreen implements Screen {
         camera.update();
 
         // For testing
-        currentOrder = new Order(stage, game, 01, "Cosi", "walc", 7.00);
+        currentOrder = new Order(stage, game, 01, "Cosi", "walc", 7, new ArrayList<String>());
         popup = new Popup(this, currentOrder.toString());
         playerAttributes = new PlayerAttributes();
 

@@ -1,7 +1,11 @@
 package com.campee.starship;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Queue;
+import java.util.Scanner;
+
 //please work
 public class PlayerAttributes {
     public boolean orderInProgress;
@@ -9,6 +13,7 @@ public class PlayerAttributes {
     public int score;
     public Queue<String> orderQueue;
     public ArrayList<String> array;
+
 
     public PlayerAttributes(boolean orderInProgress, int highScore, int score, Queue<String> orderQueue, ArrayList<String> array) {
         this.orderInProgress = orderInProgress;
@@ -26,16 +31,18 @@ public class PlayerAttributes {
         this.score = 0;
         this.orderQueue = null;
         this.array = new ArrayList<>();
-        array.add("Queue");
+        //array.add("Queue");
     }
 
     public ArrayList<String> getArray() {
         return array;
     }
 
-    public void setArray(ArrayList<String> array) {
+    public void setArray(ArrayList<String> array)  {
         this.array = array;
     }
+
+
 
     public boolean isOrderInProgress() {
         return orderInProgress;
@@ -77,5 +84,4 @@ public class PlayerAttributes {
         orderQueue.remove(order);
     }
 }
-
 
