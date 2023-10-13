@@ -268,17 +268,17 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         // visual indicator that the player is almost off the screen
         if (!popup.isVisible()) {
             // warning only visible when popup is not
-            if (playerLeft <= -levelWidth + threshold) {
-                label.setPosition(screenBounds.getWidth() - (screenBounds.getWidth() - label.getWidth()), screenBounds.getHeight() / 2);
+            if (playerLeft <= -(levelWidth - sidePanelWidth) + threshold) {
+                label.setPosition(levelWidth- (levelWidth - label.getWidth()), levelHeight / 2);
                 label.setVisible(true);
-            } else if (playerRight >= levelWidth - threshold) {
-                label.setPosition((screenBounds.getWidth() - (3 * label.getWidth())), screenBounds.getHeight() / 2);
+            } else if (playerRight >= (levelWidth - sidePanelWidth) - threshold) {
+                label.setPosition((levelWidth - (3 * label.getWidth())), levelHeight / 2);
                 label.setVisible(true);
-            } else if (playerBottom <= -levelHeight + threshold) {
-                label.setPosition(screenBounds.getWidth() / 2, screenBounds.getHeight() - (screenBounds.getHeight() - label.getHeight()));
+            } else if (playerBottom <= (-levelHeight + backButton.getHeight()) + threshold) {
+                label.setPosition(levelWidth / 2, levelHeight - (levelHeight - label.getHeight()));
                 label.setVisible(true);
-            } else if (playerTop >= levelHeight - threshold) {
-                label.setPosition(screenBounds.getWidth() / 2, screenBounds.getHeight() - label.getHeight());
+            } else if (playerTop >= (levelHeight - backButton.getHeight()) - threshold) {
+                label.setPosition(levelWidth / 2, levelHeight - label.getHeight());
                 label.setVisible(true);
             } else {
                 // remove the label
