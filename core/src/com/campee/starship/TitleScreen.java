@@ -83,6 +83,27 @@ public class TitleScreen implements Screen {
         });
 
         stage.addActor(button);
+
+        BitmapFont closeFont = new BitmapFont();
+        TextButton.TextButtonStyle closeButtonStyle = new TextButton.TextButtonStyle();
+        buttonFont.getData().setScale(1.5f);
+        textButtonStyle.font = closeFont;
+        textButtonStyle.fontColor = Color.BLACK;
+        //Pixmap backgroundPixmap = createRoundedRectanglePixmap(150, 60, 15, Color.valueOf("98FF98"));
+        textButtonStyle.up = new TextureRegionDrawable(new TextureRegion(new Texture(backgroundPixmap)));
+        closeButton = new TextButton("CLOSE", textButtonStyle);
+        closeButton.setPosition(10, Gdx.graphics.getHeight() - 50);
+        closeButton.setSize(100, 30);
+        closeButton.addListener(new InputListener() {
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                // Switch back to the title screen when the BACK button is clicked
+//                game.setScreen(new TitleScreen((MoonshipGame) game)); // Change to the screen you want
+//                return true;
+                Gdx.app.exit();
+                return true;
+            }
+        });
+        stage.addActor(closeButton);
     }
 
     private void updateButtonPosition() {
