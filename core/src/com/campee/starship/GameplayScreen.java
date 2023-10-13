@@ -268,17 +268,17 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         // visual indicator that the player is almost off the screen
         if (!popup.isVisible()) {
             // warning only visible when popup is not
-            if (playerLeft <= -levelWidth + threshold) {
-                label.setPosition(screenBounds.getWidth() - (screenBounds.getWidth() - label.getWidth()), screenBounds.getHeight() / 2);
+            if (playerLeft <= -(levelWidth - sidePanelWidth) + threshold) {
+                label.setPosition(levelWidth- (levelWidth - label.getWidth()), levelHeight / 2);
                 label.setVisible(true);
-            } else if (playerRight >= levelWidth - threshold) {
-                label.setPosition((screenBounds.getWidth() - (3 * label.getWidth())), screenBounds.getHeight() / 2);
+            } else if (playerRight >= (levelWidth - sidePanelWidth) - threshold) {
+                label.setPosition((levelWidth - (3 * label.getWidth())), levelHeight / 2);
                 label.setVisible(true);
-            } else if (playerBottom <= -levelHeight + threshold) {
-                label.setPosition(screenBounds.getWidth() / 2, screenBounds.getHeight() - (screenBounds.getHeight() - label.getHeight()));
+            } else if (playerBottom <= (-levelHeight + backButton.getHeight()) + threshold) {
+                label.setPosition(levelWidth / 2, levelHeight - (levelHeight - label.getHeight()));
                 label.setVisible(true);
-            } else if (playerTop >= levelHeight - threshold) {
-                label.setPosition(screenBounds.getWidth() / 2, screenBounds.getHeight() - label.getHeight());
+            } else if (playerTop >= (levelHeight - backButton.getHeight()) - threshold) {
+                label.setPosition(levelWidth / 2, levelHeight - label.getHeight());
                 label.setVisible(true);
             } else {
                 // remove the label
@@ -293,6 +293,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         float newY = player.sprite.getY();
 
         // object collision
+
         rock.sprite.setSize(100, 100);
         rock.sprite.setPosition(300, 300);
         //rock.setBounds(rock.sprite.getX(), rock.sprite.getY(), rock.sprite.getWidth(), rock.sprite.getHeight());
@@ -348,6 +349,39 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 //            //yMove = 1;
 //        }
 
+        /*rock.sprite.setSize(300, 300);
+        rock.sprite.setPosition(300, 300);
+        rock.setBounds(rock.sprite.getX(), rock.sprite.getY(), rock.sprite.getWidth(), rock.sprite.getHeight());
+//        System.out.println(rock.sprite.getX());
+        Rectangle rockBounds = rock.getBounds();
+        float rockLeft = rockBounds.getX();
+        float rockBottom = screenBounds.getY();
+        float rockTop = rockBottom + rockBounds.getHeight();
+        float rockRight = rockLeft + rockBounds.getWidth();
+        if (playerLeft < rockLeft) {
+            // clamp to left
+            newX = rockLeft + halfWidth;
+            player.body.setLinearVelocity(newX, player.body.getLinearVelocity().y);
+            //xMove = 1;
+        } else if (playerRight > rockRight) {
+            // clamp to right
+            newX = rockRight - halfWidth;
+            player.body.setLinearVelocity(-newX, player.body.getLinearVelocity().y);
+            //xMove = 1;
+        }
+        // vertical axis
+        if (playerBottom < rockBottom) {
+            // clamp to bottom
+            newY = rockBottom + halfHeight;
+            player.body.setLinearVelocity(player.body.getLinearVelocity().x, newY);
+            //yMove = 1;
+        } else if (playerTop > rockTop) {
+            // clamp to top
+            newY = rockTop - halfHeight;
+            player.body.setLinearVelocity(player.body.getLinearVelocity().x, -newY);
+            //yMove = 1;
+        }*/
+
 
         /* ========================== DRAW ============================ */
 
@@ -372,20 +406,37 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         if (playerAttributes.array.size() > 1 && !order.isPickedUp()) {
             pickupObject.sprite.draw(batch);
-
+            if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getPickupBounds())) {
+                pickupLabel.setVisible(true);
+                if (keyProcessor.pPressed) {
+                    order.setPickedUp(true);
+                    order.setDroppedOff(false);
+                    pickupLabel.setVisible(false);
+                }
+            } else {
+                pickupLabel.setVisible(false);
+            }
         }
+
         if (playerAttributes.array.size() > 1 && !order.isDroppedOff() && order.isPickedUp()) {
             dropoffObject.sprite.draw(batch);
+            if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getDropoffBounds())) {
+                dropoffLabel.setVisible(true);
+                if (keyProcessor.oPressed) {
+                    order.setPickedUp(false);
+                    order.setDroppedOff(true);
+                    playerAttributes.orderInProgress = false;
+                    playerAttributes.array.remove(1);
+                    dropoffLabel.setVisible(false);
+                }
+            } else {
+                dropoffLabel.setVisible(false);
+            }
         }
-        // order picking up and dropping off
-//        System.out.println("player_x: " + player.getSprite().getX() + ", player_y: " + player.getSprite().getY());
-//        System.out.println("player_y: " + player.getSprite().getY());
+
         if (!order.isPickedUp() && playerAttributes.orderInProgress) {
             pickupObject.sprite.draw(batch);
-//            System.out.println("check 1");
-            // only show order pickup, not dropoff
             if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getPickupBounds())) {
-//                System.out.println("in bounds");
                 pickupLabel.setVisible(true);
                 if (keyProcessor.pPressed) {
                     order.setPickedUp(true);
@@ -396,7 +447,6 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                 pickupLabel.setVisible(false);
             }
         } else if (order.isPickedUp() && !order.isDroppedOff() && playerAttributes.orderInProgress) {
-//            System.out.println("check 2");
             dropoffObject.sprite.draw(batch);
             if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getDropoffBounds())) {
                 dropoffLabel.setVisible(true);
