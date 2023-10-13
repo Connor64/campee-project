@@ -5,7 +5,9 @@ import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Intersector;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
@@ -27,9 +29,13 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     private TextButton nextOrderButton;
 
     private World world;
+    private int levelWidth;
+    private int levelHeight;
 
     private Player player;
     public PlayerAttributes playerAttributes;
+    ArrayList<String> visibleQ;
+
     public Order currentOrder;
     private final Popup popup;
     private Coin coin;
@@ -48,6 +54,17 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
     private PlayerCamera camera;
 
+    private ShapeRenderer shapeRenderer;
+    float sidePanelX;
+    float sidePanelY;
+    float sidePanelWidth;
+    float sidePanelHeight;
+    Color sidePanelColor;
+    BitmapFont font;
+    float screenWidth;
+    float screenHeight;
+
+
     ArrayList<String> arrays;
     String s;
     int count;
@@ -65,9 +82,22 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         world = new World(new Vector2(0, 0), true);
         multiplexer = new InputMultiplexer();
 
+        levelWidth = 500;
+        levelHeight = 500;
+
         player = new Player(world, 150, 200);
         camera = new PlayerCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         camera.update();
+
+        screenWidth = Gdx.graphics.getWidth();
+        screenHeight = Gdx.graphics.getHeight();
+        // Define side panel properties
+        sidePanelWidth = screenWidth / 5; // Width
+        sidePanelX = screenWidth - sidePanelWidth-10; // Position the panel on the right side
+        sidePanelY = 60; // Y position
+        sidePanelHeight = Gdx.graphics.getHeight() - 150; // Height
+        sidePanelColor = new Color(0.2f, 0.2f, 0.2f, 0.8f); // Background color (RGBA)
+
 
         coin = new Coin(world, 0, 0);
         coinCounter = 0;
@@ -78,6 +108,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         playerAttributes = new PlayerAttributes();
         playerAttributes.orderInProgress = false;
 
+        visibleQ = new ArrayList<>();
+        playerAttributes.setArray(visibleQ);
 
         order = new Order();
         arrays = new ArrayList<>();
@@ -123,24 +155,14 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }
-                System.out.println(order.array);
-                order.seti(count);
-                //count++;
-                //orderA = order.arrayToArray();
-                System.out.println(Arrays.toString(orderA));
-                int time = Integer.parseInt(orderA[3]);
-                int id = Integer.parseInt(orderA[0]);
-
-                order = new Order(stage, game, id, orderA[1], orderA[2], time, arrays);
                 order.seti(count);
                 count++;
-                //popup = new Popup(, order.arrayToString());
                 popup.setMessage(order.arrayToString());
 
                 popup.show();
                 popup.render();
                 multiplexer.addProcessor(popup.getStage());
-                System.out.println("Order Menu");
+
             }
         });
 
@@ -182,26 +204,36 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
     @Override
     public void show() {
+        shapeRenderer = new ShapeRenderer();
+        font = new BitmapFont(Gdx.files.internal("moonships_font.fnt"), Gdx.files.internal("moonships_font.png"), false);; // Define your BitmapFont
+        // Set font color and scale
+        font.setColor(1, 1, 0, 1);
+        font.getData().setScale(0.5f);
+
     }
 
     @Override
     public void render(float delta) {
         /* ========================== UPDATE ============================ */
 
+
+
         // If the popup is not visible, update the player and world
         if (!popup.isVisible()) {
             player.update(delta, keyProcessor);
+            player.checkBounds(levelWidth, levelHeight, 5000);
             world.step(1/60f, 6, 2); // Physics calculations
-            camera.follow(player.position, delta);
+//            player.position.y = MathUtils.clamp(player.position.y, -levelHeight, levelHeight);
+            camera.follow(player.position, levelWidth, levelHeight);
         }
 
         batch.setProjectionMatrix(camera.combined);
 
+
+
         stage.act(delta);
 
         // screen boundary collisions
-        float newX = player.sprite.getX();
-        float newY = player.sprite.getY();
         Rectangle playerBounds = player.sprite.getBoundingRectangle();
         Rectangle screenBounds = new Rectangle(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         float playerLeft = playerBounds.getX();
@@ -209,47 +241,21 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         float playerTop = playerBottom + playerBounds.getHeight();
         float playerRight = playerLeft + playerBounds.getWidth();
 
-        final float halfWidth = playerBounds.getWidth() * .5f;
-        final float halfHeight = playerBounds.getHeight() * .5f;
-
-        float screenLeft = screenBounds.getX();
-        float screenBottom = screenBounds.getY();
-        float screenTop = screenBottom + screenBounds.getHeight();
-        float screenRight = screenLeft + screenBounds.getWidth();
-
-        if (playerLeft < screenLeft) {
-            // clamp to left
-            newX = screenLeft + halfWidth;
-            player.body.setLinearVelocity(newX, player.body.getLinearVelocity().y);
-        } else if (playerRight > screenRight) {
-            // clamp to right
-            newX = screenRight - halfWidth;
-            player.body.setLinearVelocity(-newX, player.body.getLinearVelocity().y);
-        }
-        // vertical axis
-        if (playerBottom < screenBottom) {
-            // clamp to bottom
-            newY = screenBottom + halfHeight;
-            player.body.setLinearVelocity(player.body.getLinearVelocity().x, newY);
-        } else if (playerTop > screenTop) {
-            // clamp to top
-            newY = screenTop - halfHeight;
-            player.body.setLinearVelocity(player.body.getLinearVelocity().x, -newY);
-        }
+        float threshold = 50;
 
         // visual indicator that the player is almost off the screen
         if (!popup.isVisible()) {
             // warning only visible when popup is not
-            if (playerLeft <= screenLeft + (2 * halfWidth)) {
+            if (playerLeft <= -levelWidth + threshold) {
                 label.setPosition(screenBounds.getWidth() - (screenBounds.getWidth() - label.getWidth()), screenBounds.getHeight() / 2);
                 label.setVisible(true);
-            } else if (playerRight >= screenRight - (2 * halfWidth)) {
+            } else if (playerRight >= levelWidth - threshold) {
                 label.setPosition((screenBounds.getWidth() - (3 * label.getWidth())), screenBounds.getHeight() / 2);
                 label.setVisible(true);
-            } else if (playerBottom <= screenBottom + (2 * halfHeight)) {
+            } else if (playerBottom <= -levelHeight + threshold) {
                 label.setPosition(screenBounds.getWidth() / 2, screenBounds.getHeight() - (screenBounds.getHeight() - label.getHeight()));
                 label.setVisible(true);
-            } else if (playerTop >= screenTop - (2 * halfHeight)) {
+            } else if (playerTop >= levelHeight - threshold) {
                 label.setPosition(screenBounds.getWidth() / 2, screenBounds.getHeight() - label.getHeight());
                 label.setVisible(true);
             } else {
@@ -264,6 +270,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         // Draw game world stuff
         batch.begin();
+
         player.render(batch);
 
         // coin collision
@@ -304,10 +311,29 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 //            }
 ////        }
 
+
         batch.end();
 
         // Draw UI stuff
         batch.begin();
+
+        // Render the side panel
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(sidePanelColor);
+        shapeRenderer.rect(sidePanelX, sidePanelY, sidePanelWidth, sidePanelHeight);
+        shapeRenderer.end();
+
+        //shapeRenderer.setProjectionMatrix(camera.combined);
+
+        String[] items = {"", "Item 1", "Item 2", "Item 3", "Item 4", "Item 5"};
+
+        font.draw(batch, "Order List:", sidePanelX + 10, sidePanelY + sidePanelHeight - 10);
+        //font.draw(batch, "\n", sidePanelX + 10, sidePanelY + sidePanelHeight - 10);
+
+        for (int i = 1; i < items.length; i++) {
+            font.draw(batch, items[i], sidePanelX + 10, sidePanelY + sidePanelHeight - 30*i);
+        }
+
         stage.draw();
         popup.render();
         batch.end();
