@@ -129,4 +129,22 @@ public class Player extends GameObject {
     public Sprite getSprite() {
         return this.sprite;
     }
+
+    public void checkBounds(int width, int height, int force) {
+        Vector2 correctiveDirection = new Vector2();
+
+        if (body.getPosition().x + sprite.getWidth() > width) {
+            correctiveDirection.x = -1;
+        } else if (body.getPosition().x < -width) {
+            correctiveDirection.x = 1;
+        }
+
+        if (body.getPosition().y + sprite.getHeight() > height) {
+            correctiveDirection.y = -1;
+        } else if (body.getPosition().y < -height) {
+            correctiveDirection.y = 1;
+        }
+
+        body.applyForceToCenter(correctiveDirection.scl(force), true);
+    }
 }

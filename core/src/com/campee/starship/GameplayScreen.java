@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Intersector;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
@@ -29,6 +30,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     private TextButton nextOrderButton;
 
     private World world;
+    private int levelWidth;
+    private int levelHeight;
 
     private Player player;
     public PlayerAttributes playerAttributes;
@@ -64,6 +67,9 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         world = new World(new Vector2(0, 0), true);
         multiplexer = new InputMultiplexer();
 
+        levelWidth = 500;
+        levelHeight = 500;
+
         player = new Player(world, 150, 200);
         camera = new PlayerCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         camera.update();
@@ -75,7 +81,6 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         //currentOrder = new Order(stage, game, 01, "Cosi", "walc", 7, new ArrayList<String>());
         //popup = new Popup(this, currentOrder.toString());
         playerAttributes = new PlayerAttributes();
-
 
         order = new Order();
         arrays = new ArrayList<>();
@@ -175,8 +180,10 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         // If the popup is not visible, update the player and world
         if (!popup.isVisible()) {
             player.update(delta, keyProcessor);
+            player.checkBounds(levelWidth, levelHeight, 5000);
             world.step(1/60f, 6, 2); // Physics calculations
-            camera.follow(player.position, delta);
+//            player.position.y = MathUtils.clamp(player.position.y, -levelHeight, levelHeight);
+            camera.follow(player.position, levelWidth, levelHeight);
         }
 
         batch.setProjectionMatrix(camera.combined);
@@ -184,8 +191,6 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         stage.act(delta);
 
         // screen boundary collisions
-        float newX = player.sprite.getX();
-        float newY = player.sprite.getY();
         Rectangle playerBounds = player.sprite.getBoundingRectangle();
         Rectangle screenBounds = new Rectangle(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         float playerLeft = playerBounds.getX();
@@ -193,47 +198,21 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         float playerTop = playerBottom + playerBounds.getHeight();
         float playerRight = playerLeft + playerBounds.getWidth();
 
-        final float halfWidth = playerBounds.getWidth() * .5f;
-        final float halfHeight = playerBounds.getHeight() * .5f;
-
-        float screenLeft = screenBounds.getX();
-        float screenBottom = screenBounds.getY();
-        float screenTop = screenBottom + screenBounds.getHeight();
-        float screenRight = screenLeft + screenBounds.getWidth();
-
-        if (playerLeft < screenLeft) {
-            // clamp to left
-            newX = screenLeft + halfWidth;
-            player.body.setLinearVelocity(newX, player.body.getLinearVelocity().y);
-        } else if (playerRight > screenRight) {
-            // clamp to right
-            newX = screenRight - halfWidth;
-            player.body.setLinearVelocity(-newX, player.body.getLinearVelocity().y);
-        }
-        // vertical axis
-        if (playerBottom < screenBottom) {
-            // clamp to bottom
-            newY = screenBottom + halfHeight;
-            player.body.setLinearVelocity(player.body.getLinearVelocity().x, newY);
-        } else if (playerTop > screenTop) {
-            // clamp to top
-            newY = screenTop - halfHeight;
-            player.body.setLinearVelocity(player.body.getLinearVelocity().x, -newY);
-        }
+        float threshold = 50;
 
         // visual indicator that the player is almost off the screen
         if (!popup.isVisible()) {
             // warning only visible when popup is not
-            if (playerLeft <= screenLeft + (2 * halfWidth)) {
+            if (playerLeft <= -levelWidth + threshold) {
                 label.setPosition(screenBounds.getWidth() - (screenBounds.getWidth() - label.getWidth()), screenBounds.getHeight() / 2);
                 label.setVisible(true);
-            } else if (playerRight >= screenRight - (2 * halfWidth)) {
+            } else if (playerRight >= levelWidth - threshold) {
                 label.setPosition((screenBounds.getWidth() - (3 * label.getWidth())), screenBounds.getHeight() / 2);
                 label.setVisible(true);
-            } else if (playerBottom <= screenBottom + (2 * halfHeight)) {
+            } else if (playerBottom <= -levelHeight + threshold) {
                 label.setPosition(screenBounds.getWidth() / 2, screenBounds.getHeight() - (screenBounds.getHeight() - label.getHeight()));
                 label.setVisible(true);
-            } else if (playerTop >= screenTop - (2 * halfHeight)) {
+            } else if (playerTop >= levelHeight - threshold) {
                 label.setPosition(screenBounds.getWidth() / 2, screenBounds.getHeight() - label.getHeight());
                 label.setVisible(true);
             } else {
