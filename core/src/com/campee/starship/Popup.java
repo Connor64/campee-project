@@ -21,11 +21,15 @@ public class Popup {
     private ShapeRenderer shapeRenderer;
     private BitmapFont font;
     private Label messageLabel;
+    private boolean acceptClicked;
+    private boolean declineClicked;
 
     public Popup(final GameplayScreen screen, final String notificationMessage) {
         stage = new Stage();
         shapeRenderer = new ShapeRenderer();
         visible = false;
+        acceptClicked = false;
+        declineClicked = false;
 
         font = new BitmapFont();
 
@@ -69,6 +73,7 @@ public class Popup {
         acceptButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                acceptClicked = true;
                 screen.playerAttributes.orderInProgress = true;
                 screen.playerAttributes.array.add(screen.order.arrayToString());
                 System.out.println(screen.playerAttributes.array);
@@ -81,8 +86,8 @@ public class Popup {
         declineButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                declineClicked = true;
                 screen.playerAttributes.orderInProgress = false;
-
                 visible = false;
             }
         });
@@ -111,6 +116,13 @@ public class Popup {
 
     public Stage getStage() {
         return stage;
+    }
+
+    public boolean acceptClicked() {
+        return acceptClicked;
+    }
+    public boolean declineClicked() {
+        return declineClicked;
     }
 
     public void render() {
