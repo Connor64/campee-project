@@ -45,6 +45,9 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     public Label pickupLabel;
     public Label dropoffLabel;
 
+    public GameObject pickupObject;
+    public GameObject dropoffObject;
+
     private InputMultiplexer multiplexer;
 
     private final MoonshipGame GAME;
@@ -106,10 +109,11 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         //currentOrder = new Order(stage, game, 01, "Cosi", "walc", 7, new ArrayList<String>());
         //popup = new Popup(this, currentOrder.toString());
         playerAttributes = new PlayerAttributes();
-        playerAttributes.orderInProgress = false;
+//        playerAttributes.orderInProgress = false;
 
         visibleQ = new ArrayList<>();
         playerAttributes.setArray(visibleQ);
+        playerAttributes.orderInProgress = false;
 
         order = new Order();
         arrays = new ArrayList<>();
@@ -121,8 +125,18 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         int id = Integer.parseInt(orderA[0]);
         order = new Order(stage, game, id, orderA[1], orderA[2], time, arrays);
         popup = new Popup(this, order.arrayToString());
-        order.setPickupBounds(50, 60, 30, 30);
-        order.setDropoffBounds(Gdx.graphics.getWidth() - 30, Gdx.graphics.getHeight() - 30, 30, 30);
+        order.setPickupBounds(-levelWidth + 50, -levelHeight + 50, 50, 50);
+        order.setDropoffBounds(levelWidth - sidePanelWidth, levelHeight - sidePanelWidth, 50, 50);
+
+        pickupObject = new GameObject(world, order.getPickupBounds().getX(), order.getPickupBounds().getY());
+        pickupObject.setSprite("connor_apple.jpg");
+        pickupObject.sprite.setSize(order.getPickupBounds().getWidth(), order.getPickupBounds().getHeight());
+        pickupObject.sprite.setPosition(order.getPickupBounds().getX(), order.getPickupBounds().getY());
+
+        dropoffObject = new GameObject(world, order.getDropoffBounds().getX(), order.getDropoffBounds().getY());
+        dropoffObject.setSprite("connor_apple.jpg");
+        dropoffObject.sprite.setSize(order.getDropoffBounds().getWidth(), order.getDropoffBounds().getHeight());
+        dropoffObject.sprite.setPosition(order.getDropoffBounds().getX(), order.getDropoffBounds().getY());
 
         // Make button style
         Pixmap backgroundPixmap = createRoundedRectanglePixmap(200, 50, 10, Color.PURPLE); // Adjust size and color
@@ -186,16 +200,16 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         label.setSize(font.getScaleX() * 100, font.getScaleY() * 100);
 
         // pickup label
-        pickupLabel = new Label("Press P to pickup the order!", indicatorStyle);
-        label.setVisible(false);
+        pickupLabel = new Label("Press P to pickup!", indicatorStyle);
+        pickupLabel.setVisible(false);
         stage.addActor(pickupLabel);
-        pickupLabel.setSize(font.getScaleX() * 100, font.getScaleY() * 100);
+        pickupLabel.setSize(font.getScaleX() * 50, font.getScaleY() * 50);
 
         // dropoff label
-        dropoffLabel = new Label("Press F to dropoff the order!", indicatorStyle);
+        dropoffLabel = new Label("Press O to dropoff!", indicatorStyle);
         dropoffLabel.setVisible(false);
         stage.addActor(dropoffLabel);
-        dropoffLabel.setSize(font.getScaleX() * 100, font.getScaleY() * 100);
+        dropoffLabel.setSize(font.getScaleX() * 50, font.getScaleY() * 50);
     }
 
     @Override
@@ -282,34 +296,37 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             }
         }
 
-        // pickup/dropoff
         // order picking up and dropping off
-
-////        if (popup.acceptClicked()) {
-//            if (!order.isPickedUp()) {
-//                // only show order pickup, not dropoff
-//                if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getPickupBounds())) {
-//                    pickupLabel.setVisible(true);
-//                    if (keyProcessor.pPressed) {
-//                        order.setPickedUp(true);
-//                        pickupLabel.setVisible(false);
-//                    }
-//                } else {
-//                    pickupLabel.setVisible(false);
-//                }
-//            } else if (order.isPickedUp() && !order.isDroppedOff()) {
-//                if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getDropoffBounds())) {
-//                    dropoffLabel.setVisible(true);
-//                    if (keyProcessor.oPressed) {
-//                        order.setDroppedOff(true);
-//                        playerAttributes.orderInProgress = false;
-//                        dropoffLabel.setVisible(false);
-//                    }
-//                } else {
-//                    dropoffLabel.setVisible(false);
-//                }
-//            }
-////        }
+        System.out.println("player_x: " + player.getSprite().getX() + ", player_y: " + player.getSprite().getY());
+//        System.out.println("player_y: " + player.getSprite().getY());
+        if (!order.isPickedUp() && playerAttributes.orderInProgress) {
+            pickupObject.sprite.draw(batch);
+//            System.out.println("check 1");
+            // only show order pickup, not dropoff
+            if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getPickupBounds())) {
+//                System.out.println("in bounds");
+                pickupLabel.setVisible(true);
+                if (keyProcessor.pPressed) {
+                    order.setPickedUp(true);
+                    pickupLabel.setVisible(false);
+                }
+            } else {
+                pickupLabel.setVisible(false);
+            }
+        } else if (order.isPickedUp() && !order.isDroppedOff() && playerAttributes.orderInProgress) {
+//            System.out.println("check 2");
+            dropoffObject.sprite.draw(batch);
+            if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getDropoffBounds())) {
+                dropoffLabel.setVisible(true);
+                if (keyProcessor.oPressed) {
+                    order.setDroppedOff(true);
+                    playerAttributes.orderInProgress = false;
+                    dropoffLabel.setVisible(false);
+                }
+            } else {
+                dropoffLabel.setVisible(false);
+            }
+        }
 
         batch.end();
 
@@ -335,6 +352,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         stage.draw();
         popup.render();
+
         batch.end();
     }
 
