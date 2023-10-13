@@ -4,6 +4,7 @@ import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
@@ -11,32 +12,48 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.ScreenUtils;
 
+import java.util.ArrayList;
+import java.util.Queue;
+import java.util.concurrent.TimeUnit;
+
+
 public class GameScreen extends ApplicationAdapter implements Screen {
+    int test;
     SpriteBatch batch;
     Texture img;
     private Game game;
     private Stage stage;
+
     private World world;
     private Box2DDebugRenderer debugRenderer;
     public int coinCounter = 0;
 
+    private Popup popup;
+    private boolean screenClicked = false; // Add this variable
+    private boolean prevClickState = false; // Add this variable to track the previous click state
     Player player;
+    PlayerAttributes attributes;
     KeyProcessor keyProcessor;
+    OrderScreen orderScreen;
     Coin coin;
+    Order order;
     float x;
     float y;
     int move = 0;
     float screenWidth;
     float screenHeight;
-
     public GameScreen(final Game game) {
+        int SPEED = 150;
+        int move = 0;
+        ArrayList<String> array;
         world = new World(new Vector2(0, -10), true);
         debugRenderer = new Box2DDebugRenderer();
         x = 100;
         y = 100;
-
+        test = 0;
         stage = new Stage();
         this.game = game;
         batch = new SpriteBatch();
@@ -47,6 +64,15 @@ public class GameScreen extends ApplicationAdapter implements Screen {
 
         player = new Player(world, x, y);
         coin = new Coin(world, x, y);
+        x = 100;
+        y = 100;
+
+        attributes = new PlayerAttributes();
+        array = attributes.array;
+        orderScreen = new OrderScreen();
+        orderScreen.visible = false;
+        order = new Order(stage, game, 0, null, null, 0 );
+        popup = new Popup(this, order.toString());
     }
 
     @Override
@@ -56,6 +82,8 @@ public class GameScreen extends ApplicationAdapter implements Screen {
 
     @Override
     public void render(float delta) {
+
+        orderScreen.visible = false;
         ScreenUtils.clear(Color.PINK);
         world.step(1 / 60f, 6, 2);
 
@@ -63,21 +91,23 @@ public class GameScreen extends ApplicationAdapter implements Screen {
         float yMove = 0;
 
         // implement KeyProcessor
-        if (keyProcessor.upPressed) {
-            yMove = 1;
-            move = 0;
-        } else if (keyProcessor.downPressed) {
-            yMove = -1;
-            move = 1;
-        } else if (keyProcessor.leftPressed) {
-            xMove = -1;
-            move = 2;
-        } else if (keyProcessor.rightPressed) {
-            xMove = 1;
-            move = 3;
-        } else {
-            float linearDamping = 1;
-            player.body.setLinearDamping(linearDamping);
+        if (!popup.isVisible()) {
+            if (keyProcessor.upPressed) {
+                yMove = 1;
+                move = 0;
+            } else if (keyProcessor.downPressed) {
+                yMove = -1;
+                move = 1;
+            } else if (keyProcessor.leftPressed) {
+                xMove = -1;
+                move = 2;
+            } else if (keyProcessor.rightPressed) {
+                xMove = 1;
+                move = 3;
+            } else {
+                float linearDamping = 1;
+                player.body.setLinearDamping(linearDamping);
+            }
         }
 
         // player still goes out of bounds, this  code no work now :(
@@ -145,6 +175,7 @@ public class GameScreen extends ApplicationAdapter implements Screen {
         batch.begin();
         player.render(batch, xMove, yMove, move);
 
+
         if (!coin.collected) {
             coin.render(batch, 50, 25);
             if (Intersector.overlaps(player.getBounds(), coin.getBounds())) {
@@ -152,15 +183,34 @@ public class GameScreen extends ApplicationAdapter implements Screen {
                 coinCounter++;
             }
         }
+        // Gdx.input.setInputProcessor(keyProcessor);
 
+        if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
+            test++;
+            System.out.println(test);
+            if (test == 2) {
+                popup.show();
+                Gdx.input.setInputProcessor(popup.getStage());
+            }
+            if (test == 4) {
+                System.out.println(attributes.array);
+            }
+        }
+
+        if (popup.isVisible()) {
+            popup.render();
+        } else {
+            Gdx.input.setInputProcessor(keyProcessor); // Enable arrow key input
+        }
         batch.end();
+
         stage.act(delta);
         stage.draw();
     }
 
     @Override
     public void hide() {
-
+        orderScreen.setVisible(false);
     }
 
     @Override
