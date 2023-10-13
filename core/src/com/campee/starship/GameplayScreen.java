@@ -123,7 +123,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         order = new Order(stage, game, id, orderA[1], orderA[2], time, arrays);
         popup = new Popup(this, order.arrayToString());
         order.setPickupBounds(-levelWidth + 50, -levelHeight + 50, 50, 50);
-        order.setDropoffBounds(levelWidth - sidePanelWidth, levelHeight - sidePanelWidth, 50, 50);
+        order.setDropoffBounds(levelWidth - sidePanelWidth * 2, levelHeight - sidePanelHeight * 2, 50, 50);
 
         pickupObject = new GameObject(world, order.getPickupBounds().getX(), order.getPickupBounds().getY());
         pickupObject.setSprite("connor_apple.jpg");
@@ -318,42 +318,13 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                 if (keyProcessor.oPressed) {
                     order.setDroppedOff(true);
                     playerAttributes.orderInProgress = false;
+                    playerAttributes.array.remove(1);
                     dropoffLabel.setVisible(false);
                 }
             } else {
                 dropoffLabel.setVisible(false);
             }
         }
-
-        // pickup/dropoff
-        // order picking up and dropping off
-
-////        if (popup.acceptClicked()) {
-//            if (!order.isPickedUp()) {
-//                // only show order pickup, not dropoff
-//                if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getPickupBounds())) {
-//                    pickupLabel.setVisible(true);
-//                    if (keyProcessor.pPressed) {
-//                        order.setPickedUp(true);
-//                        pickupLabel.setVisible(false);
-//                    }
-//                } else {
-//                    pickupLabel.setVisible(false);
-//                }
-//            } else if (order.isPickedUp() && !order.isDroppedOff()) {
-//                if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getDropoffBounds())) {
-//                    dropoffLabel.setVisible(true);
-//                    if (keyProcessor.oPressed) {
-//                        order.setDroppedOff(true);
-//                        playerAttributes.orderInProgress = false;
-//                        dropoffLabel.setVisible(false);
-//                    }
-//                } else {
-//                    dropoffLabel.setVisible(false);
-//                }
-//            }
-////        }
-
 
         batch.end();
 
