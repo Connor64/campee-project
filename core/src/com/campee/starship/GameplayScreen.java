@@ -276,13 +276,14 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         //shapeRenderer.setProjectionMatrix(camera.combined);
 
-        String[] items = {"", "Item 1", "Item 2", "Item 3", "Item 4", "Item 5"};
+
+        String[] items = playerAttributes.array.toArray(new String[0]);
 
         font.draw(batch, "Order List:", sidePanelX + 10, sidePanelY + sidePanelHeight - 10);
         //font.draw(batch, "\n", sidePanelX + 10, sidePanelY + sidePanelHeight - 10);
 
         for (int i = 1; i < items.length; i++) {
-            font.draw(batch, items[i], sidePanelX + 10, sidePanelY + sidePanelHeight - 30*i);
+                font.draw(batch, items[i], sidePanelX + 10, sidePanelY + sidePanelHeight - 70 * i);
         }
 
         stage.draw();

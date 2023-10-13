@@ -39,6 +39,7 @@ public class PlayerAttributes {
     }
 
     public void setArray(ArrayList<String> array)  {
+        array.add("");
         this.array = array;
     }
 
