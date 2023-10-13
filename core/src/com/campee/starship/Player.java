@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 
@@ -91,10 +92,10 @@ public class Player extends GameObject {
 
     public void render(SpriteBatch batch) {
         sprite.draw(batch);
+        sprite.setBounds(body.getPosition().x, body.getPosition().y, sprite.getWidth(), sprite.getHeight());
     }
 
     public void update(float delta, KeyProcessor keyProcessor) {
-
         // Move player
         Vector2 force = new Vector2(0, 0);
         if (keyProcessor.upPressed) {
@@ -117,12 +118,15 @@ public class Player extends GameObject {
 
 //        body.applyLinearImpulse(force.x, force.y, position.x, position.y, true);
         body.applyForceToCenter(force, true);
-
         setPosition(body.getPosition());
     }
 
     private void setPosition(Vector2 position) {
         this.position = position;
         sprite.setPosition(position.x, position.y);
+    }
+
+    public Sprite getSprite() {
+        return this.sprite;
     }
 }

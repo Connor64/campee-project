@@ -46,4 +46,7 @@ public class Coin extends GameObject {
             this.collected = true;
         }
     }
+    public Sprite getSprite() {
+        return this.sprite;
+    }
 }
