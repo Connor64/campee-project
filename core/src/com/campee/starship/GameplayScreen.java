@@ -300,7 +300,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             dropoffObject.sprite.draw(batch);
         }
         // order picking up and dropping off
-        System.out.println("player_x: " + player.getSprite().getX() + ", player_y: " + player.getSprite().getY());
+//        System.out.println("player_x: " + player.getSprite().getX() + ", player_y: " + player.getSprite().getY());
 //        System.out.println("player_y: " + player.getSprite().getY());
         if (!order.isPickedUp() && playerAttributes.orderInProgress) {
             pickupObject.sprite.draw(batch);
