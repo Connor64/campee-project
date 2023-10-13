@@ -164,6 +164,10 @@ public class TitleScreen implements Screen {
     public void resize(int width, int height) {
         viewport.update(width, height, true);
         updateButtonPosition();
+
+        float closeButtonX = 10; // X-coordinate of the CLOSE button
+        float closeButtonY = viewport.getWorldHeight() - 50; // Y-coordinate of the CLOSE button
+        closeButton.setPosition(closeButtonX, closeButtonY);
     }
 
     @Override

@@ -50,12 +50,7 @@ public class MoonshipGame extends Game {
 				Gdx.app.postRunnable(new Runnable() {
 					@Override
 					public void run() {
-//						setScreen(new TitleScreen((MoonshipGame) game));
-						try {
-							setScreen(new GameplayScreen((MoonshipGame) game));
-						} catch (FileNotFoundException e) {
-							throw new RuntimeException(e);
-						}
+						setScreen(new TitleScreen((MoonshipGame) game));
 					}
 				});
 				timer.cancel();

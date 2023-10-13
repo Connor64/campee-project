@@ -14,6 +14,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
@@ -38,6 +39,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     private final Popup popup;
     private Coin coin;
     public int coinCounter;
+    public Label label;
 
     private InputMultiplexer multiplexer;
 
@@ -68,7 +70,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         levelWidth = 500;
         levelHeight = 500;
 
-        player = new Player(world, 0, 0);
+        player = new Player(world, 150, 200);
         camera = new PlayerCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         camera.update();
 
@@ -79,7 +81,6 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         //currentOrder = new Order(stage, game, 01, "Cosi", "walc", 7, new ArrayList<String>());
         //popup = new Popup(this, currentOrder.toString());
         playerAttributes = new PlayerAttributes();
-
 
         order = new Order();
         arrays = new ArrayList<>();
@@ -152,6 +153,16 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         multiplexer.addProcessor(keyProcessor);
 
         Gdx.input.setInputProcessor(multiplexer);
+
+        // visual indicator boundary
+        BitmapFont font = new BitmapFont(Gdx.files.internal("moonships_font.fnt"), Gdx.files.internal("moonships_font.png"), false);
+        font.setColor(0, 0, 0, 1);
+        font.getData().setScale(0.5f, 0.5f);
+        Label.LabelStyle indicatorStyle = new Label.LabelStyle(font, Color.BLACK);
+        label = new Label("Careful!", indicatorStyle);
+        label.setVisible(false);
+        stage.addActor(label);
+        label.setSize(font.getScaleX() * 100, font.getScaleY() * 100);
     }
 
     @Override
@@ -179,6 +190,36 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         stage.act(delta);
 
+        // screen boundary collisions
+        Rectangle playerBounds = player.sprite.getBoundingRectangle();
+        Rectangle screenBounds = new Rectangle(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        float playerLeft = playerBounds.getX();
+        float playerBottom = playerBounds.getY();
+        float playerTop = playerBottom + playerBounds.getHeight();
+        float playerRight = playerLeft + playerBounds.getWidth();
+
+        float threshold = 50;
+
+        // visual indicator that the player is almost off the screen
+        if (!popup.isVisible()) {
+            // warning only visible when popup is not
+            if (playerLeft <= -levelWidth + threshold) {
+                label.setPosition(screenBounds.getWidth() - (screenBounds.getWidth() - label.getWidth()), screenBounds.getHeight() / 2);
+                label.setVisible(true);
+            } else if (playerRight >= levelWidth - threshold) {
+                label.setPosition((screenBounds.getWidth() - (3 * label.getWidth())), screenBounds.getHeight() / 2);
+                label.setVisible(true);
+            } else if (playerBottom <= -levelHeight + threshold) {
+                label.setPosition(screenBounds.getWidth() / 2, screenBounds.getHeight() - (screenBounds.getHeight() - label.getHeight()));
+                label.setVisible(true);
+            } else if (playerTop >= levelHeight - threshold) {
+                label.setPosition(screenBounds.getWidth() / 2, screenBounds.getHeight() - label.getHeight());
+                label.setVisible(true);
+            } else {
+                // remove the label
+                label.setVisible(false);
+            }
+        }
 
         /* ========================== DRAW ============================ */
 
