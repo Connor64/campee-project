@@ -77,6 +77,7 @@ public class Popup {
                 screen.playerAttributes.orderInProgress = true;
                 screen.playerAttributes.array.add(screen.order.arrayToString());
                 System.out.println(screen.playerAttributes.array);
+                //screen.order.setPickedUp(true);
 
 
                 visible = false;
@@ -88,6 +89,8 @@ public class Popup {
             public void clicked(InputEvent event, float x, float y) {
                 declineClicked = true;
                 screen.playerAttributes.orderInProgress = false;
+                //use this for the other thing
+                //screen.playerAttributes.array.remove(1);
                 visible = false;
             }
         });
