@@ -115,7 +115,6 @@ public class GameScreen extends ApplicationAdapter implements Screen {
         float newY = player.sprite.getY();
 
 
-
         // testing to make sure the player can't leave bounds
         // TODO: fix bouncing :/
         // horizontal axis
