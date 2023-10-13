@@ -293,38 +293,60 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         float newY = player.sprite.getY();
 
         // object collision
-        /*rock.sprite.setSize(300, 300);
+        rock.sprite.setSize(100, 100);
         rock.sprite.setPosition(300, 300);
-        rock.setBounds(rock.sprite.getX(), rock.sprite.getY(), rock.sprite.getWidth(), rock.sprite.getHeight());
-//        System.out.println(rock.sprite.getX());
-        Rectangle rockBounds = rock.getBounds();
-        float rockLeft = rockBounds.getX();
-        float rockBottom = screenBounds.getY();
-        float rockTop = rockBottom + rockBounds.getHeight();
-        float rockRight = rockLeft + rockBounds.getWidth();
-        if (playerLeft < rockLeft) {
-            // clamp to left
-            newX = rockLeft + halfWidth;
-            player.body.setLinearVelocity(newX, player.body.getLinearVelocity().y);
-            //xMove = 1;
-        } else if (playerRight > rockRight) {
-            // clamp to right
-            newX = rockRight - halfWidth;
-            player.body.setLinearVelocity(-newX, player.body.getLinearVelocity().y);
-            //xMove = 1;
-        }
-        // vertical axis
-        if (playerBottom < rockBottom) {
-            // clamp to bottom
-            newY = rockBottom + halfHeight;
-            player.body.setLinearVelocity(player.body.getLinearVelocity().x, newY);
-            //yMove = 1;
-        } else if (playerTop > rockTop) {
-            // clamp to top
-            newY = rockTop - halfHeight;
-            player.body.setLinearVelocity(player.body.getLinearVelocity().x, -newY);
-            //yMove = 1;
-        }*/
+        //rock.setBounds(rock.sprite.getX(), rock.sprite.getY(), rock.sprite.getWidth(), rock.sprite.getHeight());
+
+//        Rectangle rockBounds = rock.getBounds();
+//        float rockLeft = rockBounds.getX();
+//        float rockBottom = screenBounds.getY();
+//        float rockTop = rockBottom + rockBounds.getHeight();
+//        float rockRight = rockLeft + rockBounds.getWidth();
+//        player.checkBounds((int) (rockBounds.getX() + rockBounds.getWidth()), (int)(rockBounds.getY() + rockBounds.getHeight()), 5000, 0);
+
+        Vector2 correctiveDirection = new Vector2();
+
+        // left side of rock
+//        if (player.body.getPosition().x + player.sprite.getWidth() >= rockLeft && (rockTop >= player.body.getPosition().y + player.sprite.getHeight() &&
+//                player.body.getPosition().y + player.sprite.getHeight() >= rockBottom)) {
+//            correctiveDirection.x = -1;
+//        }
+//        } else if (player.body.getPosition().x < -width) {
+//            correctiveDirection.x = 1;
+//        }
+//
+//        if (player.body.getPosition().y + player.sprite.getHeight() > height - 60) {
+//            correctiveDirection.y = -1;
+//        } else if (player.body.getPosition().y < -height) {
+//            correctiveDirection.y = 1;
+//        }
+
+        //player.body.applyForceToCenter(correctiveDirection.scl(500), true);
+
+
+//        if (playerLeft > rockLeft && playerLeft < rockRight) {
+//            // clamp to left
+//            newX = rockLeft + halfWidth;
+//            player.body.setLinearVelocity(newX, player.body.getLinearVelocity().y);
+//            //xMove = 1;
+//        } else if (playerRight < rockRight) {
+//            // clamp to right
+//            newX = rockRight - halfWidth;
+//            player.body.setLinearVelocity(-newX, player.body.getLinearVelocity().y);
+//            //xMove = 1;
+//        }
+//        // vertical axis
+//        if (playerBottom < rockBottom) {
+//            // clamp to bottom
+//            newY = rockBottom + halfHeight;
+//            player.body.setLinearVelocity(player.body.getLinearVelocity().x, newY);
+//            //yMove = 1;
+//        } else if (playerTop > rockTop) {
+//            // clamp to top
+//            newY = rockTop - halfHeight;
+//            player.body.setLinearVelocity(player.body.getLinearVelocity().x, -newY);
+//            //yMove = 1;
+//        }
 
 
         /* ========================== DRAW ============================ */
@@ -335,7 +357,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         batch.begin();
 
         player.render(batch);
-        //rock.render(batch, 300, 300);
+        rock.render(batch, 20, 200);
         log.render(batch, 0, 10);
         log.sprite.setSize(100, 75);
 
