@@ -75,7 +75,6 @@ public class Popup {
                 gameScreen.attributes.orderInProgress = true;
                 gameScreen.attributes.array.add(gameScreen.order.queueString());
                 Gdx.input.setInputProcessor(gameScreen.getStage());
-
                 visible = false;
                 // Handle accept button click
                 //hide();
