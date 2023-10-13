@@ -1,13 +1,11 @@
 package com.campee.starship;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -16,7 +14,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.utils.ScreenUtils;
 
 public class Popup {
     private Stage stage;
@@ -25,7 +22,7 @@ public class Popup {
     private BitmapFont font;
     private Label messageLabel;
 
-    public Popup(final GameScreen gameScreen, String notificationMessage) {
+    public Popup(final GameplayScreen screen, String notificationMessage) {
         stage = new Stage();
         shapeRenderer = new ShapeRenderer();
         visible = false;
@@ -72,12 +69,9 @@ public class Popup {
         acceptButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                gameScreen.attributes.orderInProgress = true;
-                gameScreen.attributes.array.add(gameScreen.order.queueString());
-                Gdx.input.setInputProcessor(gameScreen.getStage());
+                screen.playerAttributes.orderInProgress = true;
+                screen.playerAttributes.array.add(screen.currentOrder.queueString());
                 visible = false;
-                // Handle accept button click
-                //hide();
             }
         });
 
@@ -85,11 +79,7 @@ public class Popup {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 System.out.println("something happened");
-                Gdx.input.setInputProcessor(gameScreen.getStage());
-
                 visible = false;
-                // Handle decline button click
-                //hide();
             }
         });
 

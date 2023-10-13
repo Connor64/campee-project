@@ -8,35 +8,26 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 
+import javax.xml.soap.Text;
+import java.security.Key;
+
 public class Player extends GameObject {
     public Body body;
     private TextureRegion region;
-    public Sprite sprite;
-    private int xMove;
-    private int yMove;
-    private int move;
+    private Sprite sprite;
     private Texture texture;
-    private final Texture upTexture;
-    private final Texture downTexture;
-    private final Texture leftTexture;
-    private final Texture rightTexture;
-    private Texture[] textures;
+    private TextureRegion[] textureRegions;
 
     String spritePath = "";
-    private float speedBoostX;
-    private float speedBoostY;
 
     private static final float ACCELERATION = 1000f;
 
-    public Player (World world, float x, float y) {
-        // constructor for new player object
+    public Player(World world, float x, float y) {
         super(world, x, y);
-        // set bounds for collision detection
+
+        // Set bounds for collision detection
         dimension.set(0.5f, 0.5f);
         setBounds(0, 0, dimension.x, dimension.y);
-
-        speedBoostX = 0;
-        speedBoostY = 0;
 
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
@@ -56,23 +47,33 @@ public class Player extends GameObject {
 
         shape.dispose();
 
-        upTexture = new Texture(Gdx.files.internal("moonship_up.PNG"));
-        downTexture = new Texture(Gdx.files.internal("moonship_down.PNG"));
-        leftTexture = new Texture(Gdx.files.internal("moonship_left.PNG"));
-        rightTexture = new Texture(Gdx.files.internal("moonship_right.PNG"));
+        // Set up directional sprites
+        Texture upTexture = new Texture(Gdx.files.internal("moonship_up.PNG"));
+        upTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
 
+        Texture downTexture = new Texture(Gdx.files.internal("moonship_down.PNG"));
+        downTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
 
+        Texture leftTexture = new Texture(Gdx.files.internal("moonship_left.PNG"));
+        leftTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
 
-        textures = new Texture[4];
-        textures[0] = upTexture;
-        textures[1] = downTexture;
-        textures[2] = leftTexture;
-        textures[3] = rightTexture;
+        Texture rightTexture = new Texture(Gdx.files.internal("moonship_right.PNG"));
+        rightTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
 
-        texture = textures[2];
-        texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-        TextureRegion region = new TextureRegion(texture, 0, 0, 32, 32);
-        sprite = new Sprite(region);
+        // Get regions and put them into the array
+        textureRegions = new TextureRegion[]{
+                new TextureRegion(upTexture, 0, 0, 32, 32),
+                new TextureRegion(downTexture, 0, 0, 32, 32),
+                new TextureRegion(leftTexture, 0, 0, 32, 32),
+                new TextureRegion(rightTexture, 0, 0, 32, 32),
+        };
+
+        sprite = new Sprite(textureRegions[0]); // Set default sprite
+        sprite.setSize(125, 125);
+        sprite.setOrigin(sprite.getX() / 2, sprite.getY() / 2);
+        sprite.setPosition(0, 0);
+
+        setLinearDamping(5);
     }
 
     public void setLinearDamping(float damping) {
@@ -80,58 +81,43 @@ public class Player extends GameObject {
     }
 
     public void setSprite(int spriteNum) {
-        // set the correct directional sprite
-        texture = textures[spriteNum];
-        texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-        TextureRegion region = new TextureRegion(texture, 0, 0, 32, 32);
-        sprite = new Sprite(region);
-        sprite.setSize(125, 125);
-        sprite.setOrigin(sprite.getX() / 2,sprite.getY() / 2);
-        sprite.setPosition(0, 0);
-        this.setHeight(sprite.getHeight());
-        this.setWidth(sprite.getWidth());
+        sprite.setRegion(textureRegions[spriteNum]);
     }
 
-
-    public void render(SpriteBatch batch, float moveX, float moveY, int spriteNum) {
-//        if (moveX != 0) {
-//            speedBoostX = speedBoostX + 50;
-//        } else {
-//            speedBoostX = 0;
-//        }
-//        if (moveY != 0) {
-//            speedBoostY = speedBoostY + 50;
-//        } else {
-//            speedBoostY = 0;
-//        }
-//        speedBoostX = moveX * (speedBoostX + 50);
-//        speedBoostY = moveY * (speedBoostY + 50);
-
-        //       System.out.println("speedX: " + speedBoostX);
-//        System.out.println("speedY: " + speedBoostY);
-//        body.applyForceToCenter((1000 * moveX) +(50 * speedBoostX), (1000 * moveY) + (50 * speedBoostY),  true);
-//        body.setLinearVelocity(speedBoostX, speedBoostY);
-//        float maxSpeed = ACCELERATION;
-//        float desiredVelocityX = moveX * maxSpeed;
-//        float desiredVelocityY = moveY * maxSpeed;
-//
-//        Vector2 currentVelocity = body.getLinearVelocity();
-//        float velocityChangeX = desiredVelocityX - currentVelocity.x;
-//        float velocityChangeY = desiredVelocityY - currentVelocity.y;
-//
-//        float impulseX = body.getMass() * velocityChangeX;
-//        float impulseY = body.getMass() * velocityChangeY;
-//
-//        Vector2 impulse = new Vector2(impulseX, impulseY);
-//        body.applyLinearImpulse(impulse, body.getWorldCenter(), true);
-
-        // re-render sprite using movement indicator (spriteNum)
-        setSprite(spriteNum);
-
-        // render position of player
-        sprite.setPosition(body.getPosition().x, body.getPosition().y);
-        sprite.setBounds(sprite.getX(), sprite.getY(), sprite.getWidth(), sprite.getHeight());
-        setBounds(sprite.getX(), sprite.getY(), getWidth(), getHeight());
+    public void render(SpriteBatch batch) {
         sprite.draw(batch);
+    }
+
+    public void update(float delta, KeyProcessor keyProcessor) {
+
+        // Move player
+        Vector2 force = new Vector2(0, 0);
+        if (keyProcessor.upPressed) {
+//            force.y = 4f;
+            force.y = ACCELERATION;
+            setSprite(0);
+        } else if (keyProcessor.downPressed) {
+//            force.y = -4f;
+            force.y = -ACCELERATION;
+            setSprite(1);
+        } else if (keyProcessor.leftPressed) {
+//            force.x = -4f;
+            force.x = -ACCELERATION;
+            setSprite(2);
+        } else if (keyProcessor.rightPressed) {
+//            force.x = 4f;
+            force.x = ACCELERATION;
+            setSprite(3);
+        }
+
+//        body.applyLinearImpulse(force.x, force.y, position.x, position.y, true);
+        body.applyForceToCenter(force, true);
+
+        setPosition(body.getPosition());
+    }
+
+    private void setPosition(Vector2 position) {
+        this.position = position;
+        sprite.setPosition(position.x, position.y);
     }
 }

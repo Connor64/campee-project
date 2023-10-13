@@ -21,7 +21,7 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class TitleScreen implements Screen {
-    private Game game;
+    private MoonshipGame game;
     private SpriteBatch batch;
     private BitmapFont font;
     private GlyphLayout glyphLayout;
@@ -30,7 +30,7 @@ public class TitleScreen implements Screen {
     private ExtendViewport viewport;
     private TextButton button;
 
-    public TitleScreen(final Game game) {
+    public TitleScreen(final MoonshipGame game) {
         this.game = game;
         batch = new SpriteBatch();
         font = new BitmapFont(Gdx.files.internal("moonships_font.fnt"), Gdx.files.internal("moonships_font.png"), false);
@@ -76,7 +76,7 @@ public class TitleScreen implements Screen {
         button.addListener(new InputListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 // Switch to another screen when the button is clicked
-                game.setScreen(new GameScreen(game)); // Change to the screen you want
+                game.setScreen(new GameplayScreen(game)); // Change to the screen you want
                 return true;
             }
         });

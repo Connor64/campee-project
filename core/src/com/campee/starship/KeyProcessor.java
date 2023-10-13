@@ -9,8 +9,6 @@ public class KeyProcessor implements InputProcessor {
     public boolean downPressed;
     public boolean leftPressed;
     public boolean rightPressed;
-    public boolean isLeftPressed;
-    public boolean isRightPressed;
 
 
     @Override
@@ -23,14 +21,9 @@ public class KeyProcessor implements InputProcessor {
         }
         if (keycode == Input.Keys.LEFT || keycode == Input.Keys.A) {
             leftPressed = true;
-            isLeftPressed = true;
-            isRightPressed = false;
-
         }
         if (keycode == Input.Keys.RIGHT || keycode == Input.Keys.D) {
             rightPressed = true;
-            isRightPressed = true;
-            isLeftPressed = false;
         }
 
         return false;

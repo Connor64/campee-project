@@ -52,6 +52,8 @@ public class GameScreen extends ApplicationAdapter implements Screen {
     Player player;
     PlayerAttributes attributes;
     KeyProcessor keyProcessor;
+    InputMultiplexer multiplexer;
+
     //OrderScreen orderScreen;
     Coin coin;
     Order order;
@@ -101,7 +103,7 @@ public class GameScreen extends ApplicationAdapter implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 System.out.println("clicked back");
-                game.setScreen(new TitleScreen(game));
+//                game.setScreen(new TitleScreen(game));
             }
         });
 
@@ -110,25 +112,29 @@ public class GameScreen extends ApplicationAdapter implements Screen {
         nextOrderButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-
                 popup.show();
                 popup.render();
-                Gdx.input.setInputProcessor(popup.getStage());
+                multiplexer.addProcessor(popup.getStage());
+//                Gdx.input.setInputProcessor(popup.getStage());
                 System.out.println("Order Menu");
-
             }
         });
 
+        multiplexer = new InputMultiplexer();
+        multiplexer.addProcessor(stage);
+        multiplexer.addProcessor(keyProcessor);
+
         stage.addActor(nextOrderButton);
         stage.addActor(backButton);
-        Gdx.input.setInputProcessor(stage);
+
+        Gdx.input.setInputProcessor(multiplexer);
 
 
         array = attributes.array;
 //        orderScreen = new OrderScreen();
 //        orderScreen.visible = true;
         order = new Order(stage, game, 01, "Cosi", "walc", 7.00 );
-        popup = new Popup(this, order.toString());
+//        popup = new Popup(this, order.toString());
 
         // Define side panel properties
         sidePanelWidth = screenWidth / 5; // Width
@@ -140,7 +146,7 @@ public class GameScreen extends ApplicationAdapter implements Screen {
         attributes = new PlayerAttributes();
         array = attributes.array;
         order = new Order(stage, game, 0, null, null, 0 );
-        popup = new Popup(this, order.toString());
+//        popup = new Popup(this, order.toString());
     }
 
     @Override
@@ -150,24 +156,6 @@ public class GameScreen extends ApplicationAdapter implements Screen {
         // Set font color and scale
         font.setColor(1, 1, 0, 1);
         font.getData().setScale(0.5f);
-        //float itemHeight = font.getLineHeight();
-
-        /*stage = new Stage(); // Your stage
-        Gdx.input.setInputProcessor(stage);
-
-        String[] dataArray = {"Item 1", "Item 2", "Item 3", "Item 4", "Item 5"};
-
-
-        BitmapFont font = new BitmapFont(Gdx.files.internal("moonships_font.fnt"), Gdx.files.internal("moonships_font.png"), false);; // Define your BitmapFont
-        // Set font color and scale
-        font.setColor(1, 1, 0, 1);
-        font.getData().setScale(1);
-
-        orderScreen = new OrderScreen(10, 10, dataArray, font);
-        orderScreen.visible = true;
-        orderScreen.setWidth(200); // Set the width of the list
-        orderScreen.setHeight(400); // Set the height of the list
-        stage.addActor(orderScreen);*/
     }
 
     public Pixmap createRoundedRectanglePixmap(int width, int height, int cornerRadius, Color color) {
@@ -187,13 +175,6 @@ public class GameScreen extends ApplicationAdapter implements Screen {
 
     @Override
     public void render(float delta) {
-//        Gdx.input.setInputProcessor(keyProcessor);
-        //Gdx.input.setInputProcessor(popup.getStage());
-
-
-
-
-//        orderScreen.visible = false;
         ScreenUtils.clear(Color.PINK);
         float deltaTime =  Gdx.graphics.getDeltaTime();
 
@@ -234,23 +215,6 @@ public class GameScreen extends ApplicationAdapter implements Screen {
                 player.body.setLinearDamping(linearDamping);
             }
         }
-//        batch.begin();
-//        player.render(batch, x, y, move);
-
-        //ensure sprite stays within screen bounds
-//        if (x < 0) {
-//            x = 0;
-//        } else if (x > screenWidth - player.getWidth()) {
-//            x = screenWidth - player.getWidth();
-//        }
-//
-//        if (y < 0) {
-//            y = 0;
-//        } else if (y > screenHeight - player.getHeight()) {
-//            y = screenHeight - player.getHeight();
-//        }
-//
-//
 
         float newscreenWidth = screenWidth - sidePanelWidth - 10;
         // boundaries for player and screen
@@ -270,8 +234,8 @@ public class GameScreen extends ApplicationAdapter implements Screen {
         float screenRight = screenLeft + screenBounds.getWidth();
 
         // float for new position (for screen collisions)
-        float newX = player.sprite.getX();
-        float newY = player.sprite.getY();
+//        float newX = player.sprite.getX();
+//        float newY = player.sprite.getY();
 
         // visual indicator stuff
 //        Skin indicatorSkin = new Skin(Gdx.files.internal("skin/uiskin.json"),
@@ -282,11 +246,6 @@ public class GameScreen extends ApplicationAdapter implements Screen {
         Label.LabelStyle indicatorStyle = new Label.LabelStyle(font, Color.BLACK);
         Label label = new Label("Careful!", indicatorStyle);
         label.setVisible(false);
-
-//        Pixmap labelColor = new Pixmap((int) font.getScaleX(), (int) font.getScaleY(), Pixmap.Format.RGB888);
-//        labelColor.setColor(Color.WHITE);
-//        labelColor.fill();
-//        label.getStyle().background = new Image(new Texture(labelColor)).getDrawable();
 
         label.setSize(font.getScaleX() * 100, font.getScaleY() * 100);
 //        label.setPosition(screenWidth - (screenWidth - 15), screenHeight - label.getHeight());
@@ -325,35 +284,38 @@ public class GameScreen extends ApplicationAdapter implements Screen {
             }
         }
 
-
-        // testing to make sure the player can't leave bounds
-        // TODO: fix bouncing :/
-        // horizontal axis
-        if (playerLeft < screenLeft) {
-            // clamp to left
-            newX = screenLeft + halfWidth;
-            player.body.setLinearVelocity(newX, player.body.getLinearVelocity().y);
-            xMove = 1;
-        } else if (playerRight > screenRight) {
-            // clamp to right
-            newX = screenRight - halfWidth;
-            player.body.setLinearVelocity(-newX, player.body.getLinearVelocity().y);
-            xMove = 1;
-        }
-        // vertical axis
-        if (playerBottom < screenBottom) {
-            // clamp to bottom
-            newY = screenBottom + halfHeight;
-            player.body.setLinearVelocity(player.body.getLinearVelocity().x, newY);
-            yMove = 1;
-        } else if(playerTop > screenTop) {
-            // clamp to top
-            newY = screenTop - halfHeight;
-            player.body.setLinearVelocity(player.body.getLinearVelocity().x, -newY);
-            yMove = 1;
-        }
+        stage.act(delta);
+//        // testing to make sure the player can't leave bounds
+//        // TODO: fix bouncing :/
+//        // horizontal axis
+//        if (playerLeft < screenLeft) {
+//            // clamp to left
+//            newX = screenLeft + halfWidth;
+//            player.body.setLinearVelocity(newX, player.body.getLinearVelocity().y);
+//            xMove = 1;
+//        } else if (playerRight > screenRight) {
+//            // clamp to right
+//            newX = screenRight - halfWidth;
+//            player.body.setLinearVelocity(-newX, player.body.getLinearVelocity().y);
+//            xMove = 1;
+//        }
+//        // vertical axis
+//        if (playerBottom < screenBottom) {
+//            // clamp to bottom
+//            newY = screenBottom + halfHeight;
+//            player.body.setLinearVelocity(player.body.getLinearVelocity().x, newY);
+//            yMove = 1;
+//        } else if(playerTop > screenTop) {
+//            // clamp to top
+//            newY = screenTop - halfHeight;
+//            player.body.setLinearVelocity(player.body.getLinearVelocity().x, -newY);
+//            yMove = 1;
+//        }
 
         batch.begin();
+
+        stage.draw();
+
         String[] items = {"", "Item 1", "Item 2", "Item 3", "Item 4", "Item 5"};
         font.draw(batch, "Order List:", sidePanelX + 10, sidePanelY + sidePanelHeight - 10);
         font.draw(batch, "\n", sidePanelX + 10, sidePanelY + sidePanelHeight - 10);
@@ -362,7 +324,7 @@ public class GameScreen extends ApplicationAdapter implements Screen {
             font.draw(batch, items[i], sidePanelX + 10, sidePanelY + sidePanelHeight - 30*i);
         }
 
-        player.render(batch, xMove, yMove, move);
+//        player.render(batch, xMove, yMove, move);
 
         if (!coin.collected) {
             coin.render(batch, 50, 25);
@@ -375,25 +337,24 @@ public class GameScreen extends ApplicationAdapter implements Screen {
         // Gdx.input.setInputProcessor(keyProcessor);
 
 
-        if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
-            test++;
-            System.out.println(test);
-            if (test == 2) {
-                popup.show();
-                Gdx.input.setInputProcessor(popup.getStage());
-            }
-            if (test == 4) {
-                System.out.println(attributes.array);
-            }
-        }
-
-        if (popup.isVisible()) {
-            popup.render();
-        } else {
-            Gdx.input.setInputProcessor(keyProcessor); // Enable arrow key input
-        }
-//        if (orderScreen.isVisible()) {
-//            orderScreen.render();
+//        if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
+//            test++;
+//            System.out.println(test);
+//            if (test == 2) {
+//                popup.show();
+//                multiplexer.addProcessor(popup.getStage());
+////                Gdx.input.setInputProcessor(popup.getStage());
+//            }
+//            if (test == 4) {
+//                System.out.println(attributes.array);
+//            }
+//        }
+//
+//        if (popup.isVisible()) {
+//            popup.render();
+//        } else {
+//            multiplexer.removeProcessor(popup.getStage());
+////            Gdx.input.setInputProcessor(keyProcessor); // Enable arrow key input
 //        }
 
         batch.end();
