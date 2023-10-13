@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -27,6 +28,8 @@ public class GameplayScreen implements Screen {
     public PlayerAttributes playerAttributes;
     public Order currentOrder;
     private final Popup popup;
+    private Coin coin;
+    public int coinCounter;
 
     private InputMultiplexer multiplexer;
 
@@ -50,6 +53,9 @@ public class GameplayScreen implements Screen {
         player = new Player(world, 0, 0);
         camera = new PlayerCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         camera.update();
+
+        coin = new Coin(world, 0, 0);
+        coinCounter = 0;
 
         // For testing
         currentOrder = new Order(stage, game, 01, "Cosi", "walc", 7.00);
@@ -126,6 +132,15 @@ public class GameplayScreen implements Screen {
         batch.begin();
         stage.draw();
         player.render(batch);
+
+        if (!coin.collected) {
+            coin.render(batch, 150, 150);
+            if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), coin.getSprite().getBoundingRectangle())) {
+                coin.setCollected(true);
+                coinCounter++;
+            }
+        }
+
         batch.end();
 
         // Draw UI stuff
