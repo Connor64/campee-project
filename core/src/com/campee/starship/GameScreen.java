@@ -94,7 +94,6 @@ public class GameScreen extends ApplicationAdapter implements Screen {
 //            y = screenHeight - player.getHeight();
 //        }
 
-
         // boundaries for player and screen
         Rectangle playerBounds = player.getBounds();
         Rectangle screenBounds = new Rectangle(0, 0, screenWidth, screenHeight);

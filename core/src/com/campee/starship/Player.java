@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 
 public class Player extends GameObject {
@@ -24,6 +25,8 @@ public class Player extends GameObject {
     String spritePath = "";
     private float speedBoostX;
     private float speedBoostY;
+
+    private static final float ACCELERATION = 1000f;
 
     public Player (World world, float x, float y) {
         // constructor for new player object
@@ -50,7 +53,6 @@ public class Player extends GameObject {
 
         body.setUserData(this);
         body.setGravityScale(0);
-
 
         shape.dispose();
 
@@ -102,13 +104,26 @@ public class Player extends GameObject {
 //        } else {
 //            speedBoostY = 0;
 //        }
-        speedBoostX = moveX * (speedBoostX + 50);
-        speedBoostY = moveY * (speedBoostY + 50);
+//        speedBoostX = moveX * (speedBoostX + 50);
+//        speedBoostY = moveY * (speedBoostY + 50);
 
-        System.out.println("speedX: " + speedBoostX);
-        System.out.println("speedY: " + speedBoostY);
-        body.applyForceToCenter((1000 * moveX) +(50 * speedBoostX), (1000 * moveY) + (50 * speedBoostY),  true);
+ //       System.out.println("speedX: " + speedBoostX);
+//        System.out.println("speedY: " + speedBoostY);
+//        body.applyForceToCenter((1000 * moveX) +(50 * speedBoostX), (1000 * moveY) + (50 * speedBoostY),  true);
 //        body.setLinearVelocity(speedBoostX, speedBoostY);
+        float maxSpeed = ACCELERATION;
+        float desiredVelocityX = moveX * maxSpeed;
+        float desiredVelocityY = moveY * maxSpeed;
+
+        Vector2 currentVelocity = body.getLinearVelocity();
+        float velocityChangeX = desiredVelocityX - currentVelocity.x;
+        float velocityChangeY = desiredVelocityY - currentVelocity.y;
+
+        float impulseX = body.getMass() * velocityChangeX;
+        float impulseY = body.getMass() * velocityChangeY;
+
+        Vector2 impulse = new Vector2(impulseX, impulseY);
+        body.applyLinearImpulse(impulse, body.getWorldCenter(), true);
 
         // re-render sprite using movement indicator (spriteNum)
         setSprite(spriteNum);
