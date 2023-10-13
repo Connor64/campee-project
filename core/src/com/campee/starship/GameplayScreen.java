@@ -79,9 +79,6 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         coin = new Coin(world, 0, 0);
         coinCounter = 0;
 
-        // For testing
-        //currentOrder = new Order(stage, game, 01, "Cosi", "walc", 7, new ArrayList<String>());
-        //popup = new Popup(this, currentOrder.toString());
         playerAttributes = new PlayerAttributes();
 
         visibleQ = new ArrayList<>();
