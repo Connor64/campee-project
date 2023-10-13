@@ -22,7 +22,7 @@ public class Popup {
     private BitmapFont font;
     private Label messageLabel;
 
-    public Popup(final GameplayScreen screen, String notificationMessage) {
+    public Popup(final GameplayScreen screen, final String notificationMessage) {
         stage = new Stage();
         shapeRenderer = new ShapeRenderer();
         visible = false;
@@ -70,8 +70,10 @@ public class Popup {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 screen.playerAttributes.orderInProgress = true;
-                System.out.println(screen.order);
-                screen.playerAttributes.array.add(screen.order.queueString());
+                screen.playerAttributes.array.add(screen.order.arrayToString());
+                System.out.println(screen.playerAttributes.array);
+
+
                 visible = false;
             }
         });

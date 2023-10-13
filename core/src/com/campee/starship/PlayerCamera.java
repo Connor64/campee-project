@@ -38,7 +38,6 @@ public class PlayerCamera extends OrthographicCamera {
         smoothY = MathUtils.clamp(smoothY, -yBound + (viewportHeight / 2), yBound - (viewportHeight / 2));
 
         position.set(smoothX, smoothY, 0);
-//        System.out.println("pos: " + position);
         update();
     }
 }
