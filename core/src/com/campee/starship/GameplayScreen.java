@@ -128,12 +128,12 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         // Draw game world stuff
         batch.begin();
-        stage.draw();
         player.render(batch);
         batch.end();
 
         // Draw UI stuff
         batch.begin();
+        stage.draw();
         popup.render();
         batch.end();
     }
