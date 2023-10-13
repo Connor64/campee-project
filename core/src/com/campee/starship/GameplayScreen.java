@@ -106,7 +106,6 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         coinCounter = 0;
 
         playerAttributes = new PlayerAttributes();
-//        playerAttributes.orderInProgress = false;
 
         visibleQ = new ArrayList<>();
         playerAttributes.setArray(visibleQ);
@@ -293,6 +292,13 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             }
         }
 
+        if (playerAttributes.array.size() > 1 && !order.isPickedUp()) {
+            pickupObject.sprite.draw(batch);
+
+        }
+        if (playerAttributes.array.size() > 1 && !order.isDroppedOff() && order.isPickedUp()) {
+            dropoffObject.sprite.draw(batch);
+        }
         // order picking up and dropping off
         System.out.println("player_x: " + player.getSprite().getX() + ", player_y: " + player.getSprite().getY());
 //        System.out.println("player_y: " + player.getSprite().getY());
@@ -305,6 +311,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                 pickupLabel.setVisible(true);
                 if (keyProcessor.pPressed) {
                     order.setPickedUp(true);
+                    order.setDroppedOff(false);
                     pickupLabel.setVisible(false);
                 }
             } else {
@@ -316,6 +323,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getDropoffBounds())) {
                 dropoffLabel.setVisible(true);
                 if (keyProcessor.oPressed) {
+                    order.setPickedUp(false);
                     order.setDroppedOff(true);
                     playerAttributes.orderInProgress = false;
                     playerAttributes.array.remove(1);
