@@ -26,8 +26,6 @@ public class GameScreen extends ApplicationAdapter implements Screen {
     private Game game;
     private Stage stage;
     private Popup popup;
-    private boolean screenClicked = false; // Add this variable
-    private boolean prevClickState = false; // Add this variable to track the previous click state
     TextButton backButton;
     TextButton nextOrderButton;
     Player player;
@@ -82,7 +80,6 @@ public class GameScreen extends ApplicationAdapter implements Screen {
             public void clicked(InputEvent event, float x, float y) {
 
                 popup.show();
-                popup.render();
                 Gdx.input.setInputProcessor(popup.getStage());
                 System.out.println("Order Menu");
 
@@ -97,7 +94,7 @@ public class GameScreen extends ApplicationAdapter implements Screen {
         array = attributes.array;
         orderScreen = new OrderScreen();
         coin = new Coin();
-        orderScreen.visible = true;
+        orderScreen.visible = false;
         order = new Order(stage, game, 01, "Cosi", "walc", 7.00 );
         popup = new Popup(this, order.toString());
     }
@@ -125,10 +122,11 @@ public class GameScreen extends ApplicationAdapter implements Screen {
 
     @Override
     public void render(float delta) {
-        Gdx.input.setInputProcessor(keyProcessor);
+        //Gdx.input.setInputProcessor(keyProcessor);
         //Gdx.input.setInputProcessor(popup.getStage());
 
 
+        Gdx.input.setInputProcessor(stage);
 
 
         orderScreen.visible = false;
@@ -137,7 +135,7 @@ public class GameScreen extends ApplicationAdapter implements Screen {
 
         // Handle player movement
 
-        if (!popup.isVisible()) {
+
             if (keyProcessor.upPressed) {
                 y += SPEED * deltaTime;
                 move = 0;
@@ -151,7 +149,7 @@ public class GameScreen extends ApplicationAdapter implements Screen {
                 x += SPEED * deltaTime;
                 move = 3;
             }
-        }
+
 
 
         batch.begin();
@@ -177,6 +175,12 @@ public class GameScreen extends ApplicationAdapter implements Screen {
         if (Intersector.overlaps(player.getBounds(), coin.getBounds())) {
             coin.setCollected(true);
         }
+        if (popup.isVisible()) {
+            popup.render();
+        } else {
+            Gdx.input.setInputProcessor(stage); // Enable the stage input for the buttons
+        }
+
 
         batch.end();
         stage.act(delta);
