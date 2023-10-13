@@ -118,7 +118,6 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         coinCounter = 0;
 
         playerAttributes = new PlayerAttributes();
-//        playerAttributes.orderInProgress = false;
 
         visibleQ = new ArrayList<>();
         playerAttributes.setArray(visibleQ);
@@ -138,12 +137,12 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         order.setDropoffBounds(levelWidth - sidePanelWidth * 2, levelHeight - sidePanelHeight * 2, 50, 50);
 
         pickupObject = new GameObject(world, order.getPickupBounds().getX(), order.getPickupBounds().getY());
-        pickupObject.setSprite("connor_apple.jpg");
+        pickupObject.setSprite("borger.png");
         pickupObject.sprite.setSize(order.getPickupBounds().getWidth(), order.getPickupBounds().getHeight());
         pickupObject.sprite.setPosition(order.getPickupBounds().getX(), order.getPickupBounds().getY());
 
         dropoffObject = new GameObject(world, order.getDropoffBounds().getX(), order.getDropoffBounds().getY());
-        dropoffObject.setSprite("connor_apple.jpg");
+        dropoffObject.setSprite("plate.png");
         dropoffObject.sprite.setSize(order.getDropoffBounds().getWidth(), order.getDropoffBounds().getHeight());
         dropoffObject.sprite.setPosition(order.getDropoffBounds().getX(), order.getDropoffBounds().getY());
 
@@ -349,8 +348,15 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             }
         }
 
+        if (playerAttributes.array.size() > 1 && !order.isPickedUp()) {
+            pickupObject.sprite.draw(batch);
+
+        }
+        if (playerAttributes.array.size() > 1 && !order.isDroppedOff() && order.isPickedUp()) {
+            dropoffObject.sprite.draw(batch);
+        }
         // order picking up and dropping off
-        System.out.println("player_x: " + player.getSprite().getX() + ", player_y: " + player.getSprite().getY());
+//        System.out.println("player_x: " + player.getSprite().getX() + ", player_y: " + player.getSprite().getY());
 //        System.out.println("player_y: " + player.getSprite().getY());
         if (!order.isPickedUp() && playerAttributes.orderInProgress) {
             pickupObject.sprite.draw(batch);
@@ -361,6 +367,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                 pickupLabel.setVisible(true);
                 if (keyProcessor.pPressed) {
                     order.setPickedUp(true);
+                    order.setDroppedOff(false);
                     pickupLabel.setVisible(false);
                 }
             } else {
@@ -372,6 +379,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getDropoffBounds())) {
                 dropoffLabel.setVisible(true);
                 if (keyProcessor.oPressed) {
+                    order.setPickedUp(false);
                     order.setDroppedOff(true);
                     playerAttributes.orderInProgress = false;
                     playerAttributes.array.remove(1);
