@@ -17,7 +17,7 @@ import java.io.FileNotFoundException;
 public class MoonshipGame extends Game {
 	//GameScreen gameScreen;
 	//private Order order;
-	//private TitleScreen titleScreen;
+	private TitleScreen titleScreen;
 	//private TestScreen testScreen;
 
 	public SpriteBatch batch;
@@ -26,15 +26,15 @@ public class MoonshipGame extends Game {
 
 	@Override
 	public void create() {
-		//titleScreen = new TitleScreen(this);
+		titleScreen = new TitleScreen(this);
 		//testScreen = new TestScreen(this);
 		//order = new Order(this);
 //		gameScreen = new GameScreen(this);
 //		setScreen(gameScreen);
 
 		batch = new SpriteBatch();
-
-		setScreen(new GameplayScreen(this));
+		setScreen(new TitleScreen(this));
+		//setScreen(new GameplayScreen(this));
 	}
 
 	@Override

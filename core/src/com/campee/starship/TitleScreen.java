@@ -31,6 +31,7 @@ public class TitleScreen implements Screen {
     private Stage stage;
     private ExtendViewport viewport;
     private TextButton button;
+    private TextButton closeButton;
 
     public TitleScreen(final MoonshipGame game) {
         this.game = game;
@@ -78,7 +79,7 @@ public class TitleScreen implements Screen {
         button.addListener(new InputListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 // Switch to another screen when the button is clicked
-                game.setScreen(new GameplayScreen(game)); // Change to the screen you want
+                game.setScreen(new LevelScreen(game)); // Change to the screen you want
                 return true;
             }
         });
