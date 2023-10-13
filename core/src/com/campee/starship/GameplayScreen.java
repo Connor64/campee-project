@@ -9,11 +9,13 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Intersector;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
@@ -29,13 +31,18 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     private TextButton nextOrderButton;
 
     private World world;
+    private int levelWidth;
+    private int levelHeight;
 
     private Player player;
     public PlayerAttributes playerAttributes;
+    ArrayList<String> visibleQ;
+
     public Order currentOrder;
     private final Popup popup;
     private Coin coin;
     public int coinCounter;
+    public Label label;
 
     private InputMultiplexer multiplexer;
 
@@ -74,7 +81,10 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         world = new World(new Vector2(0, 0), true);
         multiplexer = new InputMultiplexer();
 
-        player = new Player(world, 0, 0);
+        levelWidth = 500;
+        levelHeight = 500;
+
+        player = new Player(world, 150, 200);
         camera = new PlayerCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         camera.update();
 
@@ -96,6 +106,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         //popup = new Popup(this, currentOrder.toString());
         playerAttributes = new PlayerAttributes();
 
+        visibleQ = new ArrayList<>();
+        playerAttributes.setArray(visibleQ);
 
         order = new Order();
         arrays = new ArrayList<>();
@@ -139,24 +151,14 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }
-                System.out.println(order.array);
-                order.seti(count);
-                //count++;
-                //orderA = order.arrayToArray();
-                System.out.println(Arrays.toString(orderA));
-                int time = Integer.parseInt(orderA[3]);
-                int id = Integer.parseInt(orderA[0]);
-
-                order = new Order(stage, game, id, orderA[1], orderA[2], time, arrays);
                 order.seti(count);
                 count++;
-                //popup = new Popup(, order.arrayToString());
                 popup.setMessage(order.arrayToString());
 
                 popup.show();
                 popup.render();
                 multiplexer.addProcessor(popup.getStage());
-                System.out.println("Order Menu");
+
             }
         });
 
@@ -168,6 +170,16 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         multiplexer.addProcessor(keyProcessor);
 
         Gdx.input.setInputProcessor(multiplexer);
+
+        // visual indicator boundary
+        BitmapFont font = new BitmapFont(Gdx.files.internal("moonships_font.fnt"), Gdx.files.internal("moonships_font.png"), false);
+        font.setColor(0, 0, 0, 1);
+        font.getData().setScale(0.5f, 0.5f);
+        Label.LabelStyle indicatorStyle = new Label.LabelStyle(font, Color.BLACK);
+        label = new Label("Careful!", indicatorStyle);
+        label.setVisible(false);
+        stage.addActor(label);
+        label.setSize(font.getScaleX() * 100, font.getScaleY() * 100);
     }
 
     @Override
@@ -193,9 +205,10 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         // If the popup is not visible, update the player and world
         if (!popup.isVisible()) {
             player.update(delta, keyProcessor);
+            player.checkBounds(levelWidth, levelHeight, 5000);
             world.step(1/60f, 6, 2); // Physics calculations
-            camera.follow(player.position, delta);
-
+//            player.position.y = MathUtils.clamp(player.position.y, -levelHeight, levelHeight);
+            camera.follow(player.position, levelWidth, levelHeight);
         }
 
         batch.setProjectionMatrix(camera.combined);
@@ -205,8 +218,6 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         stage.act(delta);
 
         // screen boundary collisions
-        float newX = player.sprite.getX();
-        float newY = player.sprite.getY();
         Rectangle playerBounds = player.sprite.getBoundingRectangle();
         Rectangle screenBounds = new Rectangle(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         float playerLeft = playerBounds.getX();
@@ -214,87 +225,28 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         float playerTop = playerBottom + playerBounds.getHeight();
         float playerRight = playerLeft + playerBounds.getWidth();
 
-        final float halfWidth = playerBounds.getWidth() * .5f;
-        final float halfHeight = playerBounds.getHeight() * .5f;
+        float threshold = 50;
 
-        float screenLeft = screenBounds.getX();
-        float screenBottom = screenBounds.getY();
-        float screenTop = screenBottom + screenBounds.getHeight();
-        float screenRight = screenLeft + screenBounds.getWidth();
-
-        if (playerLeft < screenLeft) {
-            // clamp to left
-            newX = screenLeft + halfWidth;
-            player.body.setLinearVelocity(newX, player.body.getLinearVelocity().y);
-        } else if (playerRight > screenRight) {
-            // clamp to right
-            newX = screenRight - halfWidth;
-            player.body.setLinearVelocity(-newX, player.body.getLinearVelocity().y);
+        // visual indicator that the player is almost off the screen
+        if (!popup.isVisible()) {
+            // warning only visible when popup is not
+            if (playerLeft <= -levelWidth + threshold) {
+                label.setPosition(screenBounds.getWidth() - (screenBounds.getWidth() - label.getWidth()), screenBounds.getHeight() / 2);
+                label.setVisible(true);
+            } else if (playerRight >= levelWidth - threshold) {
+                label.setPosition((screenBounds.getWidth() - (3 * label.getWidth())), screenBounds.getHeight() / 2);
+                label.setVisible(true);
+            } else if (playerBottom <= -levelHeight + threshold) {
+                label.setPosition(screenBounds.getWidth() / 2, screenBounds.getHeight() - (screenBounds.getHeight() - label.getHeight()));
+                label.setVisible(true);
+            } else if (playerTop >= levelHeight - threshold) {
+                label.setPosition(screenBounds.getWidth() / 2, screenBounds.getHeight() - label.getHeight());
+                label.setVisible(true);
+            } else {
+                // remove the label
+                label.setVisible(false);
+            }
         }
-        // vertical axis
-        if (playerBottom < screenBottom) {
-            // clamp to bottom
-            newY = screenBottom + halfHeight;
-            player.body.setLinearVelocity(player.body.getLinearVelocity().x, newY);
-        } else if (playerTop > screenTop) {
-            // clamp to top
-            newY = screenTop - halfHeight;
-            player.body.setLinearVelocity(player.body.getLinearVelocity().x, -newY);
-        }
-
-
-//        // visual indicator stuff
-////        Skin indicatorSkin = new Skin(Gdx.files.internal("skin/uiskin.json"),
-////                new TextureAtlas(Gdx.files.internal("skin/uiskin.atlas")));
-//        BitmapFont font = new BitmapFont(Gdx.files.internal("moonships_font.fnt"), Gdx.files.internal("moonships_font.png"), false);
-//        font.setColor(0, 0, 0, 1);
-//        font.getData().setScale(0.5f, 0.5f);
-//        Label.LabelStyle indicatorStyle = new Label.LabelStyle(font, Color.BLACK);
-//        Label label = new Label("Careful!", indicatorStyle);
-//        label.setVisible(false);
-//
-////        Pixmap labelColor = new Pixmap((int) font.getScaleX(), (int) font.getScaleY(), Pixmap.Format.RGB888);
-////        labelColor.setColor(Color.WHITE);
-////        labelColor.fill();
-////        label.getStyle().background = new Image(new Texture(labelColor)).getDrawable();
-//
-//        label.setSize(font.getScaleX() * 100, font.getScaleY() * 100);
-////        label.setPosition(screenWidth - (screenWidth - 15), screenHeight - label.getHeight());
-//
-//        // visual indicator that the player is almost off the screen
-//        // left side
-//        if (!popup.isVisible()) {
-//            if (playerLeft <= screenLeft + (2 * halfWidth)) {
-//                label.setVisible(false);
-//                stage.clear();
-//                label.setPosition(screenWidth - (screenWidth - label.getWidth()), screenHeight / 2);
-//                label.setVisible(true);
-//                stage.addActor(label);
-//            } else if (playerRight >= screenRight - (2 * halfWidth)) {
-//                label.setVisible(false);
-//                stage.clear();
-//                label.setPosition((screenWidth - (3 * label.getWidth())), screenHeight / 2);
-//                label.setVisible(true);
-//                stage.addActor(label);
-//            } else if (playerBottom <= screenBottom + (2 * halfHeight)) {
-//                label.setVisible(false);
-//                stage.clear();
-//                label.setPosition(screenWidth / 2, screenHeight - (screenHeight - label.getHeight()));
-//                label.setVisible(true);
-//                stage.addActor(label);
-//            } else if (playerTop >= screenTop - (2 * halfHeight)) {
-//                label.setVisible(false);
-//                stage.clear();
-//                label.setPosition(screenWidth / 2, screenHeight - label.getHeight());
-//                label.setVisible(true);
-//                stage.addActor(label);
-//            } else {
-//                // remove the label
-//                stage.clear();
-//                label.setVisible(false);
-//            }
-//        }
-
 
         /* ========================== DRAW ============================ */
 
