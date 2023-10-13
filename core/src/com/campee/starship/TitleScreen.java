@@ -20,6 +20,8 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
+import java.io.FileNotFoundException;
+
 public class TitleScreen implements Screen {
     private MoonshipGame game;
     private SpriteBatch batch;
