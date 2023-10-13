@@ -74,6 +74,7 @@ public class Popup {
             public void clicked(InputEvent event, float x, float y) {
                 gameScreen.attributes.orderInProgress = true;
                 gameScreen.attributes.array.add(gameScreen.order.queueString());
+                Gdx.input.setInputProcessor(gameScreen.getStage());
 
                 visible = false;
                 // Handle accept button click
@@ -85,6 +86,8 @@ public class Popup {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 System.out.println("something happened");
+                Gdx.input.setInputProcessor(gameScreen.getStage());
+
                 visible = false;
                 // Handle decline button click
                 //hide();
