@@ -1,6 +1,7 @@
 package com.campee.starship;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
 public class PlayerCamera extends OrthographicCamera {
@@ -26,16 +27,18 @@ public class PlayerCamera extends OrthographicCamera {
      * Linearly interpolates the camera's position to follow the specified position. Must be called every frame.
      *
      * @param target The position the camera is to follow.
-     * @param deltaTime The time, in seconds, since the last frame.
      */
-    public void follow(Vector2 target, float deltaTime) {
+    public void follow(Vector2 target, int xBound, int yBound) {
         float deltaLerp = lerpSpeed;
 
         float smoothX = (position.x * (interpolateSpeed - deltaLerp)) + (target.x * deltaLerp);
         float smoothY = (position.y * (interpolateSpeed - deltaLerp)) + (target.y * deltaLerp);
 
+        smoothX = MathUtils.clamp(smoothX, -xBound + (viewportWidth / 2), xBound - (viewportWidth / 2));
+        smoothY = MathUtils.clamp(smoothY, -yBound + (viewportHeight / 2), yBound - (viewportHeight / 2));
+
         position.set(smoothX, smoothY, 0);
-        System.out.println("pos: " + position);
+//        System.out.println("pos: " + position);
         update();
     }
 }
