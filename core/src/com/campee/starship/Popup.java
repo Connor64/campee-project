@@ -70,7 +70,8 @@ public class Popup {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 screen.playerAttributes.orderInProgress = true;
-                screen.playerAttributes.array.add(screen.currentOrder.queueString());
+                System.out.println(screen.order);
+                screen.playerAttributes.array.add(screen.order.queueString());
                 visible = false;
             }
         });
