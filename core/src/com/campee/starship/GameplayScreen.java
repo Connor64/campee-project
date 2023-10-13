@@ -18,6 +18,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.Screen;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class GameplayScreen extends ApplicationAdapter implements Screen {
 
@@ -42,9 +45,17 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
     private PlayerCamera camera;
 
-    public GameplayScreen(final MoonshipGame game) {
-        GAME = game;
-        batch = GAME.batch;
+    ArrayList<String> arrays;
+    String s;
+    int count;
+    Order order;
+    String[] orderA;
+    GameplayScreen g;
+
+    public GameplayScreen(final MoonshipGame game) throws FileNotFoundException {
+        g = this;
+        this.GAME = game;
+        batch = game.batch;
 
         stage = new Stage();
         keyProcessor = new KeyProcessor();
@@ -59,9 +70,21 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         coinCounter = 0;
 
         // For testing
-        currentOrder = new Order(stage, game, 01, "Cosi", "walc", 7.00);
-        popup = new Popup(this, currentOrder.toString());
+        //currentOrder = new Order(stage, game, 01, "Cosi", "walc", 7, new ArrayList<String>());
+        //popup = new Popup(this, currentOrder.toString());
         playerAttributes = new PlayerAttributes();
+
+
+        order = new Order();
+        arrays = new ArrayList<>();
+        order.setArray(arrays);
+        System.out.println(arrays);
+        orderA = order.arrayToArray();
+        order.seti(order.i++);
+        int time = Integer.parseInt(orderA[3]);
+        int id = Integer.parseInt(orderA[0]);
+        order = new Order(stage, game, id, orderA[1], orderA[2], time, arrays);
+        popup = new Popup(this, order.arrayToString());
 
         // Make button style
         Pixmap backgroundPixmap = createRoundedRectanglePixmap(200, 50, 10, Color.PURPLE); // Adjust size and color
@@ -89,6 +112,25 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         nextOrderButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                try {
+                    order.setArray(arrays);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+                System.out.println(order.array);
+                order.seti(count);
+                //count++;
+                //orderA = order.arrayToArray();
+                System.out.println(Arrays.toString(orderA));
+                int time = Integer.parseInt(orderA[3]);
+                int id = Integer.parseInt(orderA[0]);
+
+                order = new Order(stage, game, id, orderA[1], orderA[2], time, arrays);
+                order.seti(count);
+                count++;
+                //popup = new Popup(, order.arrayToString());
+                popup.setMessage(order.arrayToString());
+
                 popup.show();
                 popup.render();
                 multiplexer.addProcessor(popup.getStage());
