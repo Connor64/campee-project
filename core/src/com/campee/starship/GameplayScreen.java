@@ -31,6 +31,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
     private Player player;
     public PlayerAttributes playerAttributes;
+    ArrayList<String> visibleQ;
+
     public Order currentOrder;
     private final Popup popup;
     private Coin coin;
@@ -75,6 +77,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         playerAttributes = new PlayerAttributes();
 
 
+        visibleQ = new ArrayList<>();
+        playerAttributes.setArray(visibleQ);
         order = new Order();
         arrays = new ArrayList<>();
         order.setArray(arrays);
@@ -117,24 +121,14 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }
-                System.out.println(order.array);
-                order.seti(count);
-                //count++;
-                //orderA = order.arrayToArray();
-                System.out.println(Arrays.toString(orderA));
-                int time = Integer.parseInt(orderA[3]);
-                int id = Integer.parseInt(orderA[0]);
-
-                order = new Order(stage, game, id, orderA[1], orderA[2], time, arrays);
                 order.seti(count);
                 count++;
-                //popup = new Popup(, order.arrayToString());
                 popup.setMessage(order.arrayToString());
 
                 popup.show();
                 popup.render();
                 multiplexer.addProcessor(popup.getStage());
-                System.out.println("Order Menu");
+
             }
         });
 
