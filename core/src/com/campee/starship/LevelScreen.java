@@ -17,7 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 public class LevelScreen implements Screen {
-    private final Game game;
+    private final MoonshipGame game;
     private OrthographicCamera camera;
     private ShapeRenderer shapeRenderer;
     private SpriteBatch batch;
@@ -29,7 +29,7 @@ public class LevelScreen implements Screen {
     private ExtendViewport viewport;
 
     public LevelScreen(final Game game) {
-        this.game = game;
+        this.game = (MoonshipGame) game;
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 800, 600);
         shapeRenderer = new ShapeRenderer();
@@ -84,7 +84,6 @@ public class LevelScreen implements Screen {
         beginButton.setSize(150, 60);
         beginButton.addListener(new InputListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                // Switch back to the title screen when the BACK button is clicked
                 game.setScreen(new GameplayScreen((MoonshipGame) game)); // Change to the screen you want
                 return true;
             }
