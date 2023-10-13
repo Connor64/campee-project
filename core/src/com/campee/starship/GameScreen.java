@@ -2,9 +2,11 @@ package com.campee.starship;
 
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
@@ -18,39 +20,48 @@ import com.badlogic.gdx.utils.ScreenUtils;
 
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.ScreenUtils;
+
+import java.util.ArrayList;
+
 
 
 public class GameScreen extends ApplicationAdapter implements Screen {
+    int test;
     SpriteBatch batch;
+
     Texture img;
     private Game game;
     private Stage stage;
-    private Skin skin;
-    private ShapeRenderer shapeRenderer;
     private Popup popup;
-    int test;
 
     private World world;
     private Box2DDebugRenderer debugRenderer;
+    private ShapeRenderer shapeRenderer;
     public int coinCounter = 0;
 
     private boolean screenClicked = false; // Add this variable
     private boolean prevClickState = false; // Add this variable to track the previous click state
-
-
+    TextButton backButton;
+    TextButton nextOrderButton;
     Player player;
     PlayerAttributes attributes;
     KeyProcessor keyProcessor;
     //OrderScreen orderScreen;
     Coin coin;
     Order order;
-
     float x;
     float y;
     float screenWidth;
     float screenHeight;
     int SPEED = 150;
     int move = 0;
+    ArrayList<String> array;
 
     float sidePanelX;
     float sidePanelY;
@@ -63,13 +74,11 @@ public class GameScreen extends ApplicationAdapter implements Screen {
         ArrayList<String> array;
         world = new World(new Vector2(0, -10), true);
         debugRenderer = new Box2DDebugRenderer();
-
         test = 0;
         stage = new Stage();
         this.game = game;
         batch = new SpriteBatch();
         keyProcessor = new KeyProcessor();
-        Gdx.input.setInputProcessor(keyProcessor);
         screenWidth = Gdx.graphics.getWidth();
         screenHeight = Gdx.graphics.getHeight();
         x = 100;
@@ -77,6 +86,49 @@ public class GameScreen extends ApplicationAdapter implements Screen {
         player = new Player(world, x, y);
         //orderScreen = new OrderScreen();
         coin = new Coin(world, x, y);
+        attributes = new PlayerAttributes();
+
+        Pixmap backgroundPixmap = createRoundedRectanglePixmap(200, 50, 10, Color.PURPLE); // Adjust size and color
+        TextButton.TextButtonStyle buttonStyle = new TextButton.TextButtonStyle();
+        buttonStyle.up = new TextureRegionDrawable(new TextureRegion(new Texture(backgroundPixmap)));
+        BitmapFont buttonFont = new BitmapFont();
+        buttonFont.getData().setScale(1.5f);
+        buttonStyle.font = buttonFont;
+        buttonStyle.fontColor = Color.BLACK;
+        backButton = new TextButton("Back", buttonStyle);
+        backButton.setPosition(10, Gdx.graphics.getHeight() - 60); // Adjust the position as necessary
+        backButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                System.out.println("clicked back");
+                game.setScreen(new TitleScreen(game));
+            }
+        });
+
+        nextOrderButton = new TextButton("Next Order", buttonStyle);
+        nextOrderButton.setPosition(Gdx.graphics.getWidth() - 220, Gdx.graphics.getHeight() - 60); // Adjust the position as necessary
+        nextOrderButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+
+                popup.show();
+                popup.render();
+                Gdx.input.setInputProcessor(popup.getStage());
+                System.out.println("Order Menu");
+
+            }
+        });
+
+        stage.addActor(nextOrderButton);
+        stage.addActor(backButton);
+        Gdx.input.setInputProcessor(stage);
+
+
+        array = attributes.array;
+//        orderScreen = new OrderScreen();
+//        orderScreen.visible = true;
+        order = new Order(stage, game, 01, "Cosi", "walc", 7.00 );
+        popup = new Popup(this, order.toString());
 
         // Define side panel properties
         sidePanelWidth = screenWidth / 5; // Width
@@ -90,7 +142,6 @@ public class GameScreen extends ApplicationAdapter implements Screen {
         order = new Order(stage, game, 0, null, null, 0 );
         popup = new Popup(this, order.toString());
     }
-
 
     @Override
     public void show() {
@@ -119,8 +170,30 @@ public class GameScreen extends ApplicationAdapter implements Screen {
         stage.addActor(orderScreen);*/
     }
 
+    public Pixmap createRoundedRectanglePixmap(int width, int height, int cornerRadius, Color color) {
+        Pixmap pixmap = new Pixmap(width, height, Pixmap.Format.RGBA8888);
+        pixmap.setColor(color);
+
+        // Draw rounded rectangle
+        pixmap.fillRectangle(cornerRadius, 0, width - 2 * cornerRadius, height);
+        pixmap.fillRectangle(0, cornerRadius, width, height - 2 * cornerRadius);
+        pixmap.fillCircle(cornerRadius, cornerRadius, cornerRadius);
+        pixmap.fillCircle(cornerRadius, height - cornerRadius - 1, cornerRadius);
+        pixmap.fillCircle(width - cornerRadius - 1, cornerRadius, cornerRadius);
+        pixmap.fillCircle(width - cornerRadius - 1, height - cornerRadius - 1, cornerRadius);
+
+        return pixmap;
+    }
+
     @Override
     public void render(float delta) {
+//        Gdx.input.setInputProcessor(keyProcessor);
+        //Gdx.input.setInputProcessor(popup.getStage());
+
+
+
+
+//        orderScreen.visible = false;
         ScreenUtils.clear(Color.PINK);
         float deltaTime =  Gdx.graphics.getDeltaTime();
 
@@ -137,7 +210,8 @@ public class GameScreen extends ApplicationAdapter implements Screen {
         Vector2 vel = this.player.body.getLinearVelocity();
         Vector2 pos = this.player.body.getPosition();
         float MAX_VELOCITY = 100f;
-        // implement KeyProcessor
+
+        // Handle player movement
         if (!popup.isVisible()) {
             if (keyProcessor.upPressed && vel.y < MAX_VELOCITY) {
                 this.player.body.applyLinearImpulse(0, 4f, pos.x, pos.y, true);
@@ -160,9 +234,8 @@ public class GameScreen extends ApplicationAdapter implements Screen {
                 player.body.setLinearDamping(linearDamping);
             }
         }
-
-
-
+//        batch.begin();
+//        player.render(batch, x, y, move);
 
         //ensure sprite stays within screen bounds
 //        if (x < 0) {
@@ -291,7 +364,6 @@ public class GameScreen extends ApplicationAdapter implements Screen {
 
         player.render(batch, xMove, yMove, move);
 
-
         if (!coin.collected) {
             coin.render(batch, 50, 25);
             if (Intersector.overlaps(player.getBounds(), coin.getBounds())) {
@@ -299,7 +371,6 @@ public class GameScreen extends ApplicationAdapter implements Screen {
                 coinCounter++;
             }
         }
-
 
         // Gdx.input.setInputProcessor(keyProcessor);
 
@@ -328,9 +399,10 @@ public class GameScreen extends ApplicationAdapter implements Screen {
         batch.end();
         stage.act(delta);
         stage.draw();
+    }
 
-
-
+    public Stage getStage() {
+        return stage;
     }
 
     @Override

@@ -10,15 +10,15 @@ public class PlayerAttributes {
     public Queue<String> orderQueue;
     public ArrayList<String> array;
 
-
-    public PlayerAttributes(boolean orderInProgress, int highScore, int score, Queue<String> orderQueue) {
+    public PlayerAttributes(boolean orderInProgress, int highScore, int score, Queue<String> orderQueue, ArrayList<String> array) {
         this.orderInProgress = orderInProgress;
         this.highScore = highScore;
         this.score = score;
         this.orderQueue = orderQueue;
         this.array = array;
-
     }
+
+
 
     public PlayerAttributes() {
         this.orderInProgress = false;

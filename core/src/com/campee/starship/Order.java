@@ -19,7 +19,6 @@ public class Order {
     private String dropoffLocation;
     private double timeEstimate;
 
-
     public Order(Stage stage, Game game, int orderID, String pickupLocation, String dropoffLocation, double timeEstimate) {
         this.stage = stage;
         this.game = game;
