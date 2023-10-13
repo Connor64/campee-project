@@ -11,67 +11,81 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.ScreenUtils;
 
-public class Order implements Screen {
+public class Order {
     private Stage stage;
     private Game game;
     private int orderID;
     private String pickupLocation;
     private String dropoffLocation;
+    private double timeEstimate;
 
-    public Order(final Game game) {
+
+    public Order(Stage stage, Game game, int orderID, String pickupLocation, String dropoffLocation, double timeEstimate) {
+        this.stage = stage;
         this.game = game;
-        stage = new Stage();
-        Gdx.input.setInputProcessor(stage);
-
-        BitmapFont font = new BitmapFont();
-        TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
-        textButtonStyle.font = font;
-
-        textButtonStyle.fontColor = Color.BLACK;
-        TextButton button = new TextButton("POKE ME", textButtonStyle);
-        button.setColor(Color.WHITE);
-        button.setPosition(250, 250);
-        button.addListener(new InputListener() {
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                // Switch to the GameScreen when the button is clicked
-                game.setScreen(new TitleScreen(game));
-                return true;
-            }
-        });
-
-        stage.addActor(button);
+        this.orderID = orderID;
+        this.pickupLocation = pickupLocation;
+        this.dropoffLocation = dropoffLocation;
+        this.timeEstimate = timeEstimate;
     }
 
-    @Override
-    public void show() {
+    public Stage getStage() {
+        return stage;
     }
 
-    @Override
-    public void render(float delta) {
-        ScreenUtils.clear(Color.BLUE);
-        stage.act(delta);
-        stage.draw();
+    public void setStage(Stage stage) {
+        this.stage = stage;
     }
 
-    @Override
-    public void resize(int width, int height) {
-        stage.getViewport().update(width, height, true);
+    public Game getGame() {
+        return game;
     }
 
-    @Override
-    public void pause() {
+    public void setGame(Game game) {
+        this.game = game;
     }
 
-    @Override
-    public void resume() {
+    public int getOrderID() {
+        return orderID;
     }
 
-    @Override
-    public void hide() {
+    public void setOrderID(int orderID) {
+        this.orderID = orderID;
     }
 
+    public String getPickupLocation() {
+        return pickupLocation;
+    }
+
+    public void setPickupLocation(String pickupLocation) {
+        this.pickupLocation = pickupLocation;
+    }
+
+    public String getDropoffLocation() {
+        return dropoffLocation;
+    }
+
+    public void setDropoffLocation(String dropoffLocation) {
+        this.dropoffLocation = dropoffLocation;
+    }
+
+    public double getTimeEstimate() {
+        return timeEstimate;
+    }
+
+    public void setTimeEstimate(double timeEstimate) {
+        this.timeEstimate = timeEstimate;
+    }
+
+    public String queueString() {
+        return "Order ID: " + orderID;
+    }
     @Override
-    public void dispose() {
-        stage.dispose();
+    public String toString() {
+        return
+                "Order ID: " + orderID + '\n' +
+                        "Pickup Location: " + pickupLocation + '\n' +
+                        "Drop-off Location: " + dropoffLocation + '\n' +
+                        "Time Estimate: " + timeEstimate ;
     }
 }

@@ -12,18 +12,18 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 public class MoonshipGame extends Game {
-	//GameScreen gameScreen;
+	GameScreen gameScreen;
 	//private Order order;
-	private TitleScreen titleScreen;
+	//private TitleScreen titleScreen;
 	//private TestScreen testScreen;
 
 	@Override
 	public void create() {
-		titleScreen = new TitleScreen(this);
+		//titleScreen = new TitleScreen(this);
 		//testScreen = new TestScreen(this);
 		//order = new Order(this);
-		//gameScreen = new GameScreen(this);
-		setScreen(titleScreen);
+		gameScreen = new GameScreen(this);
+		setScreen(gameScreen);
 	}
 
 }

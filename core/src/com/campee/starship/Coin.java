@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.physics.box2d.World;
 
 public class Coin extends GameObject {
     public boolean collected;
@@ -13,12 +14,14 @@ public class Coin extends GameObject {
     private Sprite sprite;
     private Texture texture;
 
-    public Coin() {
+    public Coin(World world, float x, float y) {
+        super(world, x, y);
+
         // constructor for new coin object
         dimension.set(0.5f, 0.5f);
 
         // set bounds for collision detection
-        bounds.set(0, 0, dimension.x, dimension.y);
+        setBounds(0, 0, dimension.x, dimension.y);
 
         texture = new Texture(Gdx.files.internal("coin.PNG"));
         texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
@@ -27,12 +30,14 @@ public class Coin extends GameObject {
         sprite.setSize(50, 50);
         sprite.setOrigin(sprite.getX() / 2,sprite.getY() / 2);
         sprite.setPosition(0, 0);
+        this.setHeight(sprite.getHeight());
+        this.setWidth(sprite.getWidth());
     }
 
     public void render(SpriteBatch batch, int x, int y) {
         // render sprite in x,y position
         sprite.setPosition(x, y);
-        bounds.set(sprite.getX(), sprite.getY(), sprite.getWidth(), sprite.getHeight());
+        setBounds(x, y, getWidth(), getHeight());
         sprite.draw(batch);
     }
 
@@ -42,7 +47,4 @@ public class Coin extends GameObject {
         }
     }
 
-    public Rectangle getBounds() {
-        return bounds;
-    }
 }
