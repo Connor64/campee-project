@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
@@ -52,6 +53,17 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
     private PlayerCamera camera;
 
+    private ShapeRenderer shapeRenderer;
+    float sidePanelX;
+    float sidePanelY;
+    float sidePanelWidth;
+    float sidePanelHeight;
+    Color sidePanelColor;
+    BitmapFont font;
+    float screenWidth;
+    float screenHeight;
+
+
     ArrayList<String> arrays;
     String s;
     int count;
@@ -75,6 +87,16 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         player = new Player(world, 150, 200);
         camera = new PlayerCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         camera.update();
+
+        screenWidth = Gdx.graphics.getWidth();
+        screenHeight = Gdx.graphics.getHeight();
+        // Define side panel properties
+        sidePanelWidth = screenWidth / 5; // Width
+        sidePanelX = screenWidth - sidePanelWidth-10; // Position the panel on the right side
+        sidePanelY = 60; // Y position
+        sidePanelHeight = Gdx.graphics.getHeight() - 150; // Height
+        sidePanelColor = new Color(0.2f, 0.2f, 0.2f, 0.8f); // Background color (RGBA)
+
 
         coin = new Coin(world, 0, 0);
         coinCounter = 0;
@@ -166,11 +188,19 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
     @Override
     public void show() {
+        shapeRenderer = new ShapeRenderer();
+        font = new BitmapFont(Gdx.files.internal("moonships_font.fnt"), Gdx.files.internal("moonships_font.png"), false);; // Define your BitmapFont
+        // Set font color and scale
+        font.setColor(1, 1, 0, 1);
+        font.getData().setScale(0.5f);
+
     }
 
     @Override
     public void render(float delta) {
         /* ========================== UPDATE ============================ */
+
+
 
         // If the popup is not visible, update the player and world
         if (!popup.isVisible()) {
@@ -182,6 +212,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         }
 
         batch.setProjectionMatrix(camera.combined);
+
+
 
         stage.act(delta);
 
@@ -222,6 +254,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         // Draw game world stuff
         batch.begin();
+
         player.render(batch);
 
         if (!coin.collected) {
@@ -232,10 +265,29 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             }
         }
 
+
         batch.end();
 
         // Draw UI stuff
         batch.begin();
+
+        // Render the side panel
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(sidePanelColor);
+        shapeRenderer.rect(sidePanelX, sidePanelY, sidePanelWidth, sidePanelHeight);
+        shapeRenderer.end();
+
+        //shapeRenderer.setProjectionMatrix(camera.combined);
+
+        String[] items = {"", "Item 1", "Item 2", "Item 3", "Item 4", "Item 5"};
+
+        font.draw(batch, "Order List:", sidePanelX + 10, sidePanelY + sidePanelHeight - 10);
+        //font.draw(batch, "\n", sidePanelX + 10, sidePanelY + sidePanelHeight - 10);
+
+        for (int i = 1; i < items.length; i++) {
+            font.draw(batch, items[i], sidePanelX + 10, sidePanelY + sidePanelHeight - 30*i);
+        }
+
         stage.draw();
         popup.render();
         batch.end();
