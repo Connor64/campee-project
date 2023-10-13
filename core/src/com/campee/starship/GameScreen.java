@@ -46,10 +46,10 @@ public class GameScreen extends ApplicationAdapter implements Screen {
 
     private Popup popup;
 
-    private World world;
-    private Box2DDebugRenderer debugRenderer;
+    //private World world;
+    //private Box2DDebugRenderer debugRenderer;
     private ShapeRenderer shapeRenderer;
-    public int coinCounter = 0;
+    //public int coinCounter = 0;
 
     private boolean screenClicked = false; // Add this variable
     private boolean prevClickState = false; // Add this variable to track the previous click state
@@ -69,7 +69,7 @@ public class GameScreen extends ApplicationAdapter implements Screen {
     float screenWidth;
     float screenHeight;
     int SPEED = 150;
-    int move = 0;
+    //int move = 0;
     ArrayList<String> array;
 
     float sidePanelX;
