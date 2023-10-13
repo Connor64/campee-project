@@ -350,20 +350,37 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         if (playerAttributes.array.size() > 1 && !order.isPickedUp()) {
             pickupObject.sprite.draw(batch);
-
+            if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getPickupBounds())) {
+                pickupLabel.setVisible(true);
+                if (keyProcessor.pPressed) {
+                    order.setPickedUp(true);
+                    order.setDroppedOff(false);
+                    pickupLabel.setVisible(false);
+                }
+            } else {
+                pickupLabel.setVisible(false);
+            }
         }
+
         if (playerAttributes.array.size() > 1 && !order.isDroppedOff() && order.isPickedUp()) {
             dropoffObject.sprite.draw(batch);
+            if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getDropoffBounds())) {
+                dropoffLabel.setVisible(true);
+                if (keyProcessor.oPressed) {
+                    order.setPickedUp(false);
+                    order.setDroppedOff(true);
+                    playerAttributes.orderInProgress = false;
+                    playerAttributes.array.remove(1);
+                    dropoffLabel.setVisible(false);
+                }
+            } else {
+                dropoffLabel.setVisible(false);
+            }
         }
-        // order picking up and dropping off
-//        System.out.println("player_x: " + player.getSprite().getX() + ", player_y: " + player.getSprite().getY());
-//        System.out.println("player_y: " + player.getSprite().getY());
+
         if (!order.isPickedUp() && playerAttributes.orderInProgress) {
             pickupObject.sprite.draw(batch);
-//            System.out.println("check 1");
-            // only show order pickup, not dropoff
             if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getPickupBounds())) {
-//                System.out.println("in bounds");
                 pickupLabel.setVisible(true);
                 if (keyProcessor.pPressed) {
                     order.setPickedUp(true);
@@ -374,7 +391,6 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                 pickupLabel.setVisible(false);
             }
         } else if (order.isPickedUp() && !order.isDroppedOff() && playerAttributes.orderInProgress) {
-//            System.out.println("check 2");
             dropoffObject.sprite.draw(batch);
             if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getDropoffBounds())) {
                 dropoffLabel.setVisible(true);
