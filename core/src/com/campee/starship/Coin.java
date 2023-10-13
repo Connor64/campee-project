@@ -35,7 +35,7 @@ public class Coin extends GameObject {
     }
 
     public void render(SpriteBatch batch, int x, int y) {
-        // render sprite in x,y position
+        // render sprite in x, y position
         sprite.setPosition(x, y);
         setBounds(x, y, getWidth(), getHeight());
         sprite.draw(batch);
@@ -46,9 +46,7 @@ public class Coin extends GameObject {
             this.collected = true;
         }
     }
-
     public Sprite getSprite() {
         return this.sprite;
     }
-
 }

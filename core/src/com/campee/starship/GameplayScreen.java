@@ -78,7 +78,7 @@ public class GameplayScreen implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 System.out.println("clicked back");
-                game.setScreen(new TitleScreen(game));
+                game.setScreen(new LevelScreen(game));
             }
         });
 
