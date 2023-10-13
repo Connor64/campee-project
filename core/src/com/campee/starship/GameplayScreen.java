@@ -1,8 +1,6 @@
 package com.campee.starship;
 
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -20,7 +18,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.Screen;
+
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,7 +40,10 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     private final Popup popup;
     private Coin coin;
     public int coinCounter;
+
     public Label label;
+    public Label pickupLabel;
+    public Label dropoffLabel;
 
     private InputMultiplexer multiplexer;
 
@@ -105,6 +106,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         //currentOrder = new Order(stage, game, 01, "Cosi", "walc", 7, new ArrayList<String>());
         //popup = new Popup(this, currentOrder.toString());
         playerAttributes = new PlayerAttributes();
+        playerAttributes.orderInProgress = false;
 
         visibleQ = new ArrayList<>();
         playerAttributes.setArray(visibleQ);
@@ -119,6 +121,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         int id = Integer.parseInt(orderA[0]);
         order = new Order(stage, game, id, orderA[1], orderA[2], time, arrays);
         popup = new Popup(this, order.arrayToString());
+        order.setPickupBounds(50, 60, 30, 30);
+        order.setDropoffBounds(Gdx.graphics.getWidth() - 30, Gdx.graphics.getHeight() - 30, 30, 30);
 
         // Make button style
         Pixmap backgroundPixmap = createRoundedRectanglePixmap(200, 50, 10, Color.PURPLE); // Adjust size and color
@@ -180,6 +184,18 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         label.setVisible(false);
         stage.addActor(label);
         label.setSize(font.getScaleX() * 100, font.getScaleY() * 100);
+
+        // pickup label
+        pickupLabel = new Label("Press P to pickup the order!", indicatorStyle);
+        label.setVisible(false);
+        stage.addActor(pickupLabel);
+        pickupLabel.setSize(font.getScaleX() * 100, font.getScaleY() * 100);
+
+        // dropoff label
+        dropoffLabel = new Label("Press F to dropoff the order!", indicatorStyle);
+        dropoffLabel.setVisible(false);
+        stage.addActor(dropoffLabel);
+        dropoffLabel.setSize(font.getScaleX() * 100, font.getScaleY() * 100);
     }
 
     @Override
@@ -257,6 +273,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         player.render(batch);
 
+        // coin collision
         if (!coin.collected) {
             coin.render(batch, 150, 150);
             if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), coin.getSprite().getBoundingRectangle())) {
@@ -264,6 +281,35 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                 coinCounter++;
             }
         }
+
+        // pickup/dropoff
+        // order picking up and dropping off
+
+////        if (popup.acceptClicked()) {
+//            if (!order.isPickedUp()) {
+//                // only show order pickup, not dropoff
+//                if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getPickupBounds())) {
+//                    pickupLabel.setVisible(true);
+//                    if (keyProcessor.pPressed) {
+//                        order.setPickedUp(true);
+//                        pickupLabel.setVisible(false);
+//                    }
+//                } else {
+//                    pickupLabel.setVisible(false);
+//                }
+//            } else if (order.isPickedUp() && !order.isDroppedOff()) {
+//                if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getDropoffBounds())) {
+//                    dropoffLabel.setVisible(true);
+//                    if (keyProcessor.oPressed) {
+//                        order.setDroppedOff(true);
+//                        playerAttributes.orderInProgress = false;
+//                        dropoffLabel.setVisible(false);
+//                    }
+//                } else {
+//                    dropoffLabel.setVisible(false);
+//                }
+//            }
+////        }
 
 
         batch.end();

@@ -9,21 +9,46 @@ public class KeyProcessor implements InputProcessor {
     public boolean downPressed;
     public boolean leftPressed;
     public boolean rightPressed;
-
+    public boolean oPressed;
+    public boolean pPressed;
 
     @Override
     public boolean keyDown(int keycode) {
-        if (keycode == Input.Keys.UP || keycode == Input.Keys.W) {
-            upPressed = true;
-        }
-        if (keycode == Input.Keys.DOWN || keycode == Input.Keys.S) {
-            downPressed = true;
-        }
-        if (keycode == Input.Keys.LEFT || keycode == Input.Keys.A) {
-            leftPressed = true;
-        }
-        if (keycode == Input.Keys.RIGHT || keycode == Input.Keys.D) {
-            rightPressed = true;
+        switch (keycode) {
+            case Input.Keys.UP:
+            case Input.Keys.W:
+                upPressed = true;
+                downPressed = false;
+                leftPressed = false;
+                rightPressed = false;
+                break;
+            case Input.Keys.DOWN:
+            case Input.Keys.S:
+                downPressed = true;
+                upPressed = false;
+                leftPressed = false;
+                rightPressed = false;
+                break;
+            case Input.Keys.LEFT:
+            case Input.Keys.A:
+                leftPressed = true;
+                rightPressed = false;
+                upPressed = false;
+                downPressed = false;
+                break;
+            case Input.Keys.RIGHT:
+            case Input.Keys.D:
+                rightPressed = true;
+                leftPressed = false;
+                upPressed = false;
+                downPressed = false;
+                break;
+            case Input.Keys.P:
+                pPressed = true;
+                break;
+            case Input.Keys.O:
+                oPressed = true;
+                break;
         }
 
         return false;
@@ -31,17 +56,29 @@ public class KeyProcessor implements InputProcessor {
 
     @Override
     public boolean keyUp(int keycode) {
-        if (keycode == Input.Keys.UP || keycode == Input.Keys.W) {
-            upPressed = false;
-        }
-        if (keycode == Input.Keys.DOWN || keycode == Input.Keys.S) {
-            downPressed = false;
-        }
-        if (keycode == Input.Keys.LEFT || keycode == Input.Keys.A) {
-            leftPressed = false;
-        }
-        if (keycode == Input.Keys.RIGHT || keycode == Input.Keys.D) {
-            rightPressed = false;
+        switch (keycode) {
+            case Input.Keys.UP:
+            case Input.Keys.W:
+                upPressed = false;
+                break;
+            case Input.Keys.DOWN:
+            case Input.Keys.S:
+                downPressed = false;
+                break;
+            case Input.Keys.LEFT:
+            case Input.Keys.A:
+                leftPressed = false;
+                break;
+            case Input.Keys.RIGHT:
+            case Input.Keys.D:
+                rightPressed = false;
+                break;
+            case Input.Keys.P:
+                pPressed = false;
+                break;
+            case Input.Keys.O:
+                oPressed = false;
+                break;
         }
         return false;
     }
