@@ -126,12 +126,12 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         order.setDropoffBounds(levelWidth - sidePanelWidth * 2, levelHeight - sidePanelHeight * 2, 50, 50);
 
         pickupObject = new GameObject(world, order.getPickupBounds().getX(), order.getPickupBounds().getY());
-        pickupObject.setSprite("connor_apple.jpg");
+        pickupObject.setSprite("borger.png");
         pickupObject.sprite.setSize(order.getPickupBounds().getWidth(), order.getPickupBounds().getHeight());
         pickupObject.sprite.setPosition(order.getPickupBounds().getX(), order.getPickupBounds().getY());
 
         dropoffObject = new GameObject(world, order.getDropoffBounds().getX(), order.getDropoffBounds().getY());
-        dropoffObject.setSprite("connor_apple.jpg");
+        dropoffObject.setSprite("plate.png");
         dropoffObject.sprite.setSize(order.getDropoffBounds().getWidth(), order.getDropoffBounds().getHeight());
         dropoffObject.sprite.setPosition(order.getDropoffBounds().getX(), order.getDropoffBounds().getY());
 
