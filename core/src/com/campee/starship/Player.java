@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 
@@ -95,7 +96,6 @@ public class Player extends GameObject {
     }
 
     public void update(float delta, KeyProcessor keyProcessor) {
-
         // Move player
         Vector2 force = new Vector2(0, 0);
         if (keyProcessor.upPressed) {
