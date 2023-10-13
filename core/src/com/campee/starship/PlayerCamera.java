@@ -35,6 +35,7 @@ public class PlayerCamera extends OrthographicCamera {
         float smoothY = (position.y * (interpolateSpeed - deltaLerp)) + (target.y * deltaLerp);
 
         position.set(smoothX, smoothY, 0);
+        System.out.println("pos: " + position);
         update();
     }
 }

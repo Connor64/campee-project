@@ -1,11 +1,14 @@
 package com.campee.starship;
 
+import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Intersector;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -16,7 +19,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.Screen;
 
-public class GameplayScreen implements Screen {
+public class GameplayScreen extends ApplicationAdapter implements Screen {
 
     private TextButton backButton;
     private TextButton nextOrderButton;
@@ -27,20 +30,21 @@ public class GameplayScreen implements Screen {
     public PlayerAttributes playerAttributes;
     public Order currentOrder;
     private final Popup popup;
+    private Coin coin;
+    public int coinCounter;
 
     private InputMultiplexer multiplexer;
 
-    private final MoonshipGame game;
+    private final MoonshipGame GAME;
+    private SpriteBatch batch;
     private Stage stage;
     private KeyProcessor keyProcessor;
 
     private PlayerCamera camera;
 
-    private SpriteBatch batch;
-
     public GameplayScreen(final MoonshipGame game) {
-        this.game = game;
-        batch = game.batch;
+        GAME = game;
+        batch = GAME.batch;
 
         stage = new Stage();
         keyProcessor = new KeyProcessor();
@@ -50,6 +54,9 @@ public class GameplayScreen implements Screen {
         player = new Player(world, 0, 0);
         camera = new PlayerCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         camera.update();
+
+        coin = new Coin(world, 0, 0);
+        coinCounter = 0;
 
         // For testing
         currentOrder = new Order(stage, game, 01, "Cosi", "walc", 7.00);
@@ -100,6 +107,10 @@ public class GameplayScreen implements Screen {
     }
 
     @Override
+    public void create() {
+    }
+
+    @Override
     public void show() {
     }
 
@@ -118,18 +129,119 @@ public class GameplayScreen implements Screen {
 
         stage.act(delta);
 
+        // screen boundary collisions
+        float newX = player.sprite.getX();
+        float newY = player.sprite.getY();
+        Rectangle playerBounds = player.sprite.getBoundingRectangle();
+        Rectangle screenBounds = new Rectangle(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        float playerLeft = playerBounds.getX();
+        float playerBottom = playerBounds.getY();
+        float playerTop = playerBottom + playerBounds.getHeight();
+        float playerRight = playerLeft + playerBounds.getWidth();
+
+        final float halfWidth = playerBounds.getWidth() * .5f;
+        final float halfHeight = playerBounds.getHeight() * .5f;
+
+        float screenLeft = screenBounds.getX();
+        float screenBottom = screenBounds.getY();
+        float screenTop = screenBottom + screenBounds.getHeight();
+        float screenRight = screenLeft + screenBounds.getWidth();
+
+        if (playerLeft < screenLeft) {
+            // clamp to left
+            newX = screenLeft + halfWidth;
+            player.body.setLinearVelocity(newX, player.body.getLinearVelocity().y);
+        } else if (playerRight > screenRight) {
+            // clamp to right
+            newX = screenRight - halfWidth;
+            player.body.setLinearVelocity(-newX, player.body.getLinearVelocity().y);
+        }
+        // vertical axis
+        if (playerBottom < screenBottom) {
+            // clamp to bottom
+            newY = screenBottom + halfHeight;
+            player.body.setLinearVelocity(player.body.getLinearVelocity().x, newY);
+        } else if (playerTop > screenTop) {
+            // clamp to top
+            newY = screenTop - halfHeight;
+            player.body.setLinearVelocity(player.body.getLinearVelocity().x, -newY);
+        }
+
+
+//        // visual indicator stuff
+////        Skin indicatorSkin = new Skin(Gdx.files.internal("skin/uiskin.json"),
+////                new TextureAtlas(Gdx.files.internal("skin/uiskin.atlas")));
+//        BitmapFont font = new BitmapFont(Gdx.files.internal("moonships_font.fnt"), Gdx.files.internal("moonships_font.png"), false);
+//        font.setColor(0, 0, 0, 1);
+//        font.getData().setScale(0.5f, 0.5f);
+//        Label.LabelStyle indicatorStyle = new Label.LabelStyle(font, Color.BLACK);
+//        Label label = new Label("Careful!", indicatorStyle);
+//        label.setVisible(false);
+//
+////        Pixmap labelColor = new Pixmap((int) font.getScaleX(), (int) font.getScaleY(), Pixmap.Format.RGB888);
+////        labelColor.setColor(Color.WHITE);
+////        labelColor.fill();
+////        label.getStyle().background = new Image(new Texture(labelColor)).getDrawable();
+//
+//        label.setSize(font.getScaleX() * 100, font.getScaleY() * 100);
+////        label.setPosition(screenWidth - (screenWidth - 15), screenHeight - label.getHeight());
+//
+//        // visual indicator that the player is almost off the screen
+//        // left side
+//        if (!popup.isVisible()) {
+//            if (playerLeft <= screenLeft + (2 * halfWidth)) {
+//                label.setVisible(false);
+//                stage.clear();
+//                label.setPosition(screenWidth - (screenWidth - label.getWidth()), screenHeight / 2);
+//                label.setVisible(true);
+//                stage.addActor(label);
+//            } else if (playerRight >= screenRight - (2 * halfWidth)) {
+//                label.setVisible(false);
+//                stage.clear();
+//                label.setPosition((screenWidth - (3 * label.getWidth())), screenHeight / 2);
+//                label.setVisible(true);
+//                stage.addActor(label);
+//            } else if (playerBottom <= screenBottom + (2 * halfHeight)) {
+//                label.setVisible(false);
+//                stage.clear();
+//                label.setPosition(screenWidth / 2, screenHeight - (screenHeight - label.getHeight()));
+//                label.setVisible(true);
+//                stage.addActor(label);
+//            } else if (playerTop >= screenTop - (2 * halfHeight)) {
+//                label.setVisible(false);
+//                stage.clear();
+//                label.setPosition(screenWidth / 2, screenHeight - label.getHeight());
+//                label.setVisible(true);
+//                stage.addActor(label);
+//            } else {
+//                // remove the label
+//                stage.clear();
+//                label.setVisible(false);
+//            }
+//        }
+
+
         /* ========================== DRAW ============================ */
 
         ScreenUtils.clear(Color.PINK);
 
         // Draw game world stuff
         batch.begin();
-        stage.draw();
         player.render(batch);
+
+        if (!coin.collected) {
+            coin.render(batch, 150, 150);
+            if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), coin.getSprite().getBoundingRectangle())) {
+                coin.setCollected(true);
+                coinCounter++;
+            }
+        }
+
         batch.end();
 
         // Draw UI stuff
         batch.begin();
+        stage.draw();
         popup.render();
         batch.end();
     }
