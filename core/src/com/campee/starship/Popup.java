@@ -24,7 +24,7 @@ public class Popup {
     private boolean acceptClicked;
     private boolean declineClicked;
 
-    public Popup(final GameplayScreen screen, String notificationMessage) {
+    public Popup(final GameplayScreen screen, final String notificationMessage) {
         stage = new Stage();
         shapeRenderer = new ShapeRenderer();
         visible = false;
@@ -75,8 +75,10 @@ public class Popup {
             public void clicked(InputEvent event, float x, float y) {
                 acceptClicked = true;
                 screen.playerAttributes.orderInProgress = true;
-                System.out.println(screen.order);
-                screen.playerAttributes.array.add(screen.order.queueString());
+                screen.playerAttributes.array.add(screen.order.arrayToString());
+                System.out.println(screen.playerAttributes.array);
+
+
                 visible = false;
             }
         });
