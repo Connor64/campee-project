@@ -221,7 +221,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         // If the popup is not visible, update the player and world
         if (!popup.isVisible()) {
             player.update(delta, keyProcessor);
-            player.checkBounds(levelWidth, levelHeight, 5000);
+            player.checkBounds(levelWidth, levelHeight, 5000, sidePanelWidth);
             world.step(1/60f, 6, 2); // Physics calculations
 //            player.position.y = MathUtils.clamp(player.position.y, -levelHeight, levelHeight);
             camera.follow(player.position, levelWidth, levelHeight);
