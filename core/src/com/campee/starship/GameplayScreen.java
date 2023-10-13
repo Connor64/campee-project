@@ -42,6 +42,11 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     private Coin coin;
     public int coinCounter;
 
+    GameObject log;
+    GameObject rock;
+    float x;
+    float y;
+
     public Label label;
     public Label pickupLabel;
     public Label dropoffLabel;
@@ -137,6 +142,13 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         levelWidth = 500;
         levelHeight = 500;
 
+        x = screenWidth / 2;
+        y = screenHeight / 2;
+        log = new GameObject(world, x, y);
+        rock = new GameObject(world, 300, 300);
+        rock.setSprite("rock.png");
+        log.setSprite("log.png");
+
         player = new Player(world, 150, 200);
         camera = new PlayerCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         camera.update();
@@ -155,7 +167,6 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         coinCounter = 0;
 
         playerAttributes = new PlayerAttributes();
-//        playerAttributes.orderInProgress = false;
 
         visibleQ = new ArrayList<>();
         playerAttributes.setArray(visibleQ);
@@ -175,12 +186,12 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         order.setDropoffBounds(levelWidth - sidePanelWidth * 2, levelHeight - sidePanelHeight * 2, 50, 50);
 
         pickupObject = new GameObject(world, order.getPickupBounds().getX(), order.getPickupBounds().getY());
-        pickupObject.setSprite("connor_apple.jpg");
+        pickupObject.setSprite("borger.png");
         pickupObject.sprite.setSize(order.getPickupBounds().getWidth(), order.getPickupBounds().getHeight());
         pickupObject.sprite.setPosition(order.getPickupBounds().getX(), order.getPickupBounds().getY());
 
         dropoffObject = new GameObject(world, order.getDropoffBounds().getX(), order.getDropoffBounds().getY());
-        dropoffObject.setSprite("connor_apple.jpg");
+        dropoffObject.setSprite("plate.png");
         dropoffObject.sprite.setSize(order.getDropoffBounds().getWidth(), order.getDropoffBounds().getHeight());
         dropoffObject.sprite.setPosition(order.getDropoffBounds().getX(), order.getDropoffBounds().getY());
 
@@ -306,23 +317,120 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         // visual indicator that the player is almost off the screen
         if (!popup.isVisible()) {
             // warning only visible when popup is not
-            if (playerLeft <= -levelWidth + threshold) {
-                label.setPosition(screenBounds.getWidth() - (screenBounds.getWidth() - label.getWidth()), screenBounds.getHeight() / 2);
+            if (playerLeft <= -(levelWidth - sidePanelWidth) + threshold) {
+                label.setPosition(levelWidth- (levelWidth - label.getWidth()), levelHeight / 2);
                 label.setVisible(true);
-            } else if (playerRight >= levelWidth - threshold) {
-                label.setPosition((screenBounds.getWidth() - (3 * label.getWidth())), screenBounds.getHeight() / 2);
+            } else if (playerRight >= (levelWidth - sidePanelWidth) - threshold) {
+                label.setPosition((levelWidth - (3 * label.getWidth())), levelHeight / 2);
                 label.setVisible(true);
-            } else if (playerBottom <= -levelHeight + threshold) {
-                label.setPosition(screenBounds.getWidth() / 2, screenBounds.getHeight() - (screenBounds.getHeight() - label.getHeight()));
+            } else if (playerBottom <= (-levelHeight + backButton.getHeight()) + threshold) {
+                label.setPosition(levelWidth / 2, levelHeight - (levelHeight - label.getHeight()));
                 label.setVisible(true);
-            } else if (playerTop >= levelHeight - threshold) {
-                label.setPosition(screenBounds.getWidth() / 2, screenBounds.getHeight() - label.getHeight());
+            } else if (playerTop >= (levelHeight - backButton.getHeight()) - threshold) {
+                label.setPosition(levelWidth / 2, levelHeight - label.getHeight());
                 label.setVisible(true);
             } else {
                 // remove the label
                 label.setVisible(false);
             }
         }
+
+        final float halfWidth = playerBounds.getWidth() * .5f;
+        final float halfHeight = playerBounds.getHeight() * .5f;
+        // float for new position (for screen collisions)
+        float newX = player.sprite.getX();
+        float newY = player.sprite.getY();
+
+        // object collision
+
+        rock.sprite.setSize(100, 100);
+        rock.sprite.setPosition(300, 300);
+        //rock.setBounds(rock.sprite.getX(), rock.sprite.getY(), rock.sprite.getWidth(), rock.sprite.getHeight());
+
+//        Rectangle rockBounds = rock.getBounds();
+//        float rockLeft = rockBounds.getX();
+//        float rockBottom = screenBounds.getY();
+//        float rockTop = rockBottom + rockBounds.getHeight();
+//        float rockRight = rockLeft + rockBounds.getWidth();
+//        player.checkBounds((int) (rockBounds.getX() + rockBounds.getWidth()), (int)(rockBounds.getY() + rockBounds.getHeight()), 5000, 0);
+
+        Vector2 correctiveDirection = new Vector2();
+
+        // left side of rock
+//        if (player.body.getPosition().x + player.sprite.getWidth() >= rockLeft && (rockTop >= player.body.getPosition().y + player.sprite.getHeight() &&
+//                player.body.getPosition().y + player.sprite.getHeight() >= rockBottom)) {
+//            correctiveDirection.x = -1;
+//        }
+//        } else if (player.body.getPosition().x < -width) {
+//            correctiveDirection.x = 1;
+//        }
+//
+//        if (player.body.getPosition().y + player.sprite.getHeight() > height - 60) {
+//            correctiveDirection.y = -1;
+//        } else if (player.body.getPosition().y < -height) {
+//            correctiveDirection.y = 1;
+//        }
+
+        //player.body.applyForceToCenter(correctiveDirection.scl(500), true);
+
+
+//        if (playerLeft > rockLeft && playerLeft < rockRight) {
+//            // clamp to left
+//            newX = rockLeft + halfWidth;
+//            player.body.setLinearVelocity(newX, player.body.getLinearVelocity().y);
+//            //xMove = 1;
+//        } else if (playerRight < rockRight) {
+//            // clamp to right
+//            newX = rockRight - halfWidth;
+//            player.body.setLinearVelocity(-newX, player.body.getLinearVelocity().y);
+//            //xMove = 1;
+//        }
+//        // vertical axis
+//        if (playerBottom < rockBottom) {
+//            // clamp to bottom
+//            newY = rockBottom + halfHeight;
+//            player.body.setLinearVelocity(player.body.getLinearVelocity().x, newY);
+//            //yMove = 1;
+//        } else if (playerTop > rockTop) {
+//            // clamp to top
+//            newY = rockTop - halfHeight;
+//            player.body.setLinearVelocity(player.body.getLinearVelocity().x, -newY);
+//            //yMove = 1;
+//        }
+
+        /*rock.sprite.setSize(300, 300);
+        rock.sprite.setPosition(300, 300);
+        rock.setBounds(rock.sprite.getX(), rock.sprite.getY(), rock.sprite.getWidth(), rock.sprite.getHeight());
+//        System.out.println(rock.sprite.getX());
+        Rectangle rockBounds = rock.getBounds();
+        float rockLeft = rockBounds.getX();
+        float rockBottom = screenBounds.getY();
+        float rockTop = rockBottom + rockBounds.getHeight();
+        float rockRight = rockLeft + rockBounds.getWidth();
+        if (playerLeft < rockLeft) {
+            // clamp to left
+            newX = rockLeft + halfWidth;
+            player.body.setLinearVelocity(newX, player.body.getLinearVelocity().y);
+            //xMove = 1;
+        } else if (playerRight > rockRight) {
+            // clamp to right
+            newX = rockRight - halfWidth;
+            player.body.setLinearVelocity(-newX, player.body.getLinearVelocity().y);
+            //xMove = 1;
+        }
+        // vertical axis
+        if (playerBottom < rockBottom) {
+            // clamp to bottom
+            newY = rockBottom + halfHeight;
+            player.body.setLinearVelocity(player.body.getLinearVelocity().x, newY);
+            //yMove = 1;
+        } else if (playerTop > rockTop) {
+            // clamp to top
+            newY = rockTop - halfHeight;
+            player.body.setLinearVelocity(player.body.getLinearVelocity().x, -newY);
+            //yMove = 1;
+        }*/
+
 
         /* ========================== DRAW ============================ */
 
@@ -336,39 +444,67 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         }
 
         player.render(batch);
+        rock.render(batch, 20, 200);
+        log.render(batch, 0, 10);
+        log.sprite.setSize(100, 75);
 
         // coin collision
         if (!coin.collected) {
-            coin.render(batch, 150, 150);
+            coin.render(batch, 100, 100);
             if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), coin.getSprite().getBoundingRectangle())) {
                 coin.setCollected(true);
                 coinCounter++;
             }
         }
 
-        // order picking up and dropping off
-//        System.out.println("player_x: " + player.getSprite().getX() + ", player_y: " + player.getSprite().getY());
-//        System.out.println("player_y: " + player.getSprite().getY());
-        if (!order.isPickedUp() && playerAttributes.orderInProgress) {
+        if (playerAttributes.array.size() > 1 && !order.isPickedUp()) {
             pickupObject.sprite.draw(batch);
-//            System.out.println("check 1");
-            // only show order pickup, not dropoff
             if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getPickupBounds())) {
-//                System.out.println("in bounds");
                 pickupLabel.setVisible(true);
                 if (keyProcessor.pPressed) {
                     order.setPickedUp(true);
+                    order.setDroppedOff(false);
+                    pickupLabel.setVisible(false);
+                }
+            } else {
+                pickupLabel.setVisible(false);
+            }
+        }
+
+        if (playerAttributes.array.size() > 1 && !order.isDroppedOff() && order.isPickedUp()) {
+            dropoffObject.sprite.draw(batch);
+            if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getDropoffBounds())) {
+                dropoffLabel.setVisible(true);
+                if (keyProcessor.oPressed) {
+                    order.setPickedUp(false);
+                    order.setDroppedOff(true);
+                    playerAttributes.orderInProgress = false;
+                    playerAttributes.array.remove(1);
+                    dropoffLabel.setVisible(false);
+                }
+            } else {
+                dropoffLabel.setVisible(false);
+            }
+        }
+
+        if (!order.isPickedUp() && playerAttributes.orderInProgress) {
+            pickupObject.sprite.draw(batch);
+            if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getPickupBounds())) {
+                pickupLabel.setVisible(true);
+                if (keyProcessor.pPressed) {
+                    order.setPickedUp(true);
+                    order.setDroppedOff(false);
                     pickupLabel.setVisible(false);
                 }
             } else {
                 pickupLabel.setVisible(false);
             }
         } else if (order.isPickedUp() && !order.isDroppedOff() && playerAttributes.orderInProgress) {
-//            System.out.println("check 2");
             dropoffObject.sprite.draw(batch);
             if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getDropoffBounds())) {
                 dropoffLabel.setVisible(true);
                 if (keyProcessor.oPressed) {
+                    order.setPickedUp(false);
                     order.setDroppedOff(true);
                     playerAttributes.orderInProgress = false;
                     playerAttributes.array.remove(1);
