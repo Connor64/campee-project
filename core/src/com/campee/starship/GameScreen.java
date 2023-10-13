@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Intersector;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
@@ -38,12 +39,17 @@ public class GameScreen extends ApplicationAdapter implements Screen {
     Texture img;
     private Game game;
     private Stage stage;
-    private Popup popup;
 
     private World world;
     private Box2DDebugRenderer debugRenderer;
-    private ShapeRenderer shapeRenderer;
     public int coinCounter = 0;
+
+    private Popup popup;
+
+    //private World world;
+    //private Box2DDebugRenderer debugRenderer;
+    private ShapeRenderer shapeRenderer;
+    //public int coinCounter = 0;
 
     private boolean screenClicked = false; // Add this variable
     private boolean prevClickState = false; // Add this variable to track the previous click state
@@ -59,10 +65,11 @@ public class GameScreen extends ApplicationAdapter implements Screen {
     Order order;
     float x;
     float y;
+    int move = 0;
     float screenWidth;
     float screenHeight;
     int SPEED = 150;
-    int move = 0;
+    //int move = 0;
     ArrayList<String> array;
 
     float sidePanelX;
@@ -76,6 +83,7 @@ public class GameScreen extends ApplicationAdapter implements Screen {
         ArrayList<String> array;
         world = new World(new Vector2(0, -10), true);
         debugRenderer = new Box2DDebugRenderer();
+
         test = 0;
         stage = new Stage();
         this.game = game;
@@ -83,8 +91,12 @@ public class GameScreen extends ApplicationAdapter implements Screen {
         keyProcessor = new KeyProcessor();
         screenWidth = Gdx.graphics.getWidth();
         screenHeight = Gdx.graphics.getHeight();
+
+        player = new Player(world, x, y);
+        coin = new Coin(world, x, y);
         x = 100;
         y = 100;
+
         player = new Player(world, x, y);
         //orderScreen = new OrderScreen();
         coin = new Coin(world, x, y);
@@ -176,7 +188,7 @@ public class GameScreen extends ApplicationAdapter implements Screen {
     @Override
     public void render(float delta) {
         ScreenUtils.clear(Color.PINK);
-        float deltaTime =  Gdx.graphics.getDeltaTime();
+        world.step(1 / 60f, 6, 2);
 
         world.step(1 / 60f, 6, 2);
         float xMove = 0;
@@ -212,6 +224,7 @@ public class GameScreen extends ApplicationAdapter implements Screen {
                 move = 3;
             } else {
                 float linearDamping = 2;
+
                 player.body.setLinearDamping(linearDamping);
             }
         }
@@ -220,6 +233,7 @@ public class GameScreen extends ApplicationAdapter implements Screen {
         // boundaries for player and screen
         Rectangle playerBounds = player.getBounds();
         Rectangle screenBounds = new Rectangle(0, 0, newscreenWidth, screenHeight);
+
         float playerLeft = playerBounds.getX();
         float playerBottom = playerBounds.getY();
         float playerTop = playerBottom + playerBounds.getHeight();

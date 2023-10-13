@@ -8,17 +8,22 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 
-import javax.xml.soap.Text;
+//import javax.xml.soap.Text;
 import java.security.Key;
 
 public class Player extends GameObject {
     public Body body;
     private TextureRegion region;
-    private Sprite sprite;
+    public Sprite sprite;
+    private int xMove;
+    private int yMove;
+    private int move;
     private Texture texture;
     private TextureRegion[] textureRegions;
 
     String spritePath = "";
+    private float speedBoostX;
+    private float speedBoostY;
 
     private static final float ACCELERATION = 1000f;
 
