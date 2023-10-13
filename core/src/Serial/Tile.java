@@ -1,4 +1,4 @@
-package com.campee.starship;
+package Serial;
 
 import javax.swing.*;
 import java.awt.*;
@@ -9,11 +9,12 @@ import java.io.Serializable;
  * An object class that uses a sprite from a specified tile set. It comprises the grid that is the basis of a level.
  */
 public class Tile implements Serializable {
+    private static final long serialVersionUID = 2L;
     /** The ID of the tileset this tile uses. */
     private String tilesetID;
 
     /** The ID of the sprite that the tile uses from its tileset. */
-    private int spriteIndex;
+    private int spriteIndex = -1;
 
     public transient BufferedImage sprite;
 
@@ -31,6 +32,15 @@ public class Tile implements Serializable {
         this.spriteIndex = spriteIndex;
         this.tilesetID = tilesetID;
         collidable = false;
+    }
+
+    public Tile(Tile tile) {
+        if (tile == null || tile.sprite == null) return;
+
+        sprite = tile.sprite;
+        spriteIndex = tile.spriteIndex;
+        tilesetID = tile.tilesetID;
+        collidable = tile.collidable;
     }
 
     /**
@@ -52,5 +62,14 @@ public class Tile implements Serializable {
     public void draw(Graphics2D g2, int x, int y, int scaledSize, JComponent canvas) {
         // Draw the tile's (scaled) sprite
         g2.drawImage(sprite.getScaledInstance(scaledSize, scaledSize, Image.SCALE_FAST), x, y, canvas);
+    }
+
+    @Override
+    public String toString() {
+        return ("TileIndex: " + spriteIndex + "   TilesetID: " + tilesetID);
+    }
+
+    public int getIndex() {
+        return spriteIndex;
     }
 }

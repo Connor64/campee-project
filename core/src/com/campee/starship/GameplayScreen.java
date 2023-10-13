@@ -1,13 +1,14 @@
 package com.campee.starship;
 
+import Serial.LevelData;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Intersector;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
@@ -19,9 +20,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
 
-import java.io.FileNotFoundException;
+import java.io.*;
+import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class GameplayScreen extends ApplicationAdapter implements Screen {
 
@@ -67,7 +68,6 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     float screenWidth;
     float screenHeight;
 
-
     ArrayList<String> arrays;
     String s;
     int count;
@@ -75,10 +75,59 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     String[] orderA;
     GameplayScreen g;
 
+    private ArrayList<Sprite> sprites;
+
     public GameplayScreen(final MoonshipGame game) throws FileNotFoundException {
         g = this;
         this.GAME = game;
         batch = game.batch;
+
+        sprites = new ArrayList<>();
+
+        ObjectInputStream inputStream = null;
+        try {
+            InputStream fileStream = Files.newInputStream(new File(Gdx.files.internal("levels/level3.lvl").path()).toPath());
+            inputStream = new ObjectInputStream(fileStream);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        LevelData levelData = null;
+        if (inputStream != null) {
+            try {
+                 levelData = (LevelData) inputStream.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        AssetManager manager = null;
+        try {
+            manager = new AssetManager();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        if (levelData != null) {
+            float offset = ((float) levelData.width / 2f) * (125f / 2f);
+            for (int i = 0; i < levelData.width; i++) {
+                for (int j = 0; j < levelData.height; j++) {
+                    int index = levelData.layers[0][i][j].getIndex();
+                    if (index != 0) {
+                        Sprite tileSprite = new Sprite(manager.getRegion(index));
+                        tileSprite.setSize(125f / 2f, 125f / 2f);
+                        tileSprite.setPosition(i * tileSprite.getWidth() - (15 * (125 / 2f)), -j * tileSprite.getHeight() + (15 * (125 / 2f)));
+                        sprites.add(tileSprite);
+                    }
+                    System.out.print(index == 0 ? ",  " : ", X");
+                }
+                System.out.println();
+            }
+//            System.out.println("length: " + levelData.layers[0][0][0].toString());
+            System.out.println("level name: " + levelData.levelName);
+        } else {
+            System.out.println("It's null :(((((((((");
+        }
 
         stage = new Stage();
         keyProcessor = new KeyProcessor();
@@ -282,6 +331,10 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         // Draw game world stuff
         batch.begin();
 
+        for (Sprite sprite : sprites) {
+            sprite.draw(batch);
+        }
+
         player.render(batch);
 
         // coin collision
@@ -294,7 +347,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         }
 
         // order picking up and dropping off
-        System.out.println("player_x: " + player.getSprite().getX() + ", player_y: " + player.getSprite().getY());
+//        System.out.println("player_x: " + player.getSprite().getX() + ", player_y: " + player.getSprite().getY());
 //        System.out.println("player_y: " + player.getSprite().getY());
         if (!order.isPickedUp() && playerAttributes.orderInProgress) {
             pickupObject.sprite.draw(batch);

@@ -10,6 +10,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class AssetManager {
@@ -18,7 +19,9 @@ public class AssetManager {
     private final int TILE_SIZE = 16;
 
     public AssetManager() throws IOException {
-        Texture source = new Texture(Gdx.files.internal("tilesets/moonship_up.PNG"));
+        tilesets = new HashMap<>();
+
+        Texture source = new Texture(Gdx.files.internal("tilesets/1_terrain.png"));
         source.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
 
         if (!source.getTextureData().isPrepared())
@@ -55,5 +58,17 @@ public class AssetManager {
             }
         }
 
+        // If there were some tiles in the image which were completely empty, cull them from the end of the array.
+        if (spriteIndex != rows * columns) {
+            tiles = Arrays.copyOf(tiles, spriteIndex);
+        }
+
+        tilesets.put("test", tiles);
+//        System.out.println("tiles i guess: " + spriteIndex);
+
+    }
+
+    public TextureRegion getRegion(int index) {
+        return tilesets.get("test")[index];
     }
 }
