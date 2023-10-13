@@ -1,0 +1,10 @@
+01|Panera|Windsor|3
+02|Panera|Walc|5
+03|Cosi|Honors|1
+04|Starbucks|CL50|4
+05|Third St|Union|5
+06|Sushi Boss|Meredith|4
+07|Pete's Za|Beering|5
+08|Franks|Owen|2
+09|Jersey Mike's|Haas|5
+10|Starbucks|Union|2

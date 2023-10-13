@@ -16,6 +16,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
+
+import java.io.FileNotFoundException;
+
 public class LevelScreen implements Screen {
     private final Game game;
     private OrthographicCamera camera;
@@ -85,7 +88,11 @@ public class LevelScreen implements Screen {
         beginButton.addListener(new InputListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 // Switch back to the title screen when the BACK button is clicked
-                game.setScreen(new GameplayScreen((MoonshipGame) game)); // Change to the screen you want
+                try {
+                    game.setScreen(new GameplayScreen((MoonshipGame) game)); // Change to the screen you want
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
                 return true;
             }
         });

@@ -63,6 +63,7 @@ public class Order {
 
     public void setArray(ArrayList<String> array) throws FileNotFoundException {
         Scanner scanner = new Scanner(new File("Level1Orders.txt"));
+        System.out.println("here");
         while (scanner.hasNext()) {
             String line = scanner.nextLine();
             array.add(line);
@@ -77,8 +78,6 @@ public class Order {
         String[] words = new String[0];
         String line = array.get(i);
         words = line.split("\\|");
-
-
         i++;
         //return s;
         return words;
