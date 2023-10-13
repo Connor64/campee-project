@@ -1,8 +1,6 @@
 package com.campee.starship;
 
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -20,7 +18,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.Screen;
+
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,7 +40,13 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     private final Popup popup;
     private Coin coin;
     public int coinCounter;
+
     public Label label;
+    public Label pickupLabel;
+    public Label dropoffLabel;
+
+    public GameObject pickupObject;
+    public GameObject dropoffObject;
 
     private InputMultiplexer multiplexer;
 
@@ -101,13 +105,12 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         coin = new Coin(world, 0, 0);
         coinCounter = 0;
 
-        // For testing
-        //currentOrder = new Order(stage, game, 01, "Cosi", "walc", 7, new ArrayList<String>());
-        //popup = new Popup(this, currentOrder.toString());
         playerAttributes = new PlayerAttributes();
+//        playerAttributes.orderInProgress = false;
 
         visibleQ = new ArrayList<>();
         playerAttributes.setArray(visibleQ);
+        playerAttributes.orderInProgress = false;
 
         order = new Order();
         arrays = new ArrayList<>();
@@ -119,6 +122,18 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         int id = Integer.parseInt(orderA[0]);
         order = new Order(stage, game, id, orderA[1], orderA[2], time, arrays);
         popup = new Popup(this, order.arrayToString());
+        order.setPickupBounds(-levelWidth + 50, -levelHeight + 50, 50, 50);
+        order.setDropoffBounds(levelWidth - sidePanelWidth * 2, levelHeight - sidePanelHeight * 2, 50, 50);
+
+        pickupObject = new GameObject(world, order.getPickupBounds().getX(), order.getPickupBounds().getY());
+        pickupObject.setSprite("connor_apple.jpg");
+        pickupObject.sprite.setSize(order.getPickupBounds().getWidth(), order.getPickupBounds().getHeight());
+        pickupObject.sprite.setPosition(order.getPickupBounds().getX(), order.getPickupBounds().getY());
+
+        dropoffObject = new GameObject(world, order.getDropoffBounds().getX(), order.getDropoffBounds().getY());
+        dropoffObject.setSprite("connor_apple.jpg");
+        dropoffObject.sprite.setSize(order.getDropoffBounds().getWidth(), order.getDropoffBounds().getHeight());
+        dropoffObject.sprite.setPosition(order.getDropoffBounds().getX(), order.getDropoffBounds().getY());
 
         // Make button style
         Pixmap backgroundPixmap = createRoundedRectanglePixmap(200, 50, 10, Color.PURPLE); // Adjust size and color
@@ -180,6 +195,18 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         label.setVisible(false);
         stage.addActor(label);
         label.setSize(font.getScaleX() * 100, font.getScaleY() * 100);
+
+        // pickup label
+        pickupLabel = new Label("Press P to pickup!", indicatorStyle);
+        pickupLabel.setVisible(false);
+        stage.addActor(pickupLabel);
+        pickupLabel.setSize(font.getScaleX() * 50, font.getScaleY() * 50);
+
+        // dropoff label
+        dropoffLabel = new Label("Press O to dropoff!", indicatorStyle);
+        dropoffLabel.setVisible(false);
+        stage.addActor(dropoffLabel);
+        dropoffLabel.setSize(font.getScaleX() * 50, font.getScaleY() * 50);
     }
 
     @Override
@@ -205,7 +232,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         // If the popup is not visible, update the player and world
         if (!popup.isVisible()) {
             player.update(delta, keyProcessor);
-            player.checkBounds(levelWidth, levelHeight, 5000);
+            player.checkBounds(levelWidth, levelHeight, 5000, sidePanelWidth);
             world.step(1/60f, 6, 2); // Physics calculations
 //            player.position.y = MathUtils.clamp(player.position.y, -levelHeight, levelHeight);
             camera.follow(player.position, levelWidth, levelHeight);
@@ -257,6 +284,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         player.render(batch);
 
+        // coin collision
         if (!coin.collected) {
             coin.render(batch, 150, 150);
             if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), coin.getSprite().getBoundingRectangle())) {
@@ -265,6 +293,38 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             }
         }
 
+        // order picking up and dropping off
+        System.out.println("player_x: " + player.getSprite().getX() + ", player_y: " + player.getSprite().getY());
+//        System.out.println("player_y: " + player.getSprite().getY());
+        if (!order.isPickedUp() && playerAttributes.orderInProgress) {
+            pickupObject.sprite.draw(batch);
+//            System.out.println("check 1");
+            // only show order pickup, not dropoff
+            if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getPickupBounds())) {
+//                System.out.println("in bounds");
+                pickupLabel.setVisible(true);
+                if (keyProcessor.pPressed) {
+                    order.setPickedUp(true);
+                    pickupLabel.setVisible(false);
+                }
+            } else {
+                pickupLabel.setVisible(false);
+            }
+        } else if (order.isPickedUp() && !order.isDroppedOff() && playerAttributes.orderInProgress) {
+//            System.out.println("check 2");
+            dropoffObject.sprite.draw(batch);
+            if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getDropoffBounds())) {
+                dropoffLabel.setVisible(true);
+                if (keyProcessor.oPressed) {
+                    order.setDroppedOff(true);
+                    playerAttributes.orderInProgress = false;
+                    playerAttributes.array.remove(1);
+                    dropoffLabel.setVisible(false);
+                }
+            } else {
+                dropoffLabel.setVisible(false);
+            }
+        }
 
         batch.end();
 
@@ -279,17 +339,19 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         //shapeRenderer.setProjectionMatrix(camera.combined);
 
-        String[] items = {"", "Item 1", "Item 2", "Item 3", "Item 4", "Item 5"};
+
+        String[] items = playerAttributes.array.toArray(new String[0]);
 
         font.draw(batch, "Order List:", sidePanelX + 10, sidePanelY + sidePanelHeight - 10);
         //font.draw(batch, "\n", sidePanelX + 10, sidePanelY + sidePanelHeight - 10);
 
         for (int i = 1; i < items.length; i++) {
-            font.draw(batch, items[i], sidePanelX + 10, sidePanelY + sidePanelHeight - 30*i);
+                font.draw(batch, items[i], sidePanelX + 10, sidePanelY + sidePanelHeight - 70 * i);
         }
 
         stage.draw();
         popup.render();
+
         batch.end();
     }
 

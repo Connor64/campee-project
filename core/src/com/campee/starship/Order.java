@@ -10,6 +10,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -30,6 +31,10 @@ public class Order {
     private int timeEstimate;
     public ArrayList<String> array;
     public int i;
+    private Rectangle pickupBounds;
+    private Rectangle dropoffBounds;
+    private boolean pickedUp;
+    private boolean droppedOff;
 
 
     public Order(Stage stage, Game game, int orderID, String pickupLocation, String dropoffLocation, int timeEstimate, ArrayList<String> array) {
@@ -41,6 +46,10 @@ public class Order {
         this.timeEstimate = timeEstimate;
         this.array = array;
         i = 0;
+        pickedUp = false;
+        droppedOff = false;
+        pickupBounds = new Rectangle(0, 0, 0, 0);
+        dropoffBounds = new Rectangle(0, 0, 0, 0);
 
     }
     public Order() {
@@ -90,8 +99,8 @@ public class Order {
         words = line.split("\\|");
 
 
-        String s = "ID: " + words[0] + "\nPickup: " + words[1]
-                + "\nDrop-off: " + words[2] + "\nTime est: " + words[3] + " mins";
+        String s = "ID: " + words[0] + "\nP: " + words[1]
+                + "\nD: " + words[2] + "\nTime: " + words[3] + " mins";
         return s;
 
     }
@@ -121,6 +130,14 @@ public class Order {
 
     public void setOrderID(int orderID) {
         this.orderID = orderID;
+    }
+
+    public void setPickupBounds(float x, float y, float width, float height) {
+        pickupBounds.set(x, y, width, height);
+    }
+
+    public void setDropoffBounds(float x, float y, float width, float height) {
+        dropoffBounds.set(x, y, width, height);
     }
 
     public String getPickupLocation() {
@@ -157,5 +174,29 @@ public class Order {
                         "Pickup Location: " + pickupLocation + '\n' +
                         "Drop-off Location: " + dropoffLocation + '\n' +
                         "Time Estimate: " + timeEstimate ;
+    }
+
+    public Rectangle getPickupBounds() {
+        return this.pickupBounds;
+    }
+
+    public Rectangle getDropoffBounds() {
+        return this.dropoffBounds;
+    }
+
+    public void setPickedUp(boolean pick) {
+        pickedUp = pick;
+    }
+
+    public void setDroppedOff(boolean drop) {
+        droppedOff = drop;
+    }
+
+    public boolean isPickedUp() {
+        return this.pickedUp;
+    }
+
+    public boolean isDroppedOff() {
+        return this.droppedOff;
     }
 }
