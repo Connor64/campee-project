@@ -99,8 +99,8 @@ public class Order {
         words = line.split("\\|");
 
 
-        String s = "ID: " + words[0] + "\nPickup: " + words[1]
-                + "\nDrop-off: " + words[2] + "\nTime est: " + words[3] + " mins";
+        String s = "ID: " + words[0] + "\nP: " + words[1]
+                + "\nD: " + words[2] + "\nTime: " + words[3] + " mins";
         return s;
 
     }

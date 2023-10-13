@@ -88,7 +88,6 @@ public class Popup {
             public void clicked(InputEvent event, float x, float y) {
                 declineClicked = true;
                 screen.playerAttributes.orderInProgress = false;
-                System.out.println("something happened");
                 visible = false;
             }
         });
