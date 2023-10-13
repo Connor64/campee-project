@@ -1,5 +1,6 @@
 package com.campee.starship;
 
+import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.*;
@@ -16,7 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.Screen;
 
-public class GameplayScreen implements Screen {
+public class GameplayScreen extends ApplicationAdapter implements Screen {
 
     private TextButton backButton;
     private TextButton nextOrderButton;
@@ -30,17 +31,16 @@ public class GameplayScreen implements Screen {
 
     private InputMultiplexer multiplexer;
 
-    private final MoonshipGame game;
+    private final MoonshipGame GAME;
+    private SpriteBatch batch;
     private Stage stage;
     private KeyProcessor keyProcessor;
 
     private PlayerCamera camera;
 
-    private SpriteBatch batch;
-
     public GameplayScreen(final MoonshipGame game) {
-        this.game = game;
-        batch = game.batch;
+        GAME = game;
+        batch = GAME.batch;
 
         stage = new Stage();
         keyProcessor = new KeyProcessor();
@@ -97,6 +97,10 @@ public class GameplayScreen implements Screen {
         multiplexer.addProcessor(keyProcessor);
 
         Gdx.input.setInputProcessor(multiplexer);
+    }
+
+    @Override
+    public void create() {
     }
 
     @Override
