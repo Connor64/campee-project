@@ -95,4 +95,11 @@ public class GameObject {
         this.setWidth(sprite.getWidth());
     }
 
+    public void render(SpriteBatch batch, int x, int y) {
+        // render sprite in x, y position
+        sprite.setPosition(x, y);
+        setBounds(x, y, getWidth(), getHeight());
+        sprite.draw(batch);
+    }
+
 }

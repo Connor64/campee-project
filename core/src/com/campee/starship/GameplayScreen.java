@@ -41,6 +41,11 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     private Coin coin;
     public int coinCounter;
 
+    GameObject log;
+    GameObject rock;
+    float x;
+    float y;
+
     public Label label;
     public Label pickupLabel;
     public Label dropoffLabel;
@@ -87,6 +92,13 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         levelWidth = 500;
         levelHeight = 500;
+
+        x = screenWidth / 2;
+        y = screenHeight / 2;
+        log = new GameObject(world, x, y);
+        rock = new GameObject(world, 300, 300);
+        rock.setSprite("rock.png");
+        log.setSprite("log.png");
 
         player = new Player(world, 150, 200);
         camera = new PlayerCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -275,6 +287,47 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             }
         }
 
+        final float halfWidth = playerBounds.getWidth() * .5f;
+        final float halfHeight = playerBounds.getHeight() * .5f;
+        // float for new position (for screen collisions)
+        float newX = player.sprite.getX();
+        float newY = player.sprite.getY();
+
+        // object collision
+        /*rock.sprite.setSize(300, 300);
+        rock.sprite.setPosition(300, 300);
+        rock.setBounds(rock.sprite.getX(), rock.sprite.getY(), rock.sprite.getWidth(), rock.sprite.getHeight());
+//        System.out.println(rock.sprite.getX());
+        Rectangle rockBounds = rock.getBounds();
+        float rockLeft = rockBounds.getX();
+        float rockBottom = screenBounds.getY();
+        float rockTop = rockBottom + rockBounds.getHeight();
+        float rockRight = rockLeft + rockBounds.getWidth();
+        if (playerLeft < rockLeft) {
+            // clamp to left
+            newX = rockLeft + halfWidth;
+            player.body.setLinearVelocity(newX, player.body.getLinearVelocity().y);
+            //xMove = 1;
+        } else if (playerRight > rockRight) {
+            // clamp to right
+            newX = rockRight - halfWidth;
+            player.body.setLinearVelocity(-newX, player.body.getLinearVelocity().y);
+            //xMove = 1;
+        }
+        // vertical axis
+        if (playerBottom < rockBottom) {
+            // clamp to bottom
+            newY = rockBottom + halfHeight;
+            player.body.setLinearVelocity(player.body.getLinearVelocity().x, newY);
+            //yMove = 1;
+        } else if (playerTop > rockTop) {
+            // clamp to top
+            newY = rockTop - halfHeight;
+            player.body.setLinearVelocity(player.body.getLinearVelocity().x, -newY);
+            //yMove = 1;
+        }*/
+
+
         /* ========================== DRAW ============================ */
 
         ScreenUtils.clear(Color.PINK);
@@ -283,10 +336,13 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         batch.begin();
 
         player.render(batch);
+        //rock.render(batch, 300, 300);
+        log.render(batch, 0, 10);
+        log.sprite.setSize(100, 75);
 
         // coin collision
         if (!coin.collected) {
-            coin.render(batch, 150, 150);
+            coin.render(batch, 100, 100);
             if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), coin.getSprite().getBoundingRectangle())) {
                 coin.setCollected(true);
                 coinCounter++;
