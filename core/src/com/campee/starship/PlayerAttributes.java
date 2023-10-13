@@ -1,5 +1,6 @@
 package com.campee.starship;
 
+import java.util.ArrayList;
 import java.util.Queue;
 //please work
 public class PlayerAttributes {
@@ -7,19 +8,33 @@ public class PlayerAttributes {
     public int highScore;
     public int score;
     public Queue<String> orderQueue;
+    public ArrayList<String> array;
 
-    public PlayerAttributes(boolean orderInProgress, int highScore, int score, Queue<String> orderQueue) {
+    public PlayerAttributes(boolean orderInProgress, int highScore, int score, Queue<String> orderQueue, ArrayList<String> array) {
         this.orderInProgress = orderInProgress;
         this.highScore = highScore;
         this.score = score;
         this.orderQueue = orderQueue;
+        this.array = array;
     }
+
+
 
     public PlayerAttributes() {
         this.orderInProgress = false;
         this.highScore = 0;
         this.score = 0;
         this.orderQueue = null;
+        this.array = new ArrayList<>();
+        array.add("Queue");
+    }
+
+    public ArrayList<String> getArray() {
+        return array;
+    }
+
+    public void setArray(ArrayList<String> array) {
+        this.array = array;
     }
 
     public boolean isOrderInProgress() {

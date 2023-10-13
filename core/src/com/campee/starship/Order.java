@@ -76,6 +76,9 @@ public class Order {
         this.timeEstimate = timeEstimate;
     }
 
+    public String queueString() {
+        return "Order ID: " + orderID;
+    }
     @Override
     public String toString() {
         return

@@ -9,6 +9,9 @@ import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.ScreenUtils;
+
+import java.util.ArrayList;
+import java.util.Queue;
 import java.util.concurrent.TimeUnit;
 
 
@@ -18,14 +21,13 @@ public class GameScreen extends ApplicationAdapter implements Screen {
     Texture img;
     private Game game;
     private Stage stage;
-    private Skin skin;
-    private ShapeRenderer shapeRenderer;
     private Popup popup;
     private boolean screenClicked = false; // Add this variable
     private boolean prevClickState = false; // Add this variable to track the previous click state
 
 
     Player player;
+    PlayerAttributes attributes;
     KeyProcessor keyProcessor;
     OrderScreen orderScreen;
     Coin coin;
@@ -36,10 +38,10 @@ public class GameScreen extends ApplicationAdapter implements Screen {
     float screenHeight;
     int SPEED = 150;
     int move = 0;
+    ArrayList<String> array;
 
     public GameScreen(final Game game) {
         test = 0;
-
 
         stage = new Stage();
         this.game = game;
@@ -51,11 +53,14 @@ public class GameScreen extends ApplicationAdapter implements Screen {
         x = 100;
         y = 100;
         player = new Player();
+        attributes = new PlayerAttributes();
+
+        array = attributes.array;
         orderScreen = new OrderScreen();
         coin = new Coin();
         orderScreen.visible = false;
         order = new Order(stage, game, 0, null, null, 0 );
-        popup = new Popup(order.toString());
+        popup = new Popup(this, order.toString());
     }
 
 
@@ -121,6 +126,9 @@ public class GameScreen extends ApplicationAdapter implements Screen {
             if (test == 2) {
                 popup.show();
                 Gdx.input.setInputProcessor(popup.getStage());
+            }
+            if (test == 4) {
+                System.out.println(attributes.array);
             }
         }
 

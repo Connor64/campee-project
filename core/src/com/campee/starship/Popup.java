@@ -1,5 +1,6 @@
 package com.campee.starship;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -24,7 +25,7 @@ public class Popup {
     private BitmapFont font;
     private Label messageLabel;
 
-    public Popup(String notificationMessage) {
+    public Popup(final GameScreen gameScreen, String notificationMessage) {
         stage = new Stage();
         shapeRenderer = new ShapeRenderer();
         visible = false;
@@ -71,6 +72,9 @@ public class Popup {
         acceptButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                gameScreen.attributes.orderInProgress = true;
+                gameScreen.attributes.array.add(gameScreen.order.queueString());
+
                 visible = false;
                 // Handle accept button click
                 //hide();
