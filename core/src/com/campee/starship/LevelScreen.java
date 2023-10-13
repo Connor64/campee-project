@@ -20,7 +20,7 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import java.io.FileNotFoundException;
 
 public class LevelScreen implements Screen {
-    private final Game game;
+    private final MoonshipGame game;
     private OrthographicCamera camera;
     private ShapeRenderer shapeRenderer;
     private SpriteBatch batch;
@@ -32,7 +32,7 @@ public class LevelScreen implements Screen {
     private ExtendViewport viewport;
 
     public LevelScreen(final Game game) {
-        this.game = game;
+        this.game = (MoonshipGame) game;
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 800, 600);
         shapeRenderer = new ShapeRenderer();
