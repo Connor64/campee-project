@@ -328,6 +328,36 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             }
         }
 
+        // pickup/dropoff
+        // order picking up and dropping off
+
+////        if (popup.acceptClicked()) {
+//            if (!order.isPickedUp()) {
+//                // only show order pickup, not dropoff
+//                if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getPickupBounds())) {
+//                    pickupLabel.setVisible(true);
+//                    if (keyProcessor.pPressed) {
+//                        order.setPickedUp(true);
+//                        pickupLabel.setVisible(false);
+//                    }
+//                } else {
+//                    pickupLabel.setVisible(false);
+//                }
+//            } else if (order.isPickedUp() && !order.isDroppedOff()) {
+//                if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getDropoffBounds())) {
+//                    dropoffLabel.setVisible(true);
+//                    if (keyProcessor.oPressed) {
+//                        order.setDroppedOff(true);
+//                        playerAttributes.orderInProgress = false;
+//                        dropoffLabel.setVisible(false);
+//                    }
+//                } else {
+//                    dropoffLabel.setVisible(false);
+//                }
+//            }
+////        }
+
+
         batch.end();
 
         // Draw UI stuff
