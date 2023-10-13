@@ -130,16 +130,16 @@ public class Player extends GameObject {
         return this.sprite;
     }
 
-    public void checkBounds(int width, int height, int force) {
+    public void checkBounds(int width, int height, int force, float sidePanelWidth) {
         Vector2 correctiveDirection = new Vector2();
 
-        if (body.getPosition().x + sprite.getWidth() > width) {
+        if (body.getPosition().x + sprite.getWidth() > width - sidePanelWidth -10) {
             correctiveDirection.x = -1;
         } else if (body.getPosition().x < -width) {
             correctiveDirection.x = 1;
         }
 
-        if (body.getPosition().y + sprite.getHeight() > height) {
+        if (body.getPosition().y + sprite.getHeight() > height - 60) {
             correctiveDirection.y = -1;
         } else if (body.getPosition().y < -height) {
             correctiveDirection.y = 1;
