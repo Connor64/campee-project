@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -30,6 +31,9 @@ public class LevelScreen implements Screen {
     private TextButton beginButton;
     private TextButton settingsButton;
     private ExtendViewport viewport;
+    private boolean isBackButtonHovered = false;
+    private boolean isSettingButtonHovered = false;
+    private boolean isDemoButtonHovered = false;
 
     public LevelScreen(final Game game) {
         this.game = (MoonshipGame) game;
@@ -58,6 +62,18 @@ public class LevelScreen implements Screen {
                 // Switch back to the title screen when the BACK button is clicked
                 game.setScreen(new TitleScreen((MoonshipGame) game)); // Change to the screen you want
                 return true;
+            }
+            @Override
+            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+                super.enter(event, x, y, pointer, fromActor);
+                isBackButtonHovered = true;
+                backButton.setColor(Color.LIGHT_GRAY);
+            }
+            @Override
+            public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
+                super.exit(event, x, y, pointer, toActor);
+                isBackButtonHovered = false;
+                backButton.setColor(Color.WHITE);
             }
         });
         stage.addActor(backButton);
@@ -95,6 +111,18 @@ public class LevelScreen implements Screen {
                 }
                 return true;
             }
+            @Override
+            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+                super.enter(event, x, y, pointer, fromActor);
+                isDemoButtonHovered = true;
+                beginButton.setColor(Color.LIGHT_GRAY);
+            }
+            @Override
+            public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
+                super.exit(event, x, y, pointer, toActor);
+                isDemoButtonHovered = false;
+                beginButton.setColor(Color.WHITE);
+            }
         });
 
         stage.addActor(beginButton);
@@ -112,6 +140,18 @@ public class LevelScreen implements Screen {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 game.setScreen(new SettingsScreen(game));
                 return true;
+            }
+            @Override
+            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+                super.enter(event, x, y, pointer, fromActor);
+                isSettingButtonHovered = true;
+                settingsButton.setColor(Color.LIGHT_GRAY);
+            }
+            @Override
+            public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
+                super.exit(event, x, y, pointer, toActor);
+                isSettingButtonHovered = false;
+                settingsButton.setColor(Color.WHITE);
             }
         });
 

@@ -12,6 +12,7 @@ import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -64,6 +65,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     private PlayerCamera camera;
 
     private ShapeRenderer shapeRenderer;
+    private boolean isBackButtonHovered = false;
+    private boolean isOrderButtonHovered = false;
     float sidePanelX;
     float sidePanelY;
     float sidePanelWidth;
@@ -213,6 +216,18 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                 System.out.println("clicked back");
                 game.setScreen(new LevelScreen(game));
             }
+            @Override
+            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+                super.enter(event, x, y, pointer, fromActor);
+                isBackButtonHovered = true;
+                backButton.setColor(Color.LIGHT_GRAY);
+            }
+            @Override
+            public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
+                super.exit(event, x, y, pointer, toActor);
+                isBackButtonHovered = false;
+                backButton.setColor(Color.WHITE);
+            }
         });
 
         // Make next order button
@@ -234,6 +249,18 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                 popup.render();
                 multiplexer.addProcessor(popup.getStage());
 
+            }
+            @Override
+            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+                super.enter(event, x, y, pointer, fromActor);
+                isOrderButtonHovered = true;
+                nextOrderButton.setColor(Color.LIGHT_GRAY);
+            }
+            @Override
+            public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
+                super.exit(event, x, y, pointer, toActor);
+                isOrderButtonHovered = false;
+                nextOrderButton.setColor(Color.WHITE);
             }
         });
 

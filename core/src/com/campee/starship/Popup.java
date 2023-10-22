@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -23,6 +24,8 @@ public class Popup {
     private Label messageLabel;
     private boolean acceptClicked;
     private boolean declineClicked;
+    private boolean isAcceptButtonHovered = false;
+    private boolean isDeclineButtonHovered = false;
 
     public Popup(final GameplayScreen screen, final String notificationMessage) {
         stage = new Stage();
@@ -57,8 +60,8 @@ public class Popup {
         declineButtonStyle.up = new TextureRegionDrawable(new TextureRegion(new Texture(declineBackgroundPixmap)));
 
         // Create buttons
-        TextButton acceptButton = new TextButton("Accept", acceptButtonStyle);
-        TextButton declineButton = new TextButton("Decline", declineButtonStyle);
+        final TextButton acceptButton = new TextButton("Accept", acceptButtonStyle);
+        final TextButton declineButton = new TextButton("Decline", declineButtonStyle);
 
         acceptButton.setWidth(100);
         acceptButton.setHeight(50);
@@ -82,6 +85,18 @@ public class Popup {
 
                 visible = false;
             }
+            @Override
+            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+                super.enter(event, x, y, pointer, fromActor);
+                isAcceptButtonHovered = true;
+                acceptButton.setColor(Color.LIGHT_GRAY);
+            }
+            @Override
+            public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
+                super.exit(event, x, y, pointer, toActor);
+                isAcceptButtonHovered = false;
+                acceptButton.setColor(Color.WHITE);
+            }
         });
 
         declineButton.addListener(new ClickListener() {
@@ -92,6 +107,18 @@ public class Popup {
                 //use this for the other thing
                 //screen.playerAttributes.array.remove(1);
                 visible = false;
+            }
+            @Override
+            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+                super.enter(event, x, y, pointer, fromActor);
+                isDeclineButtonHovered = true;
+                declineButton.setColor(Color.LIGHT_GRAY);
+            }
+            @Override
+            public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
+                super.exit(event, x, y, pointer, toActor);
+                isDeclineButtonHovered = false;
+                declineButton.setColor(Color.WHITE);
             }
         });
 
