@@ -88,7 +88,7 @@ public class GameObject {
         texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         TextureRegion region = new TextureRegion(texture, 0, 0, 16, 16);
         sprite = new Sprite(region);
-        sprite.setSize(50, 50);
+//        sprite.setSize(50, 50);
         sprite.setOrigin(sprite.getX() / 2,sprite.getY() / 2);
         sprite.setPosition(0, 0);
         this.setHeight(sprite.getHeight());

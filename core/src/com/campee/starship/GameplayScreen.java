@@ -35,19 +35,16 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
     private Player player;
     public PlayerAttributes playerAttributes;
-    ArrayList<String> visibleQ;
+    private ArrayList<String> visibleQ;
 
-    public Order currentOrder;
     private final Popup popup;
     private Coin coin;
     public int coinCounter;
 
-    GameObject log;
-    GameObject rock;
-    float x;
-    float y;
+    private GameObject log;
+    private GameObject rock;
 
-    public Label label;
+    public Label warningLabel;
     public Label pickupLabel;
     public Label dropoffLabel;
 
@@ -64,139 +61,88 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     private PlayerCamera camera;
 
     private ShapeRenderer shapeRenderer;
-    float sidePanelX;
-    float sidePanelY;
-    float sidePanelWidth;
-    float sidePanelHeight;
-    Color sidePanelColor;
-    BitmapFont font;
-    float screenWidth;
-    float screenHeight;
+    private float sidePanelX;
+    private float sidePanelY;
+    private float sidePanelWidth;
+    private float sidePanelHeight;
+    private Color sidePanelColor;
+    private BitmapFont font;
 
-    ArrayList<String> arrays;
-    String s;
-    int count;
-    Order order;
-    String[] orderA;
-    GameplayScreen g;
+    /** The width/height of the virtual resolution of the screen. */
+    private final int VIRTUAL_WIDTH = 480, VIRTUAL_HEIGHT = 270;
 
-    private ArrayList<Sprite> sprites;
+    private ArrayList<String> orderArray;
+    private int count;
+    public Order order;
+    private String[] orderA;
+    private ArrayList<Sprite> tileSprites;
 
-    public GameplayScreen(final MoonshipGame game) throws FileNotFoundException {
-        g = this;
+    public GameplayScreen(final MoonshipGame game) throws IOException, ClassNotFoundException {
         this.GAME = game;
         batch = game.batch;
 
-        sprites = new ArrayList<>();
+        tileSprites = new ArrayList<>();
+        LevelData levelData = loadLevel();
 
-        ObjectInputStream inputStream = null;
-        try {
-            InputStream fileStream = Files.newInputStream(new File(Gdx.files.internal("levels/level3.lvl").path()).toPath());
-            inputStream = new ObjectInputStream(fileStream);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        LevelData levelData = null;
-        if (inputStream != null) {
-            try {
-                 levelData = (LevelData) inputStream.readObject();
-            } catch (IOException | ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        AssetManager manager = null;
-        try {
-            manager = new AssetManager();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        if (levelData != null) {
-            float offset = ((float) levelData.width / 2f) * (125f / 2f);
-            for (int i = 0; i < levelData.width; i++) {
-                for (int j = 0; j < levelData.height; j++) {
-                    int index = levelData.layers[0][i][j].getIndex();
-                    if (index != 0) {
-                        Sprite tileSprite = new Sprite(manager.getRegion(index));
-                        tileSprite.setSize(125f / 2f, 125f / 2f);
-                        tileSprite.setPosition(i * tileSprite.getWidth() - (15 * (125 / 2f)), -j * tileSprite.getHeight() + (15 * (125 / 2f)));
-                        sprites.add(tileSprite);
-                    }
-                    System.out.print(index == 0 ? ",  " : ", X");
-                }
-                System.out.println();
-            }
-//            System.out.println("length: " + levelData.layers[0][0][0].toString());
-            System.out.println("level name: " + levelData.levelName);
-        } else {
-            System.out.println("It's null :(((((((((");
-        }
+        // TODO: Add serializable field to level data for the tilesize
+        levelWidth = (levelData.width / 2) * 16;
+        levelHeight = (levelData.height / 2) * 16;
 
         stage = new Stage();
         keyProcessor = new KeyProcessor();
         world = new World(new Vector2(0, 0), true);
         multiplexer = new InputMultiplexer();
 
-        levelWidth = 500;
-        levelHeight = 500;
-
-        x = screenWidth / 2;
-        y = screenHeight / 2;
-        log = new GameObject(world, x, y);
         rock = new GameObject(world, 300, 300);
         rock.setSprite("rock.png");
+        rock.sprite.setPosition(300, 300);
+
+        log = new GameObject(world, VIRTUAL_WIDTH / 2, VIRTUAL_HEIGHT / 2);
         log.setSprite("log.png");
 
         player = new Player(world, 150, 200);
-        camera = new PlayerCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        playerAttributes = new PlayerAttributes();
+
+        camera = new PlayerCamera(VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
         camera.update();
 
-        screenWidth = Gdx.graphics.getWidth();
-        screenHeight = Gdx.graphics.getHeight();
         // Define side panel properties
-        sidePanelWidth = screenWidth / 5; // Width
-        sidePanelX = screenWidth - sidePanelWidth-10; // Position the panel on the right side
+        sidePanelWidth = Gdx.graphics.getWidth() / 5; // Width
+        sidePanelX = Gdx.graphics.getWidth() - sidePanelWidth; // Position the panel on the right side
         sidePanelY = 60; // Y position
         sidePanelHeight = Gdx.graphics.getHeight() - 150; // Height
-        sidePanelColor = new Color(0.2f, 0.2f, 0.2f, 0.8f); // Background color (RGBA)
-
+        sidePanelColor = new Color(0.2f, 0.2f, 0.2f, 0.5f); // Background color (RGBA)
 
         coin = new Coin(world, 0, 0);
         coinCounter = 0;
-
-        playerAttributes = new PlayerAttributes();
 
         visibleQ = new ArrayList<>();
         playerAttributes.setArray(visibleQ);
         playerAttributes.orderInProgress = false;
 
         order = new Order();
-        arrays = new ArrayList<>();
-        order.setArray(arrays);
-        System.out.println(arrays);
+        orderArray = new ArrayList<>();
+        order.setArray(orderArray);
+        System.out.println(orderArray);
         orderA = order.arrayToArray();
         order.seti(order.i++);
         int time = Integer.parseInt(orderA[3]);
         int id = Integer.parseInt(orderA[0]);
-        order = new Order(stage, game, id, orderA[1], orderA[2], time, arrays);
+        order = new Order(stage, game, id, orderA[1], orderA[2], time, orderArray);
         popup = new Popup(this, order.arrayToString());
-        order.setPickupBounds(-levelWidth + 50, -levelHeight + 50, 50, 50);
-        order.setDropoffBounds(levelWidth - sidePanelWidth * 2, levelHeight - sidePanelHeight * 2, 50, 50);
+        order.setPickupBounds(-levelWidth + 50, -levelHeight + 50, 16, 16);
+        order.setDropoffBounds(levelWidth - 100, levelHeight - 100, 16, 16);
 
         pickupObject = new GameObject(world, order.getPickupBounds().getX(), order.getPickupBounds().getY());
         pickupObject.setSprite("borger.png");
-        pickupObject.sprite.setSize(order.getPickupBounds().getWidth(), order.getPickupBounds().getHeight());
         pickupObject.sprite.setPosition(order.getPickupBounds().getX(), order.getPickupBounds().getY());
 
         dropoffObject = new GameObject(world, order.getDropoffBounds().getX(), order.getDropoffBounds().getY());
         dropoffObject.setSprite("plate.png");
-        dropoffObject.sprite.setSize(order.getDropoffBounds().getWidth(), order.getDropoffBounds().getHeight());
         dropoffObject.sprite.setPosition(order.getDropoffBounds().getX(), order.getDropoffBounds().getY());
 
         // Make button style
-        Pixmap backgroundPixmap = createRoundedRectanglePixmap(200, 50, 10, Color.PURPLE); // Adjust size and color
+        Pixmap backgroundPixmap = createRoundedRectanglePixmap(200, 50, 10, new Color (0.9f, 0, 0.9f, 0.6f)); // Adjust size and color
         TextButton.TextButtonStyle buttonStyle = new TextButton.TextButtonStyle();
         buttonStyle.up = new TextureRegionDrawable(new TextureRegion(new Texture(backgroundPixmap)));
         BitmapFont buttonFont = new BitmapFont();
@@ -222,7 +168,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 try {
-                    order.setArray(arrays);
+                    order.setArray(orderArray);
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }
@@ -251,22 +197,22 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         font.setColor(0, 0, 0, 1);
         font.getData().setScale(0.5f, 0.5f);
         Label.LabelStyle indicatorStyle = new Label.LabelStyle(font, Color.BLACK);
-        label = new Label("Careful!", indicatorStyle);
-        label.setVisible(false);
-        stage.addActor(label);
-        label.setSize(font.getScaleX() * 100, font.getScaleY() * 100);
+        warningLabel = new Label("Careful!", indicatorStyle);
+        warningLabel.setVisible(false);
+        stage.addActor(warningLabel);
+        warningLabel.setSize(font.getScaleX() * 100, font.getScaleY() * 100);
 
         // pickup label
         pickupLabel = new Label("Press P to pickup!", indicatorStyle);
         pickupLabel.setVisible(false);
         stage.addActor(pickupLabel);
-        pickupLabel.setSize(font.getScaleX() * 50, font.getScaleY() * 50);
+        pickupLabel.setSize(font.getScaleX() * 16, font.getScaleY() * 16);
 
         // dropoff label
         dropoffLabel = new Label("Press O to dropoff!", indicatorStyle);
         dropoffLabel.setVisible(false);
         stage.addActor(dropoffLabel);
-        dropoffLabel.setSize(font.getScaleX() * 50, font.getScaleY() * 50);
+        dropoffLabel.setSize(font.getScaleX() * 16, font.getScaleY() * 16);
     }
 
     @Override
@@ -280,173 +226,60 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         // Set font color and scale
         font.setColor(1, 1, 0, 1);
         font.getData().setScale(0.5f);
-
     }
 
     @Override
     public void render(float delta) {
         /* ========================== UPDATE ============================ */
 
-
-
         // If the popup is not visible, update the player and world
         if (!popup.isVisible()) {
             player.update(delta, keyProcessor);
-            player.checkBounds(levelWidth, levelHeight, 5000, sidePanelWidth);
+            player.checkBounds(levelWidth, levelHeight);
             world.step(1/60f, 6, 2); // Physics calculations
-//            player.position.y = MathUtils.clamp(player.position.y, -levelHeight, levelHeight);
+
             camera.follow(player.position, levelWidth, levelHeight);
-        }
 
-        batch.setProjectionMatrix(camera.combined);
+            // screen boundary collisions
+            Rectangle playerBounds = player.sprite.getBoundingRectangle();
+            float threshold = 50;
 
-
-
-        stage.act(delta);
-
-        // screen boundary collisions
-        Rectangle playerBounds = player.sprite.getBoundingRectangle();
-        Rectangle screenBounds = new Rectangle(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        float playerLeft = playerBounds.getX();
-        float playerBottom = playerBounds.getY();
-        float playerTop = playerBottom + playerBounds.getHeight();
-        float playerRight = playerLeft + playerBounds.getWidth();
-
-        float threshold = 50;
-
-        // visual indicator that the player is almost off the screen
-        if (!popup.isVisible()) {
-            // warning only visible when popup is not
-            if (playerLeft <= -(levelWidth - sidePanelWidth) + threshold) {
-                label.setPosition(levelWidth- (levelWidth - label.getWidth()), levelHeight / 2);
-                label.setVisible(true);
-            } else if (playerRight >= (levelWidth - sidePanelWidth) - threshold) {
-                label.setPosition((levelWidth - (3 * label.getWidth())), levelHeight / 2);
-                label.setVisible(true);
-            } else if (playerBottom <= (-levelHeight + backButton.getHeight()) + threshold) {
-                label.setPosition(levelWidth / 2, levelHeight - (levelHeight - label.getHeight()));
-                label.setVisible(true);
-            } else if (playerTop >= (levelHeight - backButton.getHeight()) - threshold) {
-                label.setPosition(levelWidth / 2, levelHeight - label.getHeight());
-                label.setVisible(true);
+            // visual indicator that the player is almost off the screen
+            if (playerBounds.getX() <= -(levelWidth + threshold)) {
+                warningLabel.setPosition(levelWidth- (levelWidth - warningLabel.getWidth()), levelHeight / 2f);
+                warningLabel.setVisible(true);
+            } else if (playerBounds.getY() >= (levelWidth - threshold)) {
+                warningLabel.setPosition((levelWidth - (3 * warningLabel.getWidth())), levelHeight / 2f);
+                warningLabel.setVisible(true);
+            } else if ((playerBounds.getX() + player.getWidth()) <= (-levelHeight + threshold)) {
+                warningLabel.setPosition(levelWidth / 2f, levelHeight - (levelHeight - warningLabel.getHeight()));
+                warningLabel.setVisible(true);
+            } else if ((playerBounds.getY() + player.getHeight()) >= (levelHeight - threshold)) {
+                warningLabel.setPosition(levelWidth / 2f, levelHeight - warningLabel.getHeight());
+                warningLabel.setVisible(true);
             } else {
                 // remove the label
-                label.setVisible(false);
+                warningLabel.setVisible(false);
             }
         }
+        batch.setProjectionMatrix(camera.combined);
 
-        final float halfWidth = playerBounds.getWidth() * .5f;
-        final float halfHeight = playerBounds.getHeight() * .5f;
-        // float for new position (for screen collisions)
-        float newX = player.sprite.getX();
-        float newY = player.sprite.getY();
-
-        // object collision
-
-        rock.sprite.setSize(100, 100);
-        rock.sprite.setPosition(300, 300);
-        //rock.setBounds(rock.sprite.getX(), rock.sprite.getY(), rock.sprite.getWidth(), rock.sprite.getHeight());
-
-//        Rectangle rockBounds = rock.getBounds();
-//        float rockLeft = rockBounds.getX();
-//        float rockBottom = screenBounds.getY();
-//        float rockTop = rockBottom + rockBounds.getHeight();
-//        float rockRight = rockLeft + rockBounds.getWidth();
-//        player.checkBounds((int) (rockBounds.getX() + rockBounds.getWidth()), (int)(rockBounds.getY() + rockBounds.getHeight()), 5000, 0);
-
-        Vector2 correctiveDirection = new Vector2();
-
-        // left side of rock
-//        if (player.body.getPosition().x + player.sprite.getWidth() >= rockLeft && (rockTop >= player.body.getPosition().y + player.sprite.getHeight() &&
-//                player.body.getPosition().y + player.sprite.getHeight() >= rockBottom)) {
-//            correctiveDirection.x = -1;
-//        }
-//        } else if (player.body.getPosition().x < -width) {
-//            correctiveDirection.x = 1;
-//        }
-//
-//        if (player.body.getPosition().y + player.sprite.getHeight() > height - 60) {
-//            correctiveDirection.y = -1;
-//        } else if (player.body.getPosition().y < -height) {
-//            correctiveDirection.y = 1;
-//        }
-
-        //player.body.applyForceToCenter(correctiveDirection.scl(500), true);
-
-
-//        if (playerLeft > rockLeft && playerLeft < rockRight) {
-//            // clamp to left
-//            newX = rockLeft + halfWidth;
-//            player.body.setLinearVelocity(newX, player.body.getLinearVelocity().y);
-//            //xMove = 1;
-//        } else if (playerRight < rockRight) {
-//            // clamp to right
-//            newX = rockRight - halfWidth;
-//            player.body.setLinearVelocity(-newX, player.body.getLinearVelocity().y);
-//            //xMove = 1;
-//        }
-//        // vertical axis
-//        if (playerBottom < rockBottom) {
-//            // clamp to bottom
-//            newY = rockBottom + halfHeight;
-//            player.body.setLinearVelocity(player.body.getLinearVelocity().x, newY);
-//            //yMove = 1;
-//        } else if (playerTop > rockTop) {
-//            // clamp to top
-//            newY = rockTop - halfHeight;
-//            player.body.setLinearVelocity(player.body.getLinearVelocity().x, -newY);
-//            //yMove = 1;
-//        }
-
-        /*rock.sprite.setSize(300, 300);
-        rock.sprite.setPosition(300, 300);
-        rock.setBounds(rock.sprite.getX(), rock.sprite.getY(), rock.sprite.getWidth(), rock.sprite.getHeight());
-//        System.out.println(rock.sprite.getX());
-        Rectangle rockBounds = rock.getBounds();
-        float rockLeft = rockBounds.getX();
-        float rockBottom = screenBounds.getY();
-        float rockTop = rockBottom + rockBounds.getHeight();
-        float rockRight = rockLeft + rockBounds.getWidth();
-        if (playerLeft < rockLeft) {
-            // clamp to left
-            newX = rockLeft + halfWidth;
-            player.body.setLinearVelocity(newX, player.body.getLinearVelocity().y);
-            //xMove = 1;
-        } else if (playerRight > rockRight) {
-            // clamp to right
-            newX = rockRight - halfWidth;
-            player.body.setLinearVelocity(-newX, player.body.getLinearVelocity().y);
-            //xMove = 1;
-        }
-        // vertical axis
-        if (playerBottom < rockBottom) {
-            // clamp to bottom
-            newY = rockBottom + halfHeight;
-            player.body.setLinearVelocity(player.body.getLinearVelocity().x, newY);
-            //yMove = 1;
-        } else if (playerTop > rockTop) {
-            // clamp to top
-            newY = rockTop - halfHeight;
-            player.body.setLinearVelocity(player.body.getLinearVelocity().x, -newY);
-            //yMove = 1;
-        }*/
-
+        stage.act(delta);
 
         /* ========================== DRAW ============================ */
 
         ScreenUtils.clear(Color.PINK);
 
-        // Draw game world stuff
+        /* ===== Draw game objects ===== */
         batch.begin();
 
-        for (Sprite sprite : sprites) {
+        for (Sprite sprite : tileSprites) {
             sprite.draw(batch);
         }
 
         player.render(batch);
         rock.render(batch, 20, 200);
         log.render(batch, 0, 10);
-        log.sprite.setSize(100, 75);
 
         // coin collision
         if (!coin.collected) {
@@ -457,85 +290,56 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             }
         }
 
-        if (playerAttributes.array.size() > 1 && !order.isPickedUp()) {
-            pickupObject.sprite.draw(batch);
-            if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getPickupBounds())) {
-                pickupLabel.setVisible(true);
-                if (keyProcessor.pPressed) {
-                    order.setPickedUp(true);
-                    order.setDroppedOff(false);
+        if (playerAttributes.array.size() > 1) {
+            if (!order.isPickedUp()) {
+                pickupObject.sprite.draw(batch);
+                if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getPickupBounds())) {
+                    pickupLabel.setVisible(true);
+                    if (keyProcessor.pPressed) {
+                        order.setPickedUp(true);
+                        order.setDroppedOff(false);
+                        pickupLabel.setVisible(false);
+                    }
+                } else {
                     pickupLabel.setVisible(false);
                 }
-            } else {
-                pickupLabel.setVisible(false);
-            }
-        }
-
-        if (playerAttributes.array.size() > 1 && !order.isDroppedOff() && order.isPickedUp()) {
-            dropoffObject.sprite.draw(batch);
-            if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getDropoffBounds())) {
-                dropoffLabel.setVisible(true);
-                if (keyProcessor.oPressed) {
-                    order.setPickedUp(false);
-                    order.setDroppedOff(true);
-                    playerAttributes.orderInProgress = false;
-                    playerAttributes.array.remove(1);
+            } else if (!order.isDroppedOff()) {
+                dropoffObject.sprite.draw(batch);
+                if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getDropoffBounds())) {
+                    dropoffLabel.setVisible(true);
+                    if (keyProcessor.oPressed) {
+                        order.setPickedUp(false);
+                        order.setDroppedOff(true);
+                        playerAttributes.orderInProgress = false;
+                        playerAttributes.array.remove(1);
+                        dropoffLabel.setVisible(false);
+                    }
+                } else {
                     dropoffLabel.setVisible(false);
                 }
-            } else {
-                dropoffLabel.setVisible(false);
-            }
-        }
-
-        if (!order.isPickedUp() && playerAttributes.orderInProgress) {
-            pickupObject.sprite.draw(batch);
-            if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getPickupBounds())) {
-                pickupLabel.setVisible(true);
-                if (keyProcessor.pPressed) {
-                    order.setPickedUp(true);
-                    order.setDroppedOff(false);
-                    pickupLabel.setVisible(false);
-                }
-            } else {
-                pickupLabel.setVisible(false);
-            }
-        } else if (order.isPickedUp() && !order.isDroppedOff() && playerAttributes.orderInProgress) {
-            dropoffObject.sprite.draw(batch);
-            if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getDropoffBounds())) {
-                dropoffLabel.setVisible(true);
-                if (keyProcessor.oPressed) {
-                    order.setPickedUp(false);
-                    order.setDroppedOff(true);
-                    playerAttributes.orderInProgress = false;
-                    playerAttributes.array.remove(1);
-                    dropoffLabel.setVisible(false);
-                }
-            } else {
-                dropoffLabel.setVisible(false);
             }
         }
 
         batch.end();
 
-        // Draw UI stuff
+        /* Draw UI elements */
         batch.begin();
 
         // Render the side panel
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(sidePanelColor);
         shapeRenderer.rect(sidePanelX, sidePanelY, sidePanelWidth, sidePanelHeight);
         shapeRenderer.end();
-
-        //shapeRenderer.setProjectionMatrix(camera.combined);
-
+        Gdx.gl.glDisable(GL20.GL_BLEND);
 
         String[] items = playerAttributes.array.toArray(new String[0]);
 
         font.draw(batch, "Order List:", sidePanelX + 10, sidePanelY + sidePanelHeight - 10);
-        //font.draw(batch, "\n", sidePanelX + 10, sidePanelY + sidePanelHeight - 10);
 
         for (int i = 1; i < items.length; i++) {
-                font.draw(batch, items[i], sidePanelX + 10, sidePanelY + sidePanelHeight - 70 * i);
+            font.draw(batch, items[i], sidePanelX + 10, sidePanelY + sidePanelHeight - 70 * i);
         }
 
         stage.draw();
@@ -579,6 +383,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     public Pixmap createRoundedRectanglePixmap(int width, int height, int cornerRadius, Color color) {
         Pixmap pixmap = new Pixmap(width, height, Pixmap.Format.RGBA8888);
         pixmap.setColor(color);
+        pixmap.setBlending(Pixmap.Blending.None); // Makes it so elements of the pixmap don't overlap if transparency is on
 
         // Draw rounded rectangle
         pixmap.fillRectangle(cornerRadius, 0, width - 2 * cornerRadius, height);
@@ -593,5 +398,33 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
     public Stage getStage() {
         return stage;
+    }
+
+    public LevelData loadLevel() throws IOException, ClassNotFoundException {
+        InputStream fileStream = Files.newInputStream(new File(Gdx.files.internal("levels/level3.lvl").path()).toPath());
+        ObjectInputStream inputStream = new ObjectInputStream(fileStream);
+
+        LevelData levelData = (LevelData) inputStream.readObject();
+
+        AssetManager manager = new AssetManager();
+
+        // If the level data is properly deserialized
+        if (levelData != null) {
+            for (int i = 0; i < levelData.width; i++) {
+                for (int j = 0; j < levelData.height; j++) {
+                    int index = levelData.layers[0][i][j].getIndex();
+                    if (index != 0) {
+                        Sprite tileSprite = new Sprite(manager.getRegion(index));
+                        tileSprite.setPosition((i - 15) * tileSprite.getWidth(), (15 - j) * tileSprite.getHeight());
+                        tileSprites.add(tileSprite);
+                    }
+                }
+            }
+            System.out.println("level name: " + levelData.levelName);
+        } else {
+            System.err.println("Unable to load level.");
+        }
+
+        return levelData;
     }
 }

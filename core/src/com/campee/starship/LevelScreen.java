@@ -18,6 +18,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 public class LevelScreen implements Screen {
     private final MoonshipGame game;
@@ -67,23 +68,8 @@ public class LevelScreen implements Screen {
         Pixmap beginButtonPixmap = createRoundedRectanglePixmap(150, 60, 15, Color.valueOf("98FF98"));
         beginButtonStyle.up = new TextureRegionDrawable(new TextureRegion(new Texture(beginButtonPixmap)));
 
-
-        float screenWidth = Gdx.graphics.getWidth();
-        float screenHeight = Gdx.graphics.getHeight();
-        float buttonX = 30;
-        //float buttonY = (screenHeight - buttonHeight) / 2;
-//        float buttonHeight = 60;
-//        float buttonWidth = 150;
-//        float screenWidth = Gdx.graphics.getWidth();
-//        float screenHeight = Gdx.graphics.getHeight();
-//        float buttonX = 30;
-//        float buttonY = (screenHeight - buttonHeight) / 2;
-
         beginButton = new TextButton("BEGIN DEMO", beginButtonStyle);
-        //beginButton.setPosition(buttonX, buttonY);
         beginButton.setPosition(30, Gdx.graphics.getHeight() - 80);
-        //beginButton.setPosition(30, Gdx.graphics.getHeight() - 80);
-        //beginButton.setSize(Gdx.graphics.getWidth() - 180, Gdx.graphics.getHeight() - 80);
         beginButton.setSize(150, 60);
         beginButton.addListener(new InputListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
@@ -91,7 +77,10 @@ public class LevelScreen implements Screen {
                 try {
                     game.setScreen(new GameplayScreen((MoonshipGame) game)); // Change to the screen you want
                 } catch (FileNotFoundException e) {
+                    System.err.println("File not found.");
                     e.printStackTrace();
+                } catch (IOException | ClassNotFoundException e) {
+                    throw new RuntimeException(e);
                 }
                 return true;
             }
@@ -129,7 +118,6 @@ public class LevelScreen implements Screen {
         shapeRenderer.begin(ShapeType.Filled);
 
         float boxWidth = 200;
-        //float boxHeight = 150;
         float boxHeight = 200;
         float boxSpacing = 50;
         float startY = (camera.viewportHeight - boxHeight) / 2;
