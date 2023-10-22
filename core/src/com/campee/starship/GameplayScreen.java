@@ -57,7 +57,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
     private Timer timer;
     private TimerTask timerTask;
-    int time = 60;
+    int timeCount = 0;
+    int orderTimeLeft = 0;
 
     public GameObject pickupObject;
     public GameObject dropoffObject;
@@ -307,35 +308,6 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
     @Override
     public void create() {
-        // Create a new Timer and schedule the TimerTask
-        timer = new Timer();
-        timerTask = new TimerTask() {
-            @Override
-            public void run() {
-                if (time > 0) {
-                    time--; // Decrement the time every second
-                    // Update the array with the new 'time' value
-                    if (playerAttributes.orderInProgress) {
-                        String temp = playerAttributes.array.get(1);
-                        String[] s = order.stringToArray(temp);
-                        s[4] = String.valueOf(time);
-
-                        StringBuilder sb = new StringBuilder();
-                        for (String thing : s) {
-                            sb.append(thing);
-                            sb.append(" ");
-                        }
-                        playerAttributes.array.set(1, sb.toString());
-                    }
-                } else {
-                    // Perform actions when the time reaches 0
-                    System.out.println("Time's up!");
-                    timer.cancel(); // Stop the timer
-                }
-            }
-        };
-        timer.scheduleAtFixedRate(timerTask, 1000, 1000); // Delay 1 second, repeat every 1 second
-
     }
 
     @Override
@@ -350,9 +322,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
     @Override
     public void render(float delta) {
-       // System.out.println("delta:" +  delta);
-        float num = (1/10) * delta;
-        System.out.println(num);
+
 
 
         /* ========================== UPDATE ============================ */
@@ -530,17 +500,31 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         if (playerAttributes.orderInProgress) {
             String temp = playerAttributes.array.get(1);
             String[] s = order.stringToArray(temp);
-            int sum = Integer.parseInt(s[4]);
-            time = Math.round(sum - num);
-            System.out.println("time: " + time);
-            s[4] = String.valueOf(time);
+            int time = Integer.parseInt(s[4]);
+            if (time <= 0) {
+                playerAttributes.array.remove(1);
+                if (playerAttributes.array.size() <= 1) {
+                    playerAttributes.orderInProgress = false;
+                    order.setDroppedOff(false);
+                    order.setPickedUp(false);
+                    dropoffLabel.setVisible(false);
+                    pickupLabel.setVisible(false);
+                }
+            } else {
+                if (timeCount % 20 == 0 && time != 0) {
+                    time -= 1;
+                    orderTimeLeft = time;
+                }
+                timeCount++;
+                s[4] = String.valueOf(time);
 
-            StringBuilder sb = new StringBuilder();
-            for(String thing : s) {
-                sb.append(thing);
-                sb.append(" ");
+                StringBuilder sb = new StringBuilder();
+                for (String thing : s) {
+                    sb.append(thing);
+                    sb.append(" ");
+                }
+                playerAttributes.array.set(1, sb.toString());
             }
-            playerAttributes.array.set(1, sb.toString());
         }
 
         if (playerAttributes.array.size() > 1 && !order.isPickedUp()) {
@@ -621,8 +605,16 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         font.draw(batch, "Order List:", sidePanelX + 10, sidePanelY + sidePanelHeight - 10);
         //font.draw(batch, "\n", sidePanelX + 10, sidePanelY + sidePanelHeight - 10);
 
+
+
         for (int i = 1; i < items.length; i++) {
+            if (i == 1 && orderTimeLeft <= 5 && orderTimeLeft > 0) {
+                font.setColor(Color.RED);
                 font.draw(batch, items[i], sidePanelX + 10, sidePanelY + sidePanelHeight - 70 * i);
+            } else {
+                font.setColor(Color.WHITE);
+                font.draw(batch, items[i], sidePanelX + 10, sidePanelY + sidePanelHeight - 70 * i);
+            }
         }
 
         stage.draw();
