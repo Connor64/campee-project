@@ -1,46 +1,71 @@
 package com.campee.starship;
 
-import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.FileNotFoundException;
 
-public class MoonshipGame extends ApplicationAdapter {
-	SpriteBatch batch;
-	Texture img;
+public class MoonshipGame extends Game {
+	//GameScreen gameScreen;
+	//private Order order;
+	private TitleScreen titleScreen;
+	//private TestScreen testScreen;
+
+	public SpriteBatch batch;
+//	public BitmapFont font;
+	static int interval;
+	static Timer timer;
+
 
 	@Override
-	public void create () {
+	public void create() {
+//		titleScreen = new TitleScreen(this);
+//		//testScreen = new TestScreen(this);
+//		//order = new Order(this);
+////		gameScreen = new GameScreen(this);
+////		setScreen(gameScreen);
+//
 		batch = new SpriteBatch();
-		Pixmap pix_big = new Pixmap(Gdx.files.internal("connor_apple.jpg"));
-		Pixmap pix_small = new Pixmap(400, 400, pix_big.getFormat());
-		pix_small.drawPixmap(pix_big,
-				0, 0, pix_big.getWidth(), pix_big.getHeight(),
-				0, 0, pix_small.getWidth(), pix_small.getHeight()
-		);
-		img = new Texture(pix_small);
-		pix_small.dispose();
-		pix_big.dispose();
-
+//		setScreen(new TitleScreen(this));
+		//setScreen(new GameplayScreen(this));
+		setScreen(new SplashScreen(this));
+		final Game game = this;
+		timer = new Timer();
+		interval = 2;
+		timer.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				Gdx.app.postRunnable(new Runnable() {
+					@Override
+					public void run() {
+						setScreen(new TitleScreen((MoonshipGame) game));
+					}
+				});
+				timer.cancel();
+			}
+		}, TimeUnit.SECONDS.toMillis(interval));
 	}
 
 	@Override
-	public void render () {
-		ScreenUtils.clear(255, 0, 255, 0);
-		batch.begin();
-		batch.draw(img, 400 - (img.getWidth() / 2), 300 - (img.getHeight() / 2));
-		batch.end();
+	public void render() {
+		super.render();
 	}
 
-	@Override
-	public void dispose () {
+	public void dispose() {
 		batch.dispose();
-		img.dispose();
+//		font.dispose();
 	}
+
 }
