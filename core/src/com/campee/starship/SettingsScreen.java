@@ -16,7 +16,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 public class SettingsScreen implements Screen {
-
     private final Game game;
     private OrthographicCamera camera;
     private SpriteBatch batch;
@@ -24,6 +23,7 @@ public class SettingsScreen implements Screen {
     private TextButton backButton;
     private Stage stage;
     private ExtendViewport viewport;
+    private float timer = 10; // Countdown timer in seconds
 
     public SettingsScreen(final Game game) {
         this.game = game;
@@ -79,15 +79,30 @@ public class SettingsScreen implements Screen {
         float textY = camera.viewportHeight - 50;
         font.draw(batch, "SETTINGS", textX, textY);
 
+        // Draw countdown timer
+        GlyphLayout timerLayout = new GlyphLayout();
+        timerLayout.setText(font, "Time Left: " + (int) timer);
+        float timerX = (camera.viewportWidth - timerLayout.width) / 2;
+        float timerY = textY - 50;
+        font.draw(batch, "Time Left: " + (int) timer, timerX, timerY);
+
         batch.end();
 
         stage.act(delta);
         stage.draw();
+
+        // Update countdown timer
+        timer -= delta;
+        if (timer <= 0) {
+            // When the timer reaches 0, switch back to the title screen
+            game.setScreen(new LevelScreen(game)); // Change to the screen you want
+        }
     }
 
     @Override
     public void resize(int width, int height) {
         camera.setToOrtho(false, width, height); // Update the camera when the screen is resized
+        viewport.update(width, height, true);
     }
 
     @Override
@@ -108,6 +123,7 @@ public class SettingsScreen implements Screen {
         font.dispose();
         stage.dispose();
     }
+
     public Pixmap createRoundedRectanglePixmap(int width, int height, int cornerRadius, Color color) {
         Pixmap pixmap = new Pixmap(width, height, Pixmap.Format.RGBA8888);
         pixmap.setColor(color);
