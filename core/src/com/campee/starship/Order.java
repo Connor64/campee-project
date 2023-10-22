@@ -98,11 +98,9 @@ public class Order {
         String line = array.get(i);
         words = line.split("\\|");
 
-
         String s = "ID: " + words[0] + "\nP: " + words[1]
                 + "\nD: " + words[2] + "\nTime: " + words[3] + " mins";
         return s;
-
     }
 
     public Stage getStage() {

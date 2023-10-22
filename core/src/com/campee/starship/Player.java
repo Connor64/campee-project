@@ -5,28 +5,18 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 
-//import javax.xml.soap.Text;
-import java.security.Key;
-
 public class Player extends GameObject {
     public Body body;
-    private TextureRegion region;
     public Sprite sprite;
-    private int xMove;
-    private int yMove;
-    private int move;
-    private Texture texture;
-    private TextureRegion[] textureRegions;
+    private final TextureRegion[] textureRegions;
+    private boolean lockX = false;
+    private boolean lockY = false;
 
-    String spritePath = "";
-    private float speedBoostX;
-    private float speedBoostY;
-
-    private static final float ACCELERATION = 1000f;
+//    private static final float ACCELERATION = 5000f;
+    private final float MOVEMENT_SPEED = 10;
 
     public Player(World world, float x, float y) {
         super(world, x, y);
@@ -75,7 +65,6 @@ public class Player extends GameObject {
         };
 
         sprite = new Sprite(textureRegions[0]); // Set default sprite
-        sprite.setSize(125, 125);
         sprite.setOrigin(sprite.getX() / 2, sprite.getY() / 2);
         sprite.setPosition(0, 0);
 
@@ -97,32 +86,27 @@ public class Player extends GameObject {
 
     public void update(float delta, KeyProcessor keyProcessor) {
         // Move player
-        Vector2 force = new Vector2(0, 0);
-        if (keyProcessor.upPressed) {
-//            force.y = 4f;
-            force.y = ACCELERATION;
+        Vector2 direction = new Vector2(0, 0);
+        if (keyProcessor.upPressed && !lockY) {
+            direction.y = 1;
             setSprite(0);
-        } else if (keyProcessor.downPressed) {
-//            force.y = -4f;
-            force.y = -ACCELERATION;
+        } else if (keyProcessor.downPressed && !lockY) {
+            direction.y = -1;
             setSprite(1);
-        } else if (keyProcessor.leftPressed) {
-//            force.x = -4f;
-            force.x = -ACCELERATION;
+        } else if (keyProcessor.leftPressed && !lockX) {
+            direction.x = -1;
             setSprite(2);
-        } else if (keyProcessor.rightPressed) {
-//            force.x = 4f;
-            force.x = ACCELERATION;
+        } else if (keyProcessor.rightPressed && !lockX) {
+            direction.x = 1;
             setSprite(3);
         }
 
-//        body.applyLinearImpulse(force.x, force.y, position.x, position.y, true);
-        body.applyForceToCenter(force, true);
-        setPosition(body.getPosition());
+        body.applyLinearImpulse(direction.scl(MOVEMENT_SPEED), body.getPosition(), true);
+        updateSpritePosition();
     }
 
-    private void setPosition(Vector2 position) {
-        this.position = position;
+    private void updateSpritePosition() {
+        position = body.getPosition();
         sprite.setPosition(position.x, position.y);
     }
 
@@ -130,21 +114,13 @@ public class Player extends GameObject {
         return this.sprite;
     }
 
-    public void checkBounds(int width, int height, int force, float sidePanelWidth) {
-        Vector2 correctiveDirection = new Vector2();
-
-        if (body.getPosition().x + sprite.getWidth() > width - sidePanelWidth -10) {
-            correctiveDirection.x = -1;
-        } else if (body.getPosition().x < -width) {
-            correctiveDirection.x = 1;
+    public void checkBounds(int width, int height) {
+        if ((body.getPosition().x + sprite.getWidth() > width) || (body.getPosition().x < -width)) {
+            body.setLinearVelocity(body.getLinearVelocity().x * -1, body.getLinearVelocity().y);
         }
 
-        if (body.getPosition().y + sprite.getHeight() > height - 60) {
-            correctiveDirection.y = -1;
-        } else if (body.getPosition().y < -height) {
-            correctiveDirection.y = 1;
+        if ((body.getPosition().y + sprite.getHeight() > (height + 16)) || (body.getPosition().y < (-height + 16))) {
+            body.setLinearVelocity(body.getLinearVelocity().x, body.getLinearVelocity().y * -1);
         }
-
-        body.applyForceToCenter(correctiveDirection.scl(force), true);
     }
 }
