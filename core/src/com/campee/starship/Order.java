@@ -83,13 +83,15 @@ public class Order {
     }
 
     public String[] arrayToArray() {
-        System.out.println(i);
-        String[] words = new String[0];
+        String[] words;
         String line = array.get(i);
         words = line.split("\\|");
         i++;
-        //return s;
         return words;
+    }
+
+    public String[] stringToArray(String line) {
+        return line.split(" ");
     }
 
 
@@ -100,7 +102,7 @@ public class Order {
 
 
         String s = "ID: " + words[0] + "\nP: " + words[1]
-                + "\nD: " + words[2] + "\nTime: " + words[3] + " mins";
+                + "\nD: " + words[2] + "\nTime: " + words[3] + " s";
         return s;
 
     }

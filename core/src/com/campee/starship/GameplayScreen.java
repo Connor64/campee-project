@@ -24,6 +24,9 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import java.io.*;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class GameplayScreen extends ApplicationAdapter implements Screen {
 
@@ -52,6 +55,10 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     public Label pickupLabel;
     public Label dropoffLabel;
 
+    private Timer timer;
+    private TimerTask timerTask;
+    int time = 60;
+
     public GameObject pickupObject;
     public GameObject dropoffObject;
 
@@ -77,6 +84,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     float screenHeight;
 
     ArrayList<String> arrays;
+    ArrayList<Order> orderArray;
     String s;
     int count;
     Order order;
@@ -127,12 +135,12 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                         tileSprite.setPosition(i * tileSprite.getWidth() - (15 * (125 / 2f)), -j * tileSprite.getHeight() + (15 * (125 / 2f)));
                         sprites.add(tileSprite);
                     }
-                    System.out.print(index == 0 ? ",  " : ", X");
+                    //System.out.print(index == 0 ? ",  " : ", X");
                 }
-                System.out.println();
+                //System.out.println();
             }
 //            System.out.println("length: " + levelData.layers[0][0][0].toString());
-            System.out.println("level name: " + levelData.levelName);
+            //System.out.println("level name: " + levelData.levelName);
         } else {
             System.out.println("It's null :(((((((((");
         }
@@ -177,8 +185,9 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         order = new Order();
         arrays = new ArrayList<>();
+        orderArray = new ArrayList<>();
         order.setArray(arrays);
-        System.out.println(arrays);
+       // System.out.println(arrays);
         orderA = order.arrayToArray();
         order.seti(order.i++);
         int time = Integer.parseInt(orderA[3]);
@@ -298,6 +307,35 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
     @Override
     public void create() {
+        // Create a new Timer and schedule the TimerTask
+        timer = new Timer();
+        timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                if (time > 0) {
+                    time--; // Decrement the time every second
+                    // Update the array with the new 'time' value
+                    if (playerAttributes.orderInProgress) {
+                        String temp = playerAttributes.array.get(1);
+                        String[] s = order.stringToArray(temp);
+                        s[4] = String.valueOf(time);
+
+                        StringBuilder sb = new StringBuilder();
+                        for (String thing : s) {
+                            sb.append(thing);
+                            sb.append(" ");
+                        }
+                        playerAttributes.array.set(1, sb.toString());
+                    }
+                } else {
+                    // Perform actions when the time reaches 0
+                    System.out.println("Time's up!");
+                    timer.cancel(); // Stop the timer
+                }
+            }
+        };
+        timer.scheduleAtFixedRate(timerTask, 1000, 1000); // Delay 1 second, repeat every 1 second
+
     }
 
     @Override
@@ -312,6 +350,11 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
     @Override
     public void render(float delta) {
+       // System.out.println("delta:" +  delta);
+        float num = (1/10) * delta;
+        System.out.println(num);
+
+
         /* ========================== UPDATE ============================ */
 
 
@@ -484,6 +527,22 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             }
         }
 
+        if (playerAttributes.orderInProgress) {
+            String temp = playerAttributes.array.get(1);
+            String[] s = order.stringToArray(temp);
+            int sum = Integer.parseInt(s[4]);
+            time = Math.round(sum - num);
+            System.out.println("time: " + time);
+            s[4] = String.valueOf(time);
+
+            StringBuilder sb = new StringBuilder();
+            for(String thing : s) {
+                sb.append(thing);
+                sb.append(" ");
+            }
+            playerAttributes.array.set(1, sb.toString());
+        }
+
         if (playerAttributes.array.size() > 1 && !order.isPickedUp()) {
             pickupObject.sprite.draw(batch);
             if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getPickupBounds())) {
@@ -492,6 +551,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                     order.setPickedUp(true);
                     order.setDroppedOff(false);
                     pickupLabel.setVisible(false);
+                    playerAttributes.orderInProgress = true;
                 }
             } else {
                 pickupLabel.setVisible(false);
