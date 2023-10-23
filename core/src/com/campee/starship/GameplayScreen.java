@@ -40,6 +40,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     private final Popup popup;
     private Coin coin;
     public int coinCounter;
+    public Coin[] coins;
 
     private GameObject log;
     private GameObject rock;
@@ -115,6 +116,16 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         coin = new Coin(world, 0, 0);
         coinCounter = 0;
+        // making a coin array
+        coins = new Coin[5];
+        for (int i = 0; i < coins.length; i++) {
+            int x = (int) ((Math.random() * (levelWidth - (-levelWidth))) + (-levelWidth));
+            int y = (int) ((Math.random() * (levelHeight - (-levelHeight))) + (-levelHeight));
+            System.out.println(x);
+            System.out.println(y);
+            coins[i] = new Coin(world, x, y);
+            coins[i].getSprite().setPosition(x, y);
+        }
 
         visibleQ = new ArrayList<>();
         playerAttributes.setArray(visibleQ);
@@ -277,16 +288,19 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             sprite.draw(batch);
         }
 
+
         player.render(batch);
         rock.render(batch, 20, 200);
         log.render(batch, 0, 10);
 
         // coin collision
-        if (!coin.collected) {
-            coin.render(batch, 100, 100);
-            if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), coin.getSprite().getBoundingRectangle())) {
-                coin.setCollected(true);
-                coinCounter++;
+        for (Coin coin : coins) {
+            if (!coin.collected) {
+                coin.render(batch, (int) coin.getSprite().getX(), (int) coin.getSprite().getY());
+                if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), coin.getSprite().getBoundingRectangle())) {
+                    coin.setCollected(true);
+                    coinCounter++;
+                }
             }
         }
 
