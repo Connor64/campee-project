@@ -290,6 +290,13 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             }
         }
 
+        // rock transparency (testing)
+        if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), rock.sprite.getBoundingRectangle())) {
+            rock.sprite.setAlpha(0.4f);
+        } else {
+            rock.sprite.setAlpha(1);
+        }
+
         if (playerAttributes.array.size() > 1) {
             if (!order.isPickedUp()) {
                 pickupObject.sprite.draw(batch);
