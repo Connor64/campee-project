@@ -79,10 +79,7 @@ public class Popup {
                 acceptClicked = true;
                 screen.playerAttributes.orderInProgress = true;
                 screen.playerAttributes.array.add(screen.order.arrayToString());
-                //System.out.println(screen.playerAttributes.array);
-                screen.orderArray.add(screen.order);
-                //System.out.println("This is the order array!" + screen.orderArray);
-                //screen.order.setPickedUp(true);
+
 
 
                 visible = false;
