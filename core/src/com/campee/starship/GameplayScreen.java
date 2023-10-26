@@ -144,6 +144,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         int time = Integer.parseInt(orderA[3]);
         //int id = Integer.parseInt(orderA[0]);
         order = new Order(stage, game, orderA[0], orderA[1], orderA[2], time, orderArray);
+        order.setDroppedOff(false);
+        order.setPickedUp(false);
         popup = new Popup(this, order.arrayToString());
         order.setPickupBounds(-levelWidth + 50, -levelHeight + 50, 16, 16);
         order.setDropoffBounds(levelWidth - 100, levelHeight - 100, 16, 16);
@@ -330,8 +332,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         }
 
         if (playerAttributes.orderInProgress) {
-            String temp = playerAttributes.array.get(1);
-            String[] s = order.stringToArray(temp);
+            String[] s = order.stringToArray(playerAttributes.array.get(1));
             int time;
             boolean twoName = false;
             try {
@@ -341,14 +342,28 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                 twoName = true;
             }
             if (time <= 0) {
+                if(!order.isDroppedOff()) {
+                    order.setDroppedOff(true);
+                    dropoffLabel.setVisible(false);
+                    order.setPickedUp(false);
+                }
                 playerAttributes.array.remove(1);
                 if (playerAttributes.array.size() <= 1) {
                     playerAttributes.orderInProgress = false;
-                    order.setDroppedOff(false);
                     order.setPickedUp(false);
                     dropoffLabel.setVisible(false);
                     pickupLabel.setVisible(false);
+                } else {
+                    pickupObject.sprite.draw(batch);
+                    order.setDroppedOff(false);
+                    order.setPickedUp(false);
+                    pickupLabel.setVisible(true);
                 }
+//                } else {
+//                    pickupObject.sprite.draw(batch);
+//                    pickupLabel.setVisible(true);
+//
+//                }
             } else {
                 if (timeCount % 60 == 0) {
                     time -= 1;
