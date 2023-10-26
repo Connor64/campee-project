@@ -1,4 +1,221 @@
 package com.campee.starship;
+
+import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.scenes.scene2d.*;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
+
+public class LevelScreen implements Screen {
+    private final MoonshipGame game;
+    private OrthographicCamera camera;
+    private ShapeRenderer shapeRenderer;
+    private SpriteBatch batch;
+    private BitmapFont font;
+    private Stage stage;
+    private ExtendViewport viewport;
+
+    public LevelScreen(final Game game) {
+        this.game = (MoonshipGame) game;
+        camera = new OrthographicCamera();
+        camera.setToOrtho(false, 800, 600);
+        shapeRenderer = new ShapeRenderer();
+        batch = new SpriteBatch();
+        font = new BitmapFont();
+        font.setColor(Color.BLACK);
+        viewport = new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        stage = new Stage(viewport);
+        Gdx.input.setInputProcessor(stage);
+
+        // BACK button
+        TextButton.TextButtonStyle backButtonStyle = new TextButton.TextButtonStyle();
+        backButtonStyle.font = font;
+        backButtonStyle.fontColor = Color.YELLOW;
+        backButtonStyle.up = new TextureRegionDrawable(new TextureRegion(new Texture(createRoundedRectanglePixmap(150, 60, 15, Color.PURPLE))));
+
+        final TextButton backButton = new TextButton("BACK", backButtonStyle);
+        backButton.setPosition(30, Gdx.graphics.getHeight() - 80);
+        backButton.addListener(new InputListener() {
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                game.setScreen(new TitleScreen((MoonshipGame) game));
+                return true;
+            }
+        });
+
+        // SETTINGS button
+        TextButton.TextButtonStyle settingsButtonStyle = new TextButton.TextButtonStyle();
+        settingsButtonStyle.font = font;
+        settingsButtonStyle.fontColor = Color.YELLOW;
+        settingsButtonStyle.up = new TextureRegionDrawable(new TextureRegion(new Texture(createRoundedRectanglePixmap(150, 60, 15, Color.PURPLE))));
+
+        final TextButton settingsButton = new TextButton("SETTINGS", settingsButtonStyle);
+        settingsButton.setPosition(Gdx.graphics.getWidth() - 180, Gdx.graphics.getHeight() - 80);
+        settingsButton.addListener(new InputListener() {
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                game.setScreen(new SettingsScreen(game));
+                return true;
+            }
+        });
+
+        stage.addActor(backButton);
+        stage.addActor(settingsButton);
+
+        loadLevelButtons();
+    }
+
+    @Override
+    public void show() {
+        Gdx.input.setInputProcessor(stage);
+    }
+
+    private void loadLevelButtons() {
+        FileHandle levelsFolder = Gdx.files.internal("levels");
+        FileHandle[] levelFiles = levelsFolder.list();
+
+        Table levelTable = new Table();
+        levelTable.defaults().pad(20);
+        int buttonsPerColumn = 3;
+        float buttonHeight = (Gdx.graphics.getHeight() - (buttonsPerColumn + 1) * 20) / buttonsPerColumn; // Adjust padding
+
+        for (int i = 0; i < levelFiles.length; i++) {
+            final FileHandle levelFile = levelFiles[i]; // Retrieve the current level file
+
+            Table buttonTable = new Table();
+            TextButton.TextButtonStyle levelButtonStyle = new TextButton.TextButtonStyle();
+            levelButtonStyle.font = font;
+            levelButtonStyle.fontColor = Color.BLACK;
+            levelButtonStyle.up = new TextureRegionDrawable(new TextureRegion(new Texture(createRoundedRectanglePixmap(250, (int) buttonHeight, 15, Color.PURPLE))));
+
+            final TextButton levelButton = new TextButton("Locked", levelButtonStyle);
+            levelButton.setDisabled(true);
+            buttonTable.add(levelButton).row();
+            buttonTable.pack();
+
+            final Button button = new Button(new TextureRegionDrawable(new TextureRegion(new Texture(createRoundedRectanglePixmap((int) buttonTable.getWidth(), (int) buttonTable.getHeight(), 15, Color.PURPLE)))));
+
+            Label.LabelStyle labelStyle = new Label.LabelStyle(font, Color.WHITE);
+            final Label levelNameLabel = new Label(levelFile.nameWithoutExtension(), labelStyle);
+
+            Container<Table> buttonContainer = new Container<>(buttonTable);
+            buttonContainer.setActor(button);
+            buttonContainer.fill(); // Make the container fill its parent
+
+            button.addListener(new InputListener() {
+                @Override
+                public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+                    super.enter(event, x, y, pointer, fromActor);
+                    button.setColor(Color.LIGHT_GRAY);
+                    levelNameLabel.setPosition(button.getX() + button.getWidth() / 2 - levelNameLabel.getWidth() / 2, button.getY() + button.getHeight() + 10);
+                    stage.addActor(levelNameLabel);
+                }
+
+                @Override
+                public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
+                    super.exit(event, x, y, pointer, toActor);
+                    button.setColor(Color.WHITE);
+                    levelNameLabel.remove(); // Remove the label when not hovering over the button
+                }
+
+                @Override
+                public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                    // Handle level button click here
+                    // For example, you can load the selected level: game.setScreen(new GameplayScreen((MoonshipGame) game, levelFile));
+                    return true;
+                }
+            });
+
+            levelTable.add(buttonContainer).padBottom(20).row();
+        }
+
+        ScrollPane scrollPane = new ScrollPane(levelTable);
+        scrollPane.setFillParent(true);
+        scrollPane.setCancelTouchFocus(false); // Disable touch focus cancellation
+        scrollPane.setScrollingDisabled(true, false); // Enable only vertical scrolling
+        stage.addActor(scrollPane);
+    }
+
+
+
+    private Pixmap createRoundedRectanglePixmap(int width, int height, int cornerRadius, Color color) {
+        Pixmap pixmap = new Pixmap(width, height, Pixmap.Format.RGBA8888);
+        pixmap.setColor(color);
+        pixmap.fillRectangle(cornerRadius, 0, width - 2 * cornerRadius, height);
+        pixmap.fillRectangle(0, cornerRadius, width, height - 2 * cornerRadius);
+        pixmap.fillCircle(cornerRadius, cornerRadius, cornerRadius);
+        pixmap.fillCircle(cornerRadius, height - cornerRadius - 1, cornerRadius);
+        pixmap.fillCircle(width - cornerRadius - 1, cornerRadius, cornerRadius);
+        pixmap.fillCircle(width - cornerRadius - 1, height - cornerRadius - 1, cornerRadius);
+        return pixmap;
+    }
+
+    @Override
+    public void render(float delta) {
+        Gdx.gl.glClearColor(0.7f, 0.9f, 1f, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        // Update label positions to match their corresponding boxes
+        for (Actor actor : stage.getActors()) {
+            if (actor instanceof Label) {
+                String actorName = actor.getName();
+                if (actorName != null && actorName.startsWith("levelLabel")) {
+                    String boxName = "box" + actorName.substring(10);
+                    Actor box = stage.getRoot().findActor(boxName);
+                    if (box != null) {
+                        float labelX = box.getX() + box.getWidth() / 2 - actor.getWidth() / 2;
+                        float labelY = box.getY() + box.getHeight() + 10;
+                        actor.setPosition(labelX, labelY);
+                    }
+                }
+            }
+        }
+
+        stage.act(delta);
+        stage.draw();
+    }
+
+
+
+    @Override
+    public void resize(int width, int height) {
+        viewport.update(width, height, true);
+    }
+
+    @Override
+    public void pause() {
+    }
+
+    @Override
+    public void resume() {
+    }
+
+    @Override
+    public void hide() {
+    }
+
+    @Override
+    public void dispose() {
+        shapeRenderer.dispose();
+        batch.dispose();
+        font.dispose();
+        stage.dispose();
+    }
+}
+
+
+
+
+
+
+/*
+package com.campee.starship;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -262,3 +479,4 @@ public class LevelScreen implements Screen {
         return pixmap;
     }
 }
+ */
