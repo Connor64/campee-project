@@ -57,7 +57,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     private Timer timer;
     private TimerTask timerTask;
     private int timeCount = 0;
-    private int orderTimeLeft = 0;
+    private int orderTimeLeft = 6;
 
     public GameObject pickupObject;
     public GameObject dropoffObject;
@@ -357,13 +357,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                     pickupObject.sprite.draw(batch);
                     order.setDroppedOff(false);
                     order.setPickedUp(false);
-                    pickupLabel.setVisible(true);
                 }
-//                } else {
-//                    pickupObject.sprite.draw(batch);
-//                    pickupLabel.setVisible(true);
-//
-//                }
             } else {
                 if (timeCount % 60 == 0) {
                     time -= 1;
@@ -404,8 +398,10 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                     if (keyProcessor.oPressed) {
                         order.setPickedUp(false);
                         order.setDroppedOff(true);
-                        playerAttributes.orderInProgress = false;
                         playerAttributes.array.remove(1);
+                        if (playerAttributes.array.size() <= 1) {
+                            playerAttributes.orderInProgress = false;
+                        }
                         dropoffLabel.setVisible(false);
                     }
                 } else {
