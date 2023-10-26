@@ -1,10 +1,10 @@
-01|Panera|Windsor|30
-02|Panera|Walc|50
-03|Cosi|Honors|25
-04|Starbucks|CL50|40
-05|Third St|Union|50
-06|Sushi Boss|Meredith|40
-07|Pete's Za|Beering|50
-08|Franks|Owen|25
-09|Jersey Mike's|Haas|50
-10|Starbucks|Union|30
+24601|Panera|Windsor|30
+c0d3r|Panera|Walc|50
+5t4ck|Cosi|Honors|25
+h4ckr|Starbucks|CL50|40
+f1l3s|Third St|Union|50
+d3bug|Sushi Boss|Meredith|40
+1o0ps|Pete's Za|Beering|50
+m4trx|Franks|Owen|25
+p1x3l|Jersey Mike's|Haas|50
+b1t5y|Starbucks|Union|30

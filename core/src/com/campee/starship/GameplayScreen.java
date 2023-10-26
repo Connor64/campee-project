@@ -20,6 +20,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
+import java.util.Collections;
+
 
 import java.io.*;
 import java.nio.file.Files;
@@ -140,8 +142,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         orderA = order.arrayToArray();
         order.seti(order.i++);
         int time = Integer.parseInt(orderA[3]);
-        int id = Integer.parseInt(orderA[0]);
-        order = new Order(stage, game, id, orderA[1], orderA[2], time, orderArray);
+        //int id = Integer.parseInt(orderA[0]);
+        order = new Order(stage, game, orderA[0], orderA[1], orderA[2], time, orderArray);
         popup = new Popup(this, order.arrayToString());
         order.setPickupBounds(-levelWidth + 50, -levelHeight + 50, 16, 16);
         order.setDropoffBounds(levelWidth - 100, levelHeight - 100, 16, 16);
@@ -341,7 +343,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                     pickupLabel.setVisible(false);
                 }
             } else {
-                if (timeCount % 20 == 0 && time != 0) {
+                if (timeCount % 50 == 0) {
                     time -= 1;
                     orderTimeLeft = time;
                 }
