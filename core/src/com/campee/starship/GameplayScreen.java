@@ -332,7 +332,14 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         if (playerAttributes.orderInProgress) {
             String temp = playerAttributes.array.get(1);
             String[] s = order.stringToArray(temp);
-            int time = Integer.parseInt(s[4]);
+            int time;
+            boolean twoName = false;
+            try {
+                time = Integer.parseInt(s[4]);
+            } catch (NumberFormatException num) {
+                time = Integer.parseInt(s[5]);
+                twoName = true;
+            }
             if (time <= 0) {
                 playerAttributes.array.remove(1);
                 if (playerAttributes.array.size() <= 1) {
@@ -343,18 +350,22 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                     pickupLabel.setVisible(false);
                 }
             } else {
-                if (timeCount % 50 == 0) {
+                if (timeCount % 60 == 0) {
                     time -= 1;
                     orderTimeLeft = time;
                 }
                 timeCount++;
-                s[4] = String.valueOf(time);
+                if (!twoName) {
+                    s[4] = String.valueOf(time);
+                } else {
+                    s[5] = String.valueOf(time);
+                }
 
                 StringBuilder sb = new StringBuilder();
                 for (String thing : s) {
-                    sb.append(thing);
-                    sb.append(" ");
-                }
+                       sb.append(thing);
+                       sb.append(" ");
+                    }
                 playerAttributes.array.set(1, sb.toString());
             }
         }
