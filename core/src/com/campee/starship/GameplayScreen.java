@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.maps.tiled.renderers.IsometricTiledMapRenderer;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -150,6 +151,9 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         order.setPickupBounds(-levelWidth + 50, -levelHeight + 50, 16, 16);
         order.setDropoffBounds(levelWidth - 100, levelHeight - 100, 16, 16);
 
+//        order.setPickupBounds(10, 55, 16, 16);
+//        order.setDropoffBounds(22, 102, 16, 16);
+
         pickupObject = new GameObject(world, order.getPickupBounds().getX(), order.getPickupBounds().getY());
         pickupObject.setSprite("borger.png");
         pickupObject.sprite.setPosition(order.getPickupBounds().getX(), order.getPickupBounds().getY());
@@ -271,6 +275,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
     @Override
     public void render(float delta) {
+        System.out.println(player.body.getPosition());
         /* ========================== UPDATE ============================ */
 
         // If the popup is not visible, update the player and world
@@ -286,22 +291,24 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             float threshold = 50;
 
             // visual indicator that the player is almost off the screen
-            if (playerBounds.getX() <= -(levelWidth + threshold)) {
-                warningLabel.setPosition(levelWidth- (levelWidth - warningLabel.getWidth()), levelHeight / 2f);
-                warningLabel.setVisible(true);
-            } else if (playerBounds.getY() >= (levelWidth - threshold)) {
-                warningLabel.setPosition((levelWidth - (3 * warningLabel.getWidth())), levelHeight / 2f);
-                warningLabel.setVisible(true);
-            } else if ((playerBounds.getX() + player.getWidth()) <= (-levelHeight + threshold)) {
-                warningLabel.setPosition(levelWidth / 2f, levelHeight - (levelHeight - warningLabel.getHeight()));
-                warningLabel.setVisible(true);
-            } else if ((playerBounds.getY() + player.getHeight()) >= (levelHeight - threshold)) {
-                warningLabel.setPosition(levelWidth / 2f, levelHeight - warningLabel.getHeight());
-                warningLabel.setVisible(true);
-            } else {
-                // remove the label
-                warningLabel.setVisible(false);
-            }
+//            if (!pickupLabel.isVisible() && !dropoffLabel.isVisible()) {
+                if (playerBounds.getX() <= -(levelWidth + threshold)) {
+                    warningLabel.setPosition(levelWidth - (levelWidth - warningLabel.getWidth()), levelHeight / 2f);
+                    warningLabel.setVisible(true);
+                } else if (playerBounds.getY() >= (levelWidth - threshold)) {
+                    warningLabel.setPosition((levelWidth - (3 * warningLabel.getWidth())), levelHeight / 2f);
+                    warningLabel.setVisible(true);
+                } else if ((playerBounds.getX() + player.getWidth()) <= (-levelHeight + threshold)) {
+                    warningLabel.setPosition(levelWidth / 2f, levelHeight - (levelHeight - warningLabel.getHeight()));
+                    warningLabel.setVisible(true);
+                } else if ((playerBounds.getY() + player.getHeight()) >= (levelHeight - threshold)) {
+                    warningLabel.setPosition(levelWidth / 2f, levelHeight - warningLabel.getHeight());
+                    warningLabel.setVisible(true);
+                } else {
+                    // remove the label
+                    warningLabel.setVisible(false);
+                }
+//            }
         }
         batch.setProjectionMatrix(camera.combined);
 
@@ -382,6 +389,24 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             if (!order.isPickedUp()) {
                 pickupObject.sprite.draw(batch);
                 if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getPickupBounds())) {
+//                    pickupLabel.setPosition(pickupObject.sprite.getX(), pickupObject.sprite.getY());
+//                    pickupLabel.setPosition(0, 0);
+//                    if ((order.getPickupBounds().getX() - pickupLabel.getWidth()) < -levelWidth) {
+//                        System.out.println("die");
+//                        pickupLabel.setX(-levelWidth + pickupLabel.getWidth());
+//                    }
+//                    if ((order.getPickupBounds().getX() + pickupLabel.getWidth()) > levelWidth) {
+//                        System.out.println("a");
+//                        pickupLabel.setX(levelWidth - pickupLabel.getWidth());
+//                    }
+//                    if ((order.getPickupBounds().getY() + pickupLabel.getHeight()) > levelHeight) {
+//                        System.out.println("eh");
+//                        pickupLabel.setY(levelHeight - pickupLabel.getHeight());
+//                    }
+//                    if ((order.getPickupBounds().getY() - pickupLabel.getHeight()) < -levelHeight) {
+//                        System.out.println("yes");
+//                        pickupLabel.setY(-levelHeight + pickupLabel.getHeight());
+//                    }
                     pickupLabel.setVisible(true);
                     if (keyProcessor.pPressed) {
                         order.setPickedUp(true);
@@ -430,7 +455,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         for (int i = 1; i < items.length; i++) {
             if (i == 1 && orderTimeLeft <= 5 && orderTimeLeft > 0) {
-                if(order.isPickedUp()) {
+                if (order.isPickedUp()) {
                     font.setColor(Color.RED);
                 }
             } else {
