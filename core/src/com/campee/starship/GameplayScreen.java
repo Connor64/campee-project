@@ -333,10 +333,11 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             int time = Integer.parseInt(s[4]);
             if (time <= 0) {
                 playerAttributes.array.remove(1);
+                order.setPickedUp(false);
+                order.setDroppedOff(false);
+
                 if (playerAttributes.array.size() <= 1) {
                     playerAttributes.orderInProgress = false;
-                    order.setDroppedOff(false);
-                    order.setPickedUp(false);
                     dropoffLabel.setVisible(false);
                     pickupLabel.setVisible(false);
                 }
