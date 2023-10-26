@@ -419,12 +419,14 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         for (int i = 1; i < items.length; i++) {
             if (i == 1 && orderTimeLeft <= 5 && orderTimeLeft > 0) {
-                font.setColor(Color.RED);
-                font.draw(batch, items[i], sidePanelX + 10, sidePanelY + sidePanelHeight - 70 * i);
+                if(order.isPickedUp()) {
+                    font.setColor(Color.RED);
+                }
             } else {
                 font.setColor(Color.WHITE);
-                font.draw(batch, items[i], sidePanelX + 10, sidePanelY + sidePanelHeight - 70 * i);
             }
+            font.draw(batch, items[i], sidePanelX + 10, sidePanelY + sidePanelHeight - 70 * i);
+
         }
 
         stage.draw();
