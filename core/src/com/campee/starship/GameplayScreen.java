@@ -20,6 +20,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
+import java.util.Collections;
+
 
 import java.io.*;
 import java.nio.file.Files;
@@ -55,7 +57,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     private Timer timer;
     private TimerTask timerTask;
     private int timeCount = 0;
-    private int orderTimeLeft = 0;
+    private int orderTimeLeft = 6;
 
     public GameObject pickupObject;
     public GameObject dropoffObject;
@@ -140,8 +142,10 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         orderA = order.arrayToArray();
         order.seti(order.i++);
         int time = Integer.parseInt(orderA[3]);
-        int id = Integer.parseInt(orderA[0]);
-        order = new Order(stage, game, id, orderA[1], orderA[2], time, orderArray);
+        //int id = Integer.parseInt(orderA[0]);
+        order = new Order(stage, game, orderA[0], orderA[1], orderA[2], time, orderArray);
+        order.setDroppedOff(false);
+        order.setPickedUp(false);
         popup = new Popup(this, order.arrayToString());
         order.setPickupBounds(-levelWidth + 50, -levelHeight + 50, 16, 16);
         order.setDropoffBounds(levelWidth - 100, levelHeight - 100, 16, 16);
@@ -328,26 +332,43 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         }
 
         if (playerAttributes.orderInProgress) {
-            String temp = playerAttributes.array.get(1);
-            String[] s = order.stringToArray(temp);
-            int time = Integer.parseInt(s[4]);
+            String[] s = order.stringToArray(playerAttributes.array.get(1));
+            int time;
+            boolean twoName = false;
+            try {
+                time = Integer.parseInt(s[4]);
+            } catch (NumberFormatException num) {
+                time = Integer.parseInt(s[5]);
+                twoName = true;
+            }
             if (time <= 0) {
+                if(!order.isDroppedOff()) {
+                    order.setDroppedOff(true);
+                    dropoffLabel.setVisible(false);
+                    order.setPickedUp(false);
+                }
                 playerAttributes.array.remove(1);
-                order.setPickedUp(false);
-                order.setDroppedOff(false);
-
                 if (playerAttributes.array.size() <= 1) {
                     playerAttributes.orderInProgress = false;
+                    order.setPickedUp(false);
                     dropoffLabel.setVisible(false);
                     pickupLabel.setVisible(false);
+                } else {
+                    pickupObject.sprite.draw(batch);
+                    order.setDroppedOff(false);
+                    order.setPickedUp(false);
                 }
             } else {
-                if (timeCount % 20 == 0 && time != 0) {
+                if (timeCount % 40 == 0) {
                     time -= 1;
                     orderTimeLeft = time;
                 }
                 timeCount++;
-                s[4] = String.valueOf(time);
+                if (!twoName) {
+                    s[4] = String.valueOf(time);
+                } else {
+                    s[5] = String.valueOf(time);
+                }
 
                 StringBuilder sb = new StringBuilder();
                 for (String thing : s) {
@@ -377,8 +398,10 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                     if (keyProcessor.oPressed) {
                         order.setPickedUp(false);
                         order.setDroppedOff(true);
-                        playerAttributes.orderInProgress = false;
                         playerAttributes.array.remove(1);
+                        if (playerAttributes.array.size() <= 1) {
+                            playerAttributes.orderInProgress = false;
+                        }
                         dropoffLabel.setVisible(false);
                     }
                 } else {
@@ -407,12 +430,14 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         for (int i = 1; i < items.length; i++) {
             if (i == 1 && orderTimeLeft <= 5 && orderTimeLeft > 0) {
-                font.setColor(Color.RED);
-                font.draw(batch, items[i], sidePanelX + 10, sidePanelY + sidePanelHeight - 70 * i);
+                if(order.isPickedUp()) {
+                    font.setColor(Color.RED);
+                }
             } else {
                 font.setColor(Color.WHITE);
-                font.draw(batch, items[i], sidePanelX + 10, sidePanelY + sidePanelHeight - 70 * i);
             }
+            font.draw(batch, items[i], sidePanelX + 10, sidePanelY + sidePanelHeight - 70 * i);
+
         }
 
         stage.draw();
