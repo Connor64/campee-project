@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -32,6 +33,8 @@ public class TitleScreen implements Screen {
     private ExtendViewport viewport;
     private TextButton button;
     private TextButton closeButton;
+    private boolean isPlayButtonHovered = false;
+    private boolean isCloseButtonHovered = false;
 
     public TitleScreen(final MoonshipGame game) {
         this.game = game;
@@ -82,6 +85,18 @@ public class TitleScreen implements Screen {
                 game.setScreen(new LevelScreen(game)); // Change to the screen you want
                 return true;
             }
+            @Override
+            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+                super.enter(event, x, y, pointer, fromActor);
+                isPlayButtonHovered = true;
+                button.setColor(Color.LIGHT_GRAY);
+            }
+            @Override
+            public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
+                super.exit(event, x, y, pointer, toActor);
+                isPlayButtonHovered = false;
+                button.setColor(Color.WHITE);
+            }
         });
 
         stage.addActor(button);
@@ -103,6 +118,18 @@ public class TitleScreen implements Screen {
 //                return true;
                 Gdx.app.exit();
                 return true;
+            }
+            @Override
+            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+                super.enter(event, x, y, pointer, fromActor);
+                isCloseButtonHovered = true;
+                closeButton.setColor(Color.LIGHT_GRAY);
+            }
+            @Override
+            public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
+                super.exit(event, x, y, pointer, toActor);
+                isCloseButtonHovered = false;
+                closeButton.setColor(Color.WHITE);
             }
         });
         stage.addActor(closeButton);

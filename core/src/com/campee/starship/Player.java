@@ -15,7 +15,7 @@ public class Player extends GameObject {
     private boolean lockX = false;
     private boolean lockY = false;
 
-//    private static final float ACCELERATION = 5000f;
+    //    private static final float ACCELERATION = 5000f;
     private final float MOVEMENT_SPEED = 10;
 
     public Player(World world, float x, float y) {

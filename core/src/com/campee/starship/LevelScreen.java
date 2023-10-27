@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -31,6 +32,9 @@ public class LevelScreen implements Screen {
     private TextButton beginButton;
     private TextButton settingsButton;
     private ExtendViewport viewport;
+    private boolean isBackButtonHovered = false;
+    private boolean isSettingButtonHovered = false;
+    private boolean isDemoButtonHovered = false;
 
     public LevelScreen(final Game game) {
         this.game = (MoonshipGame) game;
@@ -60,6 +64,18 @@ public class LevelScreen implements Screen {
                 game.setScreen(new TitleScreen((MoonshipGame) game)); // Change to the screen you want
                 return true;
             }
+            @Override
+            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+                super.enter(event, x, y, pointer, fromActor);
+                isBackButtonHovered = true;
+                backButton.setColor(Color.LIGHT_GRAY);
+            }
+            @Override
+            public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
+                super.exit(event, x, y, pointer, toActor);
+                isBackButtonHovered = false;
+                backButton.setColor(Color.WHITE);
+            }
         });
         stage.addActor(backButton);
         TextButton.TextButtonStyle beginButtonStyle = new TextButton.TextButtonStyle();
@@ -68,8 +84,23 @@ public class LevelScreen implements Screen {
         Pixmap beginButtonPixmap = createRoundedRectanglePixmap(150, 60, 15, Color.valueOf("98FF98"));
         beginButtonStyle.up = new TextureRegionDrawable(new TextureRegion(new Texture(beginButtonPixmap)));
 
+
+        float screenWidth = Gdx.graphics.getWidth();
+        float screenHeight = Gdx.graphics.getHeight();
+        float buttonX = 30;
+        //float buttonY = (screenHeight - buttonHeight) / 2;
+//        float buttonHeight = 60;
+//        float buttonWidth = 150;
+//        float screenWidth = Gdx.graphics.getWidth();
+//        float screenHeight = Gdx.graphics.getHeight();
+//        float buttonX = 30;
+//        float buttonY = (screenHeight - buttonHeight) / 2;
+
         beginButton = new TextButton("BEGIN DEMO", beginButtonStyle);
+        //beginButton.setPosition(buttonX, buttonY);
         beginButton.setPosition(30, Gdx.graphics.getHeight() - 80);
+        //beginButton.setPosition(30, Gdx.graphics.getHeight() - 80);
+        //beginButton.setSize(Gdx.graphics.getWidth() - 180, Gdx.graphics.getHeight() - 80);
         beginButton.setSize(150, 60);
         beginButton.addListener(new InputListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
@@ -77,12 +108,25 @@ public class LevelScreen implements Screen {
                 try {
                     game.setScreen(new GameplayScreen((MoonshipGame) game)); // Change to the screen you want
                 } catch (FileNotFoundException e) {
-                    System.err.println("File not found.");
                     e.printStackTrace();
-                } catch (IOException | ClassNotFoundException e) {
-                    throw new RuntimeException(e);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
                 }
                 return true;
+            }
+            @Override
+            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+                super.enter(event, x, y, pointer, fromActor);
+                isDemoButtonHovered = true;
+                beginButton.setColor(Color.LIGHT_GRAY);
+            }
+            @Override
+            public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
+                super.exit(event, x, y, pointer, toActor);
+                isDemoButtonHovered = false;
+                beginButton.setColor(Color.WHITE);
             }
         });
 
@@ -102,6 +146,18 @@ public class LevelScreen implements Screen {
                 game.setScreen(new SettingsScreen(game));
                 return true;
             }
+            @Override
+            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+                super.enter(event, x, y, pointer, fromActor);
+                isSettingButtonHovered = true;
+                settingsButton.setColor(Color.LIGHT_GRAY);
+            }
+            @Override
+            public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
+                super.exit(event, x, y, pointer, toActor);
+                isSettingButtonHovered = false;
+                settingsButton.setColor(Color.WHITE);
+            }
         });
 
         stage.addActor(settingsButton);
@@ -118,6 +174,7 @@ public class LevelScreen implements Screen {
         shapeRenderer.begin(ShapeType.Filled);
 
         float boxWidth = 200;
+        //float boxHeight = 150;
         float boxHeight = 200;
         float boxSpacing = 50;
         float startY = (camera.viewportHeight - boxHeight) / 2;

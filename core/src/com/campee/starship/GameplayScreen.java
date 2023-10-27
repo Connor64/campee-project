@@ -8,10 +8,12 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.maps.tiled.renderers.IsometricTiledMapRenderer;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -19,10 +21,15 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
+import java.util.Collections;
+
 
 import java.io.*;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class GameplayScreen extends ApplicationAdapter implements Screen {
 
@@ -49,6 +56,11 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     public Label pickupLabel;
     public Label dropoffLabel;
 
+    private Timer timer;
+    private TimerTask timerTask;
+    private int timeCount = 0;
+    private int orderTimeLeft = 6;
+
     public GameObject pickupObject;
     public GameObject dropoffObject;
 
@@ -62,6 +74,10 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     private PlayerCamera camera;
 
     private ShapeRenderer shapeRenderer;
+    private boolean isBackButtonHovered = false;
+    private boolean isOrderButtonHovered = false;
+    float screenWidth;
+    float screenHeight;
     private float sidePanelX;
     private float sidePanelY;
     private float sidePanelWidth;
@@ -138,11 +154,16 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         orderA = order.arrayToArray();
         order.seti(order.i++);
         int time = Integer.parseInt(orderA[3]);
-        int id = Integer.parseInt(orderA[0]);
-        order = new Order(stage, game, id, orderA[1], orderA[2], time, orderArray);
+        //int id = Integer.parseInt(orderA[0]);
+        order = new Order(stage, game, orderA[0], orderA[1], orderA[2], time, orderArray);
+        order.setDroppedOff(false);
+        order.setPickedUp(false);
         popup = new Popup(this, order.arrayToString());
         order.setPickupBounds(-levelWidth + 50, -levelHeight + 50, 16, 16);
         order.setDropoffBounds(levelWidth - 100, levelHeight - 100, 16, 16);
+
+//        order.setPickupBounds(10, 55, 16, 16);
+//        order.setDropoffBounds(22, 102, 16, 16);
 
         pickupObject = new GameObject(world, order.getPickupBounds().getX(), order.getPickupBounds().getY());
         pickupObject.setSprite("borger.png");
@@ -170,6 +191,18 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                 System.out.println("clicked back");
                 game.setScreen(new LevelScreen(game));
             }
+            @Override
+            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+                super.enter(event, x, y, pointer, fromActor);
+                isBackButtonHovered = true;
+                backButton.setColor(Color.LIGHT_GRAY);
+            }
+            @Override
+            public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
+                super.exit(event, x, y, pointer, toActor);
+                isBackButtonHovered = false;
+                backButton.setColor(Color.WHITE);
+            }
         });
 
         // Make next order button
@@ -191,6 +224,18 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                 popup.render();
                 multiplexer.addProcessor(popup.getStage());
 
+            }
+            @Override
+            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+                super.enter(event, x, y, pointer, fromActor);
+                isOrderButtonHovered = true;
+                nextOrderButton.setColor(Color.LIGHT_GRAY);
+            }
+            @Override
+            public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
+                super.exit(event, x, y, pointer, toActor);
+                isOrderButtonHovered = false;
+                nextOrderButton.setColor(Color.WHITE);
             }
         });
 
@@ -241,6 +286,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
     @Override
     public void render(float delta) {
+        System.out.println(player.body.getPosition());
         /* ========================== UPDATE ============================ */
 
         // If the popup is not visible, update the player and world
@@ -256,22 +302,24 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             float threshold = 50;
 
             // visual indicator that the player is almost off the screen
-            if (playerBounds.getX() <= -(levelWidth + threshold)) {
-                warningLabel.setPosition(levelWidth- (levelWidth - warningLabel.getWidth()), levelHeight / 2f);
-                warningLabel.setVisible(true);
-            } else if (playerBounds.getY() >= (levelWidth - threshold)) {
-                warningLabel.setPosition((levelWidth - (3 * warningLabel.getWidth())), levelHeight / 2f);
-                warningLabel.setVisible(true);
-            } else if ((playerBounds.getX() + player.getWidth()) <= (-levelHeight + threshold)) {
-                warningLabel.setPosition(levelWidth / 2f, levelHeight - (levelHeight - warningLabel.getHeight()));
-                warningLabel.setVisible(true);
-            } else if ((playerBounds.getY() + player.getHeight()) >= (levelHeight - threshold)) {
-                warningLabel.setPosition(levelWidth / 2f, levelHeight - warningLabel.getHeight());
-                warningLabel.setVisible(true);
-            } else {
-                // remove the label
-                warningLabel.setVisible(false);
-            }
+//            if (!pickupLabel.isVisible() && !dropoffLabel.isVisible()) {
+                if (playerBounds.getX() <= -(levelWidth + threshold)) {
+                    warningLabel.setPosition(levelWidth - (levelWidth - warningLabel.getWidth()), levelHeight / 2f);
+                    warningLabel.setVisible(true);
+                } else if (playerBounds.getY() >= (levelWidth - threshold)) {
+                    warningLabel.setPosition((levelWidth - (3 * warningLabel.getWidth())), levelHeight / 2f);
+                    warningLabel.setVisible(true);
+                } else if ((playerBounds.getX() + player.getWidth()) <= (-levelHeight + threshold)) {
+                    warningLabel.setPosition(levelWidth / 2f, levelHeight - (levelHeight - warningLabel.getHeight()));
+                    warningLabel.setVisible(true);
+                } else if ((playerBounds.getY() + player.getHeight()) >= (levelHeight - threshold)) {
+                    warningLabel.setPosition(levelWidth / 2f, levelHeight - warningLabel.getHeight());
+                    warningLabel.setVisible(true);
+                } else {
+                    // remove the label
+                    warningLabel.setVisible(false);
+                }
+//            }
         }
         batch.setProjectionMatrix(camera.combined);
 
@@ -311,10 +359,76 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             rock.sprite.setAlpha(1);
         }
 
+        if (playerAttributes.orderInProgress) {
+            String[] s = order.stringToArray(playerAttributes.array.get(1));
+            int time;
+            boolean twoName = false;
+            try {
+                time = Integer.parseInt(s[4]);
+            } catch (NumberFormatException num) {
+                time = Integer.parseInt(s[5]);
+                twoName = true;
+            }
+            if (time <= 0) {
+                if(!order.isDroppedOff()) {
+                    order.setDroppedOff(true);
+                    dropoffLabel.setVisible(false);
+                    order.setPickedUp(false);
+                }
+                playerAttributes.array.remove(1);
+                if (playerAttributes.array.size() <= 1) {
+                    playerAttributes.orderInProgress = false;
+                    order.setPickedUp(false);
+                    dropoffLabel.setVisible(false);
+                    pickupLabel.setVisible(false);
+                } else {
+                    pickupObject.sprite.draw(batch);
+                    order.setDroppedOff(false);
+                    order.setPickedUp(false);
+                }
+            } else {
+                if (timeCount % 40 == 0) {
+                    time -= 1;
+                    orderTimeLeft = time;
+                }
+                timeCount++;
+                if (!twoName) {
+                    s[4] = String.valueOf(time);
+                } else {
+                    s[5] = String.valueOf(time);
+                }
+
+                StringBuilder sb = new StringBuilder();
+                for (String thing : s) {
+                    sb.append(thing);
+                    sb.append(" ");
+                }
+                playerAttributes.array.set(1, sb.toString());
+            }
+        }
+
         if (playerAttributes.array.size() > 1) {
             if (!order.isPickedUp()) {
                 pickupObject.sprite.draw(batch);
                 if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getPickupBounds())) {
+//                    pickupLabel.setPosition(pickupObject.sprite.getX(), pickupObject.sprite.getY());
+//                    pickupLabel.setPosition(0, 0);
+//                    if ((order.getPickupBounds().getX() - pickupLabel.getWidth()) < -levelWidth) {
+//                        System.out.println("die");
+//                        pickupLabel.setX(-levelWidth + pickupLabel.getWidth());
+//                    }
+//                    if ((order.getPickupBounds().getX() + pickupLabel.getWidth()) > levelWidth) {
+//                        System.out.println("a");
+//                        pickupLabel.setX(levelWidth - pickupLabel.getWidth());
+//                    }
+//                    if ((order.getPickupBounds().getY() + pickupLabel.getHeight()) > levelHeight) {
+//                        System.out.println("eh");
+//                        pickupLabel.setY(levelHeight - pickupLabel.getHeight());
+//                    }
+//                    if ((order.getPickupBounds().getY() - pickupLabel.getHeight()) < -levelHeight) {
+//                        System.out.println("yes");
+//                        pickupLabel.setY(-levelHeight + pickupLabel.getHeight());
+//                    }
                     pickupLabel.setVisible(true);
                     if (keyProcessor.pPressed) {
                         order.setPickedUp(true);
@@ -331,8 +445,10 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                     if (keyProcessor.oPressed) {
                         order.setPickedUp(false);
                         order.setDroppedOff(true);
-                        playerAttributes.orderInProgress = false;
                         playerAttributes.array.remove(1);
+                        if (playerAttributes.array.size() <= 1) {
+                            playerAttributes.orderInProgress = false;
+                        }
                         dropoffLabel.setVisible(false);
                     }
                 } else {
@@ -360,7 +476,15 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         font.draw(batch, "Order List:", sidePanelX + 10, sidePanelY + sidePanelHeight - 10);
 
         for (int i = 1; i < items.length; i++) {
+            if (i == 1 && orderTimeLeft <= 5 && orderTimeLeft > 0) {
+                if (order.isPickedUp()) {
+                    font.setColor(Color.RED);
+                }
+            } else {
+                font.setColor(Color.WHITE);
+            }
             font.draw(batch, items[i], sidePanelX + 10, sidePanelY + sidePanelHeight - 70 * i);
+
         }
 
         stage.draw();

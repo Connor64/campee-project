@@ -145,7 +145,7 @@ public class GameScreen extends ApplicationAdapter implements Screen {
         array = attributes.array;
 //        orderScreen = new OrderScreen();
 //        orderScreen.visible = true;
-        order = new Order(stage, game, 01, "Cosi", "walc", 7, new ArrayList<String>());
+        //order = new Order(stage, game, "24601", "Cosi", "walc", 7, new ArrayList<String>());
 //        popup = new Popup(this, order.toString());
 
         // Define side panel properties
@@ -157,7 +157,7 @@ public class GameScreen extends ApplicationAdapter implements Screen {
 
         attributes = new PlayerAttributes();
         array = attributes.array;
-        order = new Order(stage, game, 0, null, null, 0 , array);
+        //order = new Order(stage, game, null, null, null, 0 , array);
 //        popup = new Popup(this, order.toString());
     }
 

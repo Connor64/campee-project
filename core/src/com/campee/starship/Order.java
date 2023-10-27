@@ -16,6 +16,8 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.ScreenUtils;
+import java.util.Collections;
+
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -25,7 +27,7 @@ import java.util.Scanner;
 public class Order {
     private Stage stage;
     private Game game;
-    private int orderID;
+    private String orderID;
     private String pickupLocation;
     private String dropoffLocation;
     private int timeEstimate;
@@ -37,7 +39,7 @@ public class Order {
     private boolean droppedOff;
 
 
-    public Order(Stage stage, Game game, int orderID, String pickupLocation, String dropoffLocation, int timeEstimate, ArrayList<String> array) {
+    public Order(Stage stage, Game game, String orderID, String pickupLocation, String dropoffLocation, int timeEstimate, ArrayList<String> array) {
         this.stage = stage;
         this.game = game;
         this.orderID = orderID;
@@ -55,7 +57,7 @@ public class Order {
     public Order() {
         stage = null;
         game = null;
-        orderID = 0;
+        orderID = null;
         pickupLocation = null;
         dropoffLocation = null;
         timeEstimate = 0;
@@ -78,18 +80,23 @@ public class Order {
             array.add(line);
             //String[] words = line.split("\\|");
         }
+        Collections.shuffle(array);
+
+
 
         this.array = array;
     }
 
     public String[] arrayToArray() {
-        System.out.println(i);
-        String[] words = new String[0];
+        String[] words;
         String line = array.get(i);
         words = line.split("\\|");
         i++;
-        //return s;
         return words;
+    }
+
+    public String[] stringToArray(String line) {
+        return line.split(" ");
     }
 
 
@@ -98,9 +105,11 @@ public class Order {
         String line = array.get(i);
         words = line.split("\\|");
 
+
         String s = "ID: " + words[0] + "\nP: " + words[1]
-                + "\nD: " + words[2] + "\nTime: " + words[3] + " mins";
+                + "\nD: " + words[2] + "\nTime: " + words[3] + " s";
         return s;
+
     }
 
     public Stage getStage() {
@@ -122,11 +131,11 @@ public class Order {
         this.game = game;
     }
 
-    public int getOrderID() {
+    public String getOrderID() {
         return orderID;
     }
 
-    public void setOrderID(int orderID) {
+    public void setOrderID(String orderID) {
         this.orderID = orderID;
     }
 
