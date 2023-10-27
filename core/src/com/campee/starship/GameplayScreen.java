@@ -144,7 +144,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         order = new Order();
         orderArray = new ArrayList<>();
         order.setArray(orderArray);
-        System.out.println(orderArray);
+        Collections.shuffle(orderArray);
+        //System.out.println(orderArray);
         orderA = order.arrayToArray();
         order.seti(order.i++);
         int time = Integer.parseInt(orderA[3]);
