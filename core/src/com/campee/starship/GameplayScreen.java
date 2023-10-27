@@ -338,7 +338,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
 
         player.render(batch);
-        rock.render(batch, 20, 200);
+        rock.render(batch, 20, -100);
         log.render(batch, 0, 10);
 
         // coin collision
@@ -352,12 +352,28 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             }
         }
 
-        // rock transparency (testing)
-        if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), rock.sprite.getBoundingRectangle())) {
+//        Rectangle rockBounds = rock.sprite.getBoundingRectangle();
+//        float rockBottom = rock.sprite.getY();
+        Rectangle agg = new Rectangle(rock.sprite.getX(), rock.sprite.getY(), rock.sprite.getWidth(), rock.sprite.getHeight() / 2);
+//        if ((player.getSprite().getX() >= rock.sprite.getX() - rock.sprite.getWidth()) && (player.getSprite().getX()) <= (rock.sprite.getX())) {
+////        if ((player.body.getPosition().x >= rockBounds.getX()) && ((player.body.getPosition().x) <= (rockBounds.getX() + rockBounds.getWidth()))) {
+//            // if the player is within the width of the rock
+//            if ((player.body.getPosition().y + player.getSprite().getHeight() >= rockBottom) && (player.body.getPosition().y <= rockBottom + 8 )) {
+//                // if the player is trying to intersect from the bottom, bounce
+//                player.body.setLinearVelocity(player.body.getLinearVelocity().x, player.body.getLinearVelocity().y * -1);
+//            }
+//        }
+        // rock transparency and collisions (testing for buildings)
+        if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), agg)) {
+            player.body.setLinearVelocity(player.body.getLinearVelocity().x, player.body.getLinearVelocity().y * -1);
+            if ((player.getSprite().getX() >= (agg.getX() - agg.getWidth()) && player.getSprite().getX() <= agg.getX())) {
+                player.body.setLinearVelocity(player.body.getLinearVelocity().x * -1, player.body.getLinearVelocity().y);
+            }
             rock.sprite.setAlpha(0.4f);
         } else {
             rock.sprite.setAlpha(1);
         }
+
 
         if (playerAttributes.orderInProgress) {
             String[] s = order.stringToArray(playerAttributes.array.get(1));
