@@ -102,7 +102,9 @@ public class Popup {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 declineClicked = true;
-                screen.playerAttributes.orderInProgress = false;
+                if (screen.playerAttributes.array.size() <= 1) {
+                    screen.playerAttributes.orderInProgress = false;
+                }
                 //use this for the other thing
                 //screen.playerAttributes.array.remove(1);
                 visible = false;

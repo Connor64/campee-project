@@ -57,8 +57,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
     private Timer timer;
     private TimerTask timerTask;
-    private int timeCount = 0;
-    private int orderTimeLeft = 6;
+    private int[] timeCount;
+    private int[] orderTimeLeft;
 
     public GameObject pickupObject;
     public GameObject dropoffObject;
@@ -96,6 +96,11 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     public GameplayScreen(final MoonshipGame game) throws IOException, ClassNotFoundException {
         this.GAME = game;
         batch = game.batch;
+
+        timeCount = new int[5];
+        orderTimeLeft = new int[5];
+        Arrays.fill(timeCount, 0);
+        Arrays.fill(orderTimeLeft, 6);
 
         tileSprites = new ArrayList<>();
         LevelData levelData = loadLevel();
@@ -275,7 +280,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
     @Override
     public void render(float delta) {
-        System.out.println(player.body.getPosition());
+       // System.out.println(player.body.getPosition());
         /* ========================== UPDATE ============================ */
 
         // If the popup is not visible, update the player and world
@@ -339,74 +344,61 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         }
 
         if (playerAttributes.orderInProgress) {
-            String[] s = order.stringToArray(playerAttributes.array.get(1));
-            int time;
-            boolean twoName = false;
-            try {
-                time = Integer.parseInt(s[4]);
-            } catch (NumberFormatException num) {
-                time = Integer.parseInt(s[5]);
-                twoName = true;
-            }
-            if (time <= 0) {
-                if(!order.isDroppedOff()) {
-                    order.setDroppedOff(true);
-                    dropoffLabel.setVisible(false);
-                    order.setPickedUp(false);
+            for (int i = 1; i < playerAttributes.array.size(); i++ ) {
+                String[] s = order.stringToArray(playerAttributes.array.get(i));
+                int time;
+                boolean twoName = false;
+                try {
+                    time = Integer.parseInt(s[4]);
+                } catch (NumberFormatException num) {
+                    time = Integer.parseInt(s[5]);
+                    twoName = true;
                 }
-                playerAttributes.array.remove(1);
-                if (playerAttributes.array.size() <= 1) {
-                    playerAttributes.orderInProgress = false;
-                    order.setPickedUp(false);
-                    dropoffLabel.setVisible(false);
-                    pickupLabel.setVisible(false);
+                if (time <= 0) {
+                    if (i == 1) {
+                        if (!order.isDroppedOff()) {
+                            order.setDroppedOff(true);
+                            dropoffLabel.setVisible(false);
+                            order.setPickedUp(false);
+                        }
+                        if (playerAttributes.array.size() <= 1) {
+                            playerAttributes.orderInProgress = false;
+                            order.setPickedUp(false);
+                            dropoffLabel.setVisible(false);
+                            pickupLabel.setVisible(false);
+                        } else {
+                            pickupObject.sprite.draw(batch);
+                            order.setDroppedOff(false);
+                            order.setPickedUp(false);
+                        }
+                    }
+                    playerAttributes.array.remove(i);
                 } else {
-                    pickupObject.sprite.draw(batch);
-                    order.setDroppedOff(false);
-                    order.setPickedUp(false);
-                }
-            } else {
-                if (timeCount % 40 == 0) {
-                    time -= 1;
-                    orderTimeLeft = time;
-                }
-                timeCount++;
-                if (!twoName) {
-                    s[4] = String.valueOf(time);
-                } else {
-                    s[5] = String.valueOf(time);
-                }
+                    if (timeCount[i - 1] % 40 == 0) {
+                        time -= 1;
+                        orderTimeLeft[i - 1] = time;
+                    }
+                    timeCount[i - 1]++;
 
-                StringBuilder sb = new StringBuilder();
-                for (String thing : s) {
-                    sb.append(thing);
-                    sb.append(" ");
+                    if (!twoName) {
+                        s[4] = String.valueOf(time);
+                    } else {
+                        s[5] = String.valueOf(time);
+                    }
+
+                    StringBuilder sb = new StringBuilder();
+                    for (String thing : s) {
+                        sb.append(thing);
+                        sb.append(" ");
+                    }
+                    playerAttributes.array.set(i, sb.toString());
                 }
-                playerAttributes.array.set(1, sb.toString());
             }
         }
         if (playerAttributes.array.size() > 1) {
             if (!order.isPickedUp()) {
                 pickupObject.sprite.draw(batch);
                 if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getPickupBounds())) {
-//                    pickupLabel.setPosition(pickupObject.sprite.getX(), pickupObject.sprite.getY());
-//                    pickupLabel.setPosition(0, 0);
-//                    if ((order.getPickupBounds().getX() - pickupLabel.getWidth()) < -levelWidth) {
-//                        System.out.println("die");
-//                        pickupLabel.setX(-levelWidth + pickupLabel.getWidth());
-//                    }
-//                    if ((order.getPickupBounds().getX() + pickupLabel.getWidth()) > levelWidth) {
-//                        System.out.println("a");
-//                        pickupLabel.setX(levelWidth - pickupLabel.getWidth());
-//                    }
-//                    if ((order.getPickupBounds().getY() + pickupLabel.getHeight()) > levelHeight) {
-//                        System.out.println("eh");
-//                        pickupLabel.setY(levelHeight - pickupLabel.getHeight());
-//                    }
-//                    if ((order.getPickupBounds().getY() - pickupLabel.getHeight()) < -levelHeight) {
-//                        System.out.println("yes");
-//                        pickupLabel.setY(-levelHeight + pickupLabel.getHeight());
-//                    }
                     pickupLabel.setVisible(true);
                     if (keyProcessor.pPressed) {
                         order.setPickedUp(true);
@@ -451,13 +443,14 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         String[] items = playerAttributes.array.toArray(new String[0]);
 
+        font.setColor(Color.WHITE);
         font.draw(batch, "Order List:", sidePanelX + 10, sidePanelY + sidePanelHeight - 10);
 
         for (int i = 1; i < items.length; i++) {
-            if (i == 1 && orderTimeLeft <= 5 && orderTimeLeft > 0) {
-                if (order.isPickedUp()) {
+            if (orderTimeLeft[i - 1] <= 5 && orderTimeLeft[i - 1] > 0) {
+                //if (order.isPickedUp()) {
                     font.setColor(Color.RED);
-                }
+               // }
             } else {
                 font.setColor(Color.WHITE);
             }
