@@ -40,6 +40,8 @@ public class LevelScreen implements Screen {
     private boolean isBackButtonHovered = false;
     private boolean isSettingButtonHovered = false;
     private boolean isDemoButtonHovered = false;
+    private ArrayList<TextButton> levelButtons;
+    private ArrayList<Label> levelLabels;
 
 
     public LevelScreen(final Game game) {
@@ -139,6 +141,8 @@ public class LevelScreen implements Screen {
         });
         stage.addActor(beginButton);
 
+        levelButtons = new ArrayList<>();
+        levelLabels = new ArrayList<>();
         loadLevelButtons();
 
         TextButton.TextButtonStyle settingsButtonStyle = new TextButton.TextButtonStyle();
@@ -186,6 +190,7 @@ public class LevelScreen implements Screen {
         levelTable.defaults().pad(20);
         int buttonsPerRow = 3;
         int buttonsPerColumn = 3;
+        /*
         float buttonWidthPercentage = 0.2f; // 20% of the viewport width
         float buttonHeightPercentage = 0.3f; // 10% of the viewport height
 
@@ -193,6 +198,15 @@ public class LevelScreen implements Screen {
         float buttonHeight = viewport.getWorldHeight() * buttonHeightPercentage;
         float paddingX = (viewport.getWorldWidth() - buttonsPerRow * buttonWidth) / (buttonsPerRow + 1);
         float paddingY = (viewport.getWorldHeight() - buttonsPerColumn * buttonHeight) / (buttonsPerColumn + 1);
+*/
+        float screenWidth = Gdx.graphics.getWidth();
+        float screenHeight = Gdx.graphics.getHeight();
+        float buttonWidthPercentage = 0.2f; // 20% of the initial screen width
+        float buttonHeightPercentage = 0.3f; // 30% of the initial screen height
+        float buttonWidth = screenWidth * buttonWidthPercentage;
+        float buttonHeight = screenHeight * buttonHeightPercentage;
+        float paddingX = (screenWidth - buttonsPerRow * buttonWidth) / (buttonsPerRow + 1);
+        float paddingY = (screenHeight - buttonsPerColumn * buttonHeight) / (buttonsPerColumn + 1);
 
         for (int i = 0; i < levelFiles.length; i++) {
             final FileHandle levelFile = levelFiles[i]; // Retrieve the current level file
@@ -206,13 +220,16 @@ public class LevelScreen implements Screen {
             Label.LabelStyle labelStyle = new Label.LabelStyle(font, Color.WHITE);
             final Label levelNameLabel = new Label(levelFile.nameWithoutExtension(), labelStyle);
             String levelName = levelFile.nameWithoutExtension();
+
             final TextButton levelButton = new TextButton(levelName, levelButtonStyle);
             levelButton.setDisabled(true);
             buttonTable.add(levelButton).row();
             buttonTable.pack();
 
             final Button button = new Button(new TextureRegionDrawable(new TextureRegion(new Texture(createRoundedRectanglePixmap((int) buttonTable.getWidth(), (int) buttonTable.getHeight(), 15, Color.PURPLE)))));
-
+            float labelX = button.getX() + button.getWidth() / 2 - levelNameLabel.getWidth() / 2;
+            float labelY = button.getY() + button.getHeight() - levelNameLabel.getHeight() - 10; // Adjust the padding as needed
+            levelNameLabel.setPosition(labelX, labelY);
 
             Container<Table> buttonContainer = new Container<>(buttonTable);
             float buttonX = paddingX + (paddingX + buttonWidth) * (i % buttonsPerRow);
@@ -227,17 +244,14 @@ public class LevelScreen implements Screen {
                 public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
                     super.enter(event, x, y, pointer, fromActor);
                     button.setColor(Color.LIGHT_GRAY);
-                    levelNameLabel.setPosition(button.getX() + button.getWidth() / 2 - levelNameLabel.getWidth() / 2, button.getY() + button.getHeight() + 10);
-                    stage.addActor(levelNameLabel);
                 }
 
                 @Override
                 public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
                     super.exit(event, x, y, pointer, toActor);
                     button.setColor(Color.WHITE);
-                    levelNameLabel.remove(); // Remove the label when not hovering over the button
+                    //levelNameLabel.remove(); // Remove the label when not hovering over the button
                 }
-
                 @Override
                 public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                     // Handle level button click here
@@ -251,7 +265,9 @@ public class LevelScreen implements Screen {
             if ((i + 1) % buttonsPerRow == 0) {
                 levelTable.row();
             }
+            stage.addActor(levelNameLabel);
         }
+
 
         ScrollPane scrollPane = new ScrollPane(levelTable);
         scrollPane.setFillParent(true);
@@ -278,6 +294,16 @@ public class LevelScreen implements Screen {
         shapeRenderer.rect(boxSpacing * 3 + boxWidth * 2, startY, boxWidth, boxHeight); // Level 3 box
         shapeRenderer.end();
         batch.setProjectionMatrix(camera.combined);
+
+        for (int i = 0; i < levelButtons.size(); i++) {
+            TextButton button = levelButtons.get(i);
+            Label label = levelLabels.get(i);
+
+            float labelX = button.getX() + button.getWidth() / 2 - label.getWidth() / 2;
+            float labelY = button.getY() + button.getHeight() / 2 + label.getHeight() / 2; // Adjust the padding as needed
+            label.setPosition(labelX, labelY);
+        }
+
         batch.begin();
         GlyphLayout layout = new GlyphLayout();
         layout.setText(font, "LEVEL SELECT SCREEN");
@@ -320,6 +346,19 @@ public class LevelScreen implements Screen {
             }
         }
 
+        for (int i = 0; i < levelButtons.size(); i++) {
+            TextButton button = levelButtons.get(i);
+            Label label = levelLabels.get(i);
+            String levelName = button.getText().toString();
+
+            layout = new GlyphLayout();
+            layout.setText(font, levelName);
+
+            float labelX = button.getX() + button.getWidth() / 2 - layout.width / 2;
+            float labelY = button.getY() + button.getHeight() / 2 + layout.height / 2;
+
+            font.draw(batch, levelName, labelX, labelY);
+        }
 
         batch.end();
         stage.act(delta);
@@ -332,7 +371,7 @@ public class LevelScreen implements Screen {
         //beginButton.setPosition(viewport.getWorldWidth() - 180, viewport.getWorldHeight() - 80);
         float buttonWidth = 150;
         float buttonHeight = 60;
-        float buttonXPercentage = 0.19f; // 90% from the left side of the screen
+        float buttonXPercentage = 0.5f; // 90% from the left side of the screen
         float buttonYPercentage = 0.4f;
         float buttonX = viewport.getWorldWidth() * buttonXPercentage - buttonWidth / 2;
         float buttonY = viewport.getWorldHeight() * buttonYPercentage - buttonHeight / 2;
@@ -342,7 +381,8 @@ public class LevelScreen implements Screen {
         //beginButton.setPosition(viewport.getWorldWidth() - 700, viewport.getWorldHeight() - 80);
         settingsButton.setPosition(viewport.getWorldWidth() - 180, viewport.getWorldHeight() - 80);
 
-        loadLevelButtons();
+        stage.getViewport().update(width, height, true);
+        //loadLevelButtons();
     }
 
     @Override
