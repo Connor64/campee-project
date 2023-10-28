@@ -1,4 +1,263 @@
+package com.campee.starship;
 
+import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
+
+public class LevelScreen extends ScreenAdapter {
+    private final Game game;
+    private Stage stage;
+
+    public LevelScreen(final Game game) {
+        this.game = game;
+        stage = new Stage(new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
+
+        Table outerTable = new Table();
+        outerTable.setFillParent(true);
+        stage.addActor(outerTable);
+
+        Table innerTable = new Table();
+        outerTable.add(innerTable).center();
+
+        FileHandle levelsFolder = Gdx.files.internal("levels");
+        FileHandle[] levelFiles = levelsFolder.list();
+
+        Label titleLabel = new Label("LEVEL SELECT SCREEN", createTitleLabelStyle(Color.BLACK));
+
+        // Add title label to the top of the window with some padding
+        innerTable.add(titleLabel).padTop(50).colspan(3).center().row();
+
+        for (int i = 0; i < levelFiles.length; i += 3) {
+            Table rowTable = new Table(); // Create a new table for each row
+
+            // Add up to three level widgets in this row
+            for (int j = i; j < Math.min(i + 3, levelFiles.length); j++) {
+                Table levelWidget = createLevelWidget(levelFiles[j].nameWithoutExtension());
+                rowTable.add(levelWidget).pad(40).center();
+            }
+
+            // Add the rowTable to the innerTable
+            innerTable.add(rowTable).row();
+        }
+
+        // Create a ScrollPane with the innerTable as its content
+        ScrollPane scrollPane = new ScrollPane(innerTable);
+        scrollPane.setScrollingDisabled(true, false); // Disable horizontal scrolling, enable vertical scrolling
+        scrollPane.setForceScroll(false, true); // Allow scrolling only when content overflows vertically
+
+        // Set the ScrollPane to fill the outerTable and expand both vertically and horizontally
+        scrollPane.setFillParent(true);
+
+        // Add the ScrollPane to the outerTable
+        outerTable.add(scrollPane).expand().fill().pad(20);
+
+        Gdx.input.setInputProcessor(stage);
+    }
+
+    private Label.LabelStyle createTitleLabelStyle(Color color) {
+        Label.LabelStyle style = new Label.LabelStyle();
+        style.font = new BitmapFont();
+        style.fontColor = color;
+        return style;
+    }
+    private Table createLevelWidget(String levelName) {
+        Table levelWidget = new Table();
+
+        // Create a label
+        Label label = new Label(levelName, createLabelStyle(Color.BLACK));
+
+        // Create a button
+        TextButton button = new TextButton("LOCKED", createButtonStyle(Color.DARK_GRAY, Color.GRAY));
+
+        // Add the label to the top center of the table
+        levelWidget.add(label).padBottom(30).colspan(3).center().row();
+
+        // Add the button slightly towards the bottom of the rectangle
+        levelWidget.add(button).padBottom(30).colspan(3).center().row();
+
+        // Set background for the table
+        levelWidget.setBackground(new TextureRegionDrawable(new TextureRegion(new Texture(createPixmap(Color.LIGHT_GRAY)))));
+
+        // Adjust padding and other properties as needed
+        levelWidget.pad(30);
+
+        return levelWidget;
+    }
+
+    private Label.LabelStyle createLabelStyle(Color color) {
+        Label.LabelStyle style = new Label.LabelStyle();
+        style.font = new BitmapFont();
+        style.fontColor = color;
+        return style;
+    }
+
+    private TextButton.TextButtonStyle createButtonStyle(Color upColor, Color downColor) {
+        TextButton.TextButtonStyle style = new TextButton.TextButtonStyle();
+        style.font = new BitmapFont();
+        style.up = new TextureRegionDrawable(new TextureRegion(new Texture(createPixmap(upColor))));
+        style.down = new TextureRegionDrawable(new TextureRegion(new Texture(createPixmap(downColor))));
+        return style;
+    }
+
+    private Pixmap createPixmap(Color color) {
+        Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+        pixmap.setColor(color);
+        pixmap.fill();
+        return pixmap;
+    }
+
+    @Override
+    public void render(float delta) {
+        Gdx.gl.glClearColor(0.7f, 0.9f, 1f, 1);
+        Gdx.gl.glClear(Gdx.gl20.GL_COLOR_BUFFER_BIT);
+
+        stage.act(delta);
+        stage.draw();
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        stage.getViewport().update(width, height, true);
+    }
+
+    @Override
+    public void dispose() {
+        stage.dispose();
+    }
+}
+
+
+
+
+
+
+/*
+package com.campee.starship;
+
+import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
+
+public class LevelScreen extends ScreenAdapter {
+    private final Game game;
+    private Stage stage;
+
+    public LevelScreen(final Game game) {
+        this.game = game;
+        stage = new Stage(new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
+
+        Table table = new Table();
+        table.top().left();
+
+        FileHandle levelsFolder = Gdx.files.internal("levels");
+        FileHandle[] levelFiles = levelsFolder.list();
+
+        for (final FileHandle levelFile : levelFiles) {
+            // Create level name label
+            Label levelLabel = new Label(levelFile.nameWithoutExtension(), createLabelStyle(Color.PURPLE));
+
+            // Create LOCKED button
+            TextButton lockedButton = new TextButton("LOCKED", createButtonStyle(Color.DARK_GRAY, Color.GRAY));
+            lockedButton.setDisabled(true);
+
+            // Create a horizontal container to hold the level name label and LOCKED button
+            HorizontalGroup group = new HorizontalGroup();
+            group.space(10);
+            group.addActor(levelLabel);
+            group.addActor(lockedButton);
+
+            // Add the container to the table
+            table.add(group).pad(10).row();
+        }
+
+        // Add the table to a ScrollPane for scrolling
+        ScrollPane scrollPane = new ScrollPane(table);
+        scrollPane.setFillParent(true);
+        stage.addActor(scrollPane);
+
+        Gdx.input.setInputProcessor(stage);
+    }
+
+    @Override
+    public void render(float delta) {
+        Gdx.gl.glClearColor(0.7f, 0.9f, 1f, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
+        stage.draw();
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        stage.getViewport().update(width, height, true);
+    }
+
+    @Override
+    public void dispose() {
+        stage.dispose();
+    }
+
+    private Label.LabelStyle createLabelStyle(Color color) {
+        BitmapFont font = new BitmapFont();
+        Label.LabelStyle style = new Label.LabelStyle();
+        style.font = font;
+        style.fontColor = Color.WHITE;
+        style.background = new TextureRegionDrawable(new TextureRegion(createRoundedRectangleTexture(300, 60, 15, color)));
+        return style;
+    }
+
+    private TextButton.TextButtonStyle createButtonStyle(Color upColor, Color downColor) {
+        BitmapFont font = new BitmapFont();
+        TextButton.TextButtonStyle style = new TextButton.TextButtonStyle();
+        style.font = font;
+        style.up = new TextureRegionDrawable(new TextureRegion(createRoundedRectangleTexture(150, 60, 15, upColor)));
+        style.down = new TextureRegionDrawable(new TextureRegion(createRoundedRectangleTexture(150, 60, 15, downColor)));
+        style.fontColor = Color.WHITE;
+        return style;
+    }
+
+    private Texture createRoundedRectangleTexture(int width, int height, int cornerRadius, Color color) {
+        Pixmap pixmap = new Pixmap(width, height, Pixmap.Format.RGBA8888);
+        pixmap.setColor(color);
+        pixmap.fillRectangle(cornerRadius, 0, width - 2 * cornerRadius, height);
+        pixmap.fillRectangle(0, cornerRadius, width, height - 2 * cornerRadius);
+        pixmap.fillCircle(cornerRadius, cornerRadius, cornerRadius);
+        pixmap.fillCircle(cornerRadius, height - cornerRadius - 1, cornerRadius);
+        pixmap.fillCircle(width - cornerRadius - 1, cornerRadius, cornerRadius);
+        pixmap.fillCircle(width - cornerRadius - 1, height - cornerRadius - 1, cornerRadius);
+
+        Texture texture = new Texture(pixmap);
+        pixmap.dispose();
+        return texture;
+    }
+}
+*/
+
+/*
 package com.campee.starship;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
@@ -190,15 +449,15 @@ public class LevelScreen implements Screen {
         levelTable.defaults().pad(20);
         int buttonsPerRow = 3;
         int buttonsPerColumn = 3;
-        /*
-        float buttonWidthPercentage = 0.2f; // 20% of the viewport width
-        float buttonHeightPercentage = 0.3f; // 10% of the viewport height
 
-        float buttonWidth = viewport.getWorldWidth() * buttonWidthPercentage;
-        float buttonHeight = viewport.getWorldHeight() * buttonHeightPercentage;
-        float paddingX = (viewport.getWorldWidth() - buttonsPerRow * buttonWidth) / (buttonsPerRow + 1);
-        float paddingY = (viewport.getWorldHeight() - buttonsPerColumn * buttonHeight) / (buttonsPerColumn + 1);
-*/
+//        float buttonWidthPercentage = 0.2f; // 20% of the viewport width
+//        float buttonHeightPercentage = 0.3f; // 10% of the viewport height
+//
+//        float buttonWidth = viewport.getWorldWidth() * buttonWidthPercentage;
+//        float buttonHeight = viewport.getWorldHeight() * buttonHeightPercentage;
+//        float paddingX = (viewport.getWorldWidth() - buttonsPerRow * buttonWidth) / (buttonsPerRow + 1);
+//        float paddingY = (viewport.getWorldHeight() - buttonsPerColumn * buttonHeight) / (buttonsPerColumn + 1);
+
         float screenWidth = Gdx.graphics.getWidth();
         float screenHeight = Gdx.graphics.getHeight();
         float buttonWidthPercentage = 0.2f; // 20% of the initial screen width
@@ -414,3 +673,6 @@ public class LevelScreen implements Screen {
         return pixmap;
     }
 }
+
+
+ */
