@@ -33,6 +33,7 @@ import java.util.TimerTask;
 
 public class GameplayScreen extends ApplicationAdapter implements Screen {
 
+    private int threeStrikes;
     private TextButton backButton;
     private TextButton nextOrderButton;
     private TextButton gameStatsButton;
@@ -102,6 +103,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         this.GAME = game;
         batch = game.batch;
         visibleText = true;
+        threeStrikes = 0;
 
         timeCount = new int[5];
         orderTimeLeft = new int[5];
@@ -217,26 +219,6 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             }
         });
 
-        //Make game stats button
-        gameStatsButton = new TextButton("Game Stats", buttonStyle);
-        gameStatsButton.setPosition(Gdx.graphics.getWidth() - 220, 10);
-        gameStatsButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                visibleText = false;
-                String gameStatsMessage = "GAME OVER! \nTotal Coins Collected: " + coinCounter
-                        + "\nTotal Orders Completed: " + totalOrdersCompleted;
-                popup.showGameStatsMessage(gameStatsMessage);
-                popup.hideNextOrderMessage();
-                popup.hideAcceptButton();
-                popup.hideDeclineButton();
-                popup.show();
-                popup.render();
-                multiplexer.addProcessor(popup.getStage());
-            }
-        });
-
-
 
         // Make next order button
         nextOrderButton = new TextButton("Next Order", buttonStyle);
@@ -275,7 +257,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         stage.addActor(backButton);
         stage.addActor(nextOrderButton);
-        stage.addActor(gameStatsButton);
+
 
         multiplexer = new InputMultiplexer();
         multiplexer.addProcessor(stage);
@@ -319,10 +301,23 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         font.getData().setScale(0.5f);
     }
 
+    public void showGameOverScreen() {
+        visibleText = false;
+        String gameStatsMessage = "GAME OVER! \nTotal Coins Collected: " + coinCounter
+                + "\nTotal Orders Completed: " + totalOrdersCompleted;
+        popup.showGameStatsMessage(gameStatsMessage);
+        popup.hideNextOrderMessage();
+        popup.hideAcceptButton();
+        popup.hideDeclineButton();
+        popup.show();
+        popup.render();
+        multiplexer.addProcessor(popup.getStage());
+    }
     @Override
     public void render(float delta) {
-       // System.out.println(player.body.getPosition());
+        // System.out.println(player.body.getPosition());
         /* ========================== UPDATE ============================ */
+
 
         // If the popup is not visible, update the player and world
         if (!popup.isVisible()) {
@@ -360,6 +355,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         batch.setProjectionMatrix(camera.combined);
 
         stage.act(delta);
+
 
         /* ========================== DRAW ============================ */
 
@@ -499,8 +495,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         for (int i = 1; i < items.length; i++) {
             if (orderTimeLeft[i - 1] <= 5 && orderTimeLeft[i - 1] > 0) {
                 //if (order.isPickedUp()) {
-                    font.setColor(Color.RED);
-               // }
+                font.setColor(Color.RED);
+                // }
             } else {
                 font.setColor(Color.WHITE);
             }

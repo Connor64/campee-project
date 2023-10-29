@@ -30,10 +30,13 @@ public class Popup {
     private boolean isDeclineButtonHovered = false;
     private final TextButton acceptButton;
     private final TextButton declineButton;
+    private GameplayScreen gameplayScreen;
+    private int declineCount;
 
     public Popup(final GameplayScreen screen, final String notificationMessage) {
         stage = new Stage();
         shapeRenderer = new ShapeRenderer();
+        this.gameplayScreen = screen;
         visible = false;
         acceptClicked = false;
         declineClicked = false;
@@ -94,8 +97,6 @@ public class Popup {
                 screen.playerAttributes.orderInProgress = true;
                 screen.playerAttributes.array.add(screen.order.arrayToString());
 
-
-
                 visible = false;
             }
             @Override
@@ -116,8 +117,12 @@ public class Popup {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 declineClicked = true;
+                declineCount++;
                 if (screen.playerAttributes.array.size() <= 1) {
                     screen.playerAttributes.orderInProgress = false;
+                }
+                if (declineCount >= 3) {
+                    gameplayScreen.showGameOverScreen();
                 }
                 //use this for the other thing
                 //screen.playerAttributes.array.remove(1);
