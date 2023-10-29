@@ -35,6 +35,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
     private TextButton backButton;
     private TextButton nextOrderButton;
+    private TextButton gameStatsButton;
 
     private World world;
     private int levelWidth;
@@ -47,6 +48,9 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     private final Popup popup;
     private Coin coin;
     public int coinCounter;
+    public Coin[] coins;
+
+    private int totalOrdersCompleted;
 
     private GameObject log;
     private GameObject rock;
@@ -136,11 +140,22 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         coin = new Coin(world, 0, 0);
         coinCounter = 0;
+        // making a coin array
+        coins = new Coin[5];
+        for (int i = 0; i < coins.length; i++) {
+            int x = (int) ((Math.random() * (levelWidth - (-levelWidth))) + (-levelWidth));
+            int y = (int) ((Math.random() * (levelHeight - (-levelHeight))) + (-levelHeight));
+            System.out.println(x);
+            System.out.println(y);
+            coins[i] = new Coin(world, x, y);
+            coins[i].getSprite().setPosition(x, y);
+        }
 
         visibleQ = new ArrayList<>();
         playerAttributes.setArray(visibleQ);
         playerAttributes.orderInProgress = false;
 
+        totalOrdersCompleted = 0;
         order = new Order();
         orderArray = new ArrayList<>();
         order.setArray(orderArray);
@@ -200,6 +215,25 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             }
         });
 
+        //Make game stats button
+        gameStatsButton = new TextButton("Game Stats", buttonStyle);
+        gameStatsButton.setPosition(Gdx.graphics.getWidth() - 220, 10);
+        gameStatsButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                String gameStatsMessage = "GAME OVER\nTotal Coins Collected: " + coinCounter
+                        + "\nTotal Orders Completed: " + totalOrdersCompleted;
+                popup.setMessage(gameStatsMessage);
+                popup.hideAcceptButton();
+                popup.hideDeclineButton();
+                popup.show();
+                popup.render();
+                multiplexer.addProcessor(popup.getStage());
+            }
+        });
+
+
+
         // Make next order button
         nextOrderButton = new TextButton("Next Order", buttonStyle);
         nextOrderButton.setPosition(Gdx.graphics.getWidth() - 220, Gdx.graphics.getHeight() - 60); // Adjust the position as necessary
@@ -220,6 +254,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                 multiplexer.addProcessor(popup.getStage());
 
             }
+
             @Override
             public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
                 super.enter(event, x, y, pointer, fromActor);
@@ -236,6 +271,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         stage.addActor(backButton);
         stage.addActor(nextOrderButton);
+        stage.addActor(gameStatsButton);
 
         multiplexer = new InputMultiplexer();
         multiplexer.addProcessor(stage);
@@ -298,23 +334,24 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
             // visual indicator that the player is almost off the screen
 //            if (!pickupLabel.isVisible() && !dropoffLabel.isVisible()) {
-                if (playerBounds.getX() <= -(levelWidth + threshold)) {
-                    warningLabel.setPosition(levelWidth - (levelWidth - warningLabel.getWidth()), levelHeight / 2f);
-                    warningLabel.setVisible(true);
-                } else if (playerBounds.getY() >= (levelWidth - threshold)) {
-                    warningLabel.setPosition((levelWidth - (3 * warningLabel.getWidth())), levelHeight / 2f);
-                    warningLabel.setVisible(true);
-                } else if ((playerBounds.getX() + player.getWidth()) <= (-levelHeight + threshold)) {
-                    warningLabel.setPosition(levelWidth / 2f, levelHeight - (levelHeight - warningLabel.getHeight()));
-                    warningLabel.setVisible(true);
-                } else if ((playerBounds.getY() + player.getHeight()) >= (levelHeight - threshold)) {
-                    warningLabel.setPosition(levelWidth / 2f, levelHeight - warningLabel.getHeight());
-                    warningLabel.setVisible(true);
-                } else {
-                    // remove the label
-                    warningLabel.setVisible(false);
-                }
+            if (playerBounds.getX() <= -(levelWidth + threshold)) {
+                warningLabel.setPosition(levelWidth - (levelWidth - warningLabel.getWidth()), levelHeight / 2f);
+                warningLabel.setVisible(true);
+            } else if (playerBounds.getY() >= (levelWidth - threshold)) {
+                warningLabel.setPosition((levelWidth - (3 * warningLabel.getWidth())), levelHeight / 2f);
+                warningLabel.setVisible(true);
+            } else if ((playerBounds.getX() + player.getWidth()) <= (-levelHeight + threshold)) {
+                warningLabel.setPosition(levelWidth / 2f, levelHeight - (levelHeight - warningLabel.getHeight()));
+                warningLabel.setVisible(true);
+            } else if ((playerBounds.getY() + player.getHeight()) >= (levelHeight - threshold)) {
+                warningLabel.setPosition(levelWidth / 2f, levelHeight - warningLabel.getHeight());
+                warningLabel.setVisible(true);
+            } else {
+                // remove the label
+                warningLabel.setVisible(false);
+            }
 //            }
+
         }
         batch.setProjectionMatrix(camera.combined);
 
@@ -336,11 +373,13 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         log.render(batch, 0, 10);
 
         // coin collision
-        if (!coin.collected) {
-            coin.render(batch, 100, 100);
-            if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), coin.getSprite().getBoundingRectangle())) {
-                coin.setCollected(true);
-                coinCounter++;
+        for (Coin coin : coins) {
+            if (!coin.collected) {
+                coin.render(batch, (int) coin.getSprite().getX(), (int) coin.getSprite().getY());
+                if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), coin.getSprite().getBoundingRectangle())) {
+                    coin.setCollected(true);
+                    coinCounter++;
+                }
             }
         }
 
@@ -417,6 +456,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                         order.setPickedUp(false);
                         order.setDroppedOff(true);
                         playerAttributes.array.remove(1);
+                        totalOrdersCompleted++;
                         if (playerAttributes.array.size() <= 1) {
                             playerAttributes.orderInProgress = false;
                         }
@@ -446,6 +486,9 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         font.setColor(Color.WHITE);
         font.draw(batch, "Order List:", sidePanelX + 10, sidePanelY + sidePanelHeight - 10);
+        float coinCountTextX = sidePanelX - font.getRegion().getRegionWidth() - 110;
+        float coinCountTextY = sidePanelY - 20;
+        font.draw(batch, "Coins Collected: " + coinCounter, coinCountTextX, coinCountTextY);
 
         for (int i = 1; i < items.length; i++) {
             if (orderTimeLeft[i - 1] <= 5 && orderTimeLeft[i - 1] > 0) {

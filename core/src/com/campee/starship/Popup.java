@@ -26,6 +26,8 @@ public class Popup {
     private boolean declineClicked;
     private boolean isAcceptButtonHovered = false;
     private boolean isDeclineButtonHovered = false;
+    private final TextButton acceptButton;
+    private final TextButton declineButton;
 
     public Popup(final GameplayScreen screen, final String notificationMessage) {
         stage = new Stage();
@@ -60,8 +62,8 @@ public class Popup {
         declineButtonStyle.up = new TextureRegionDrawable(new TextureRegion(new Texture(declineBackgroundPixmap)));
 
         // Create buttons
-        final TextButton acceptButton = new TextButton("Accept", acceptButtonStyle);
-        final TextButton declineButton = new TextButton("Decline", declineButtonStyle);
+        acceptButton = new TextButton("Accept", acceptButtonStyle);
+        declineButton = new TextButton("Decline", declineButtonStyle);
 
         acceptButton.setWidth(100);
         acceptButton.setHeight(50);
@@ -169,6 +171,21 @@ public class Popup {
             stage.act();
             stage.draw();
         }
+    }
+    public void showAcceptButton() {
+        acceptButton.setVisible(true);
+    }
+
+    public void showDeclineButton() {
+        declineButton.setVisible(true);
+    }
+
+    public void hideAcceptButton() {
+        acceptButton.setVisible(false);
+    }
+
+    public void hideDeclineButton() {
+        declineButton.setVisible(false);
     }
 
     public Pixmap createRoundedRectanglePixmap(int width, int height, int cornerRadius, Color color) {
