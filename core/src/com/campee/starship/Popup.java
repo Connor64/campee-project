@@ -21,7 +21,9 @@ public class Popup {
     public boolean visible;
     private ShapeRenderer shapeRenderer;
     private BitmapFont font;
+    private BitmapFont gameStatsfont;
     private Label messageLabel;
+    private Label gameStatsMessage;
     private boolean acceptClicked;
     private boolean declineClicked;
     private boolean isAcceptButtonHovered = false;
@@ -37,6 +39,7 @@ public class Popup {
         declineClicked = false;
 
         font = new BitmapFont();
+        gameStatsfont = new BitmapFont(Gdx.files.internal("moonships_font.fnt"), Gdx.files.internal("moonships_font.png"), false);
 
         // Set font color and scale
         font.setColor(1, 1, 0, 1);
@@ -46,6 +49,15 @@ public class Popup {
         messageLabel.setFontScale(1.5f);
         messageLabel.setPosition(Gdx.graphics.getWidth() / 2 - messageLabel.getWidth() / 2, Gdx.graphics.getHeight() / 2 + 100);
 
+        gameStatsfont.setColor(1, 1, 0, 1);
+        gameStatsfont.getData().setScale(1f);
+        gameStatsMessage = new Label(notificationMessage, new Label.LabelStyle(gameStatsfont, Color.YELLOW));
+        gameStatsMessage.setFontScale(0.5f);
+
+        float centerX = Gdx.graphics.getWidth() / 2 - gameStatsMessage.getWidth() / 2;
+        float centerY = Gdx.graphics.getHeight() / 2 - gameStatsMessage.getHeight() / 2;
+
+        gameStatsMessage.setPosition(centerX, centerY);
 
 
         Pixmap acceptBackgroundPixmap = createRoundedRectanglePixmap(200, 50, 10, Color.GREEN); // Adjust size and color
@@ -56,7 +68,7 @@ public class Popup {
 
 
         Pixmap declineBackgroundPixmap = createRoundedRectanglePixmap(200, 50, 10, Color.RED); // Adjust size and color
-        TextButton.TextButtonStyle declineButtonStyle = new TextButton.TextButtonStyle();
+        TextButton.TextButtonStyle declineButtonStyle = new TextButton.TextButtonStyle();git
         declineButtonStyle.font = font;
         declineButtonStyle.fontColor = Color.BLACK;
         declineButtonStyle.up = new TextureRegionDrawable(new TextureRegion(new Texture(declineBackgroundPixmap)));
@@ -129,10 +141,30 @@ public class Popup {
         stage.addActor(acceptButton);
         stage.addActor(declineButton);
         stage.addActor(messageLabel);
+        stage.addActor(gameStatsMessage);
     }
 
-    public void setMessage(String message) {
+    public void showNextOrderMessage(String message) {
+        // Set the message text and show the "Next Order" message
         messageLabel.setText(message);
+        messageLabel.setVisible(true);
+        gameStatsMessage.setVisible(false);
+    }
+
+    public void hideNextOrderMessage() {
+        // Hide the "Next Order" message
+        messageLabel.setVisible(false);
+    }
+
+    public void showGameStatsMessage(String message) {
+        gameStatsMessage.setText(message);
+        gameStatsMessage.setVisible(true);
+        messageLabel.setVisible(false);
+    }
+
+    public void hideGameStatsMessage() {
+        // Hide the "Game Stats" message
+        gameStatsMessage.setVisible(false);
     }
 
     public void show() {
@@ -187,6 +219,7 @@ public class Popup {
     public void hideDeclineButton() {
         declineButton.setVisible(false);
     }
+
 
     public Pixmap createRoundedRectanglePixmap(int width, int height, int cornerRadius, Color color) {
         Pixmap pixmap = new Pixmap(width, height, Pixmap.Format.RGBA8888);

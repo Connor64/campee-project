@@ -49,6 +49,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     private Coin coin;
     public int coinCounter;
     public Coin[] coins;
+    private boolean visibleText;
 
     private int totalOrdersCompleted;
 
@@ -100,6 +101,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     public GameplayScreen(final MoonshipGame game) throws IOException, ClassNotFoundException {
         this.GAME = game;
         batch = game.batch;
+        visibleText = true;
 
         timeCount = new int[5];
         orderTimeLeft = new int[5];
@@ -221,9 +223,11 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         gameStatsButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                String gameStatsMessage = "GAME OVER\nTotal Coins Collected: " + coinCounter
+                visibleText = false;
+                String gameStatsMessage = "GAME OVER! \nTotal Coins Collected: " + coinCounter
                         + "\nTotal Orders Completed: " + totalOrdersCompleted;
-                popup.setMessage(gameStatsMessage);
+                popup.showGameStatsMessage(gameStatsMessage);
+                popup.hideNextOrderMessage();
                 popup.hideAcceptButton();
                 popup.hideDeclineButton();
                 popup.show();
@@ -247,7 +251,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                 }
                 order.seti(count);
                 count++;
-                popup.setMessage(order.arrayToString());
+                popup.showNextOrderMessage(order.arrayToString());
 
                 popup.show();
                 popup.render();
@@ -484,11 +488,13 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         String[] items = playerAttributes.array.toArray(new String[0]);
 
-        font.setColor(Color.WHITE);
-        font.draw(batch, "Order List:", sidePanelX + 10, sidePanelY + sidePanelHeight - 10);
-        float coinCountTextX = sidePanelX - font.getRegion().getRegionWidth() - 110;
-        float coinCountTextY = sidePanelY - 20;
-        font.draw(batch, "Coins Collected: " + coinCounter, coinCountTextX, coinCountTextY);
+        if (visibleText) {
+            font.setColor(Color.WHITE);
+            font.draw(batch, "Order List:", sidePanelX + 10, sidePanelY + sidePanelHeight - 10);
+            float coinCountTextX = sidePanelX - font.getRegion().getRegionWidth() - 110;
+            float coinCountTextY = sidePanelY - 20;
+            font.draw(batch, "Coins Collected: " + coinCounter, coinCountTextX, coinCountTextY);
+        }
 
         for (int i = 1; i < items.length; i++) {
             if (orderTimeLeft[i - 1] <= 5 && orderTimeLeft[i - 1] > 0) {
