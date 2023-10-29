@@ -68,7 +68,7 @@ public class Popup {
 
 
         Pixmap declineBackgroundPixmap = createRoundedRectanglePixmap(200, 50, 10, Color.RED); // Adjust size and color
-        TextButton.TextButtonStyle declineButtonStyle = new TextButton.TextButtonStyle();git
+        TextButton.TextButtonStyle declineButtonStyle = new TextButton.TextButtonStyle();
         declineButtonStyle.font = font;
         declineButtonStyle.fontColor = Color.BLACK;
         declineButtonStyle.up = new TextureRegionDrawable(new TextureRegion(new Texture(declineBackgroundPixmap)));
