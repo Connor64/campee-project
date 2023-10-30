@@ -58,6 +58,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     public Label warningLabel;
     public Label pickupLabel;
     public Label dropoffLabel;
+    public Label autoDeclineLabel;
 
     private Timer timer;
     private TimerTask timerTask;
@@ -275,14 +276,13 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         stage.addActor(dropoffLabel);
         dropoffLabel.setSize(font.getScaleX() * 16, font.getScaleY() * 16);
 
-        // timed incoming order label
-        Skin skin = new Skin();
-        skin.add("default-font", font);
-        Label.LabelStyle labelStyle = new Label.LabelStyle(font, Color.BLACK);
-        labelStyle.font = skin.getFont("default-font");
-        skin.add("default", labelStyle);
-        //incomingOrder = new TimedPopup("Your message here", 30.0f, skin); // 5 seconds duration
-        //popup.show(); // Show the initial popup
+        //auto decline after order timeout label
+        autoDeclineLabel = new Label("Order Timeout! Declined.", indicatorStyle);
+        //autoDeclineLabel.setPosition(Gdx.graphics.getWidth() / 2 - autoDeclineLabel.getWidth() / 2, Gdx.graphics.getHeight() - autoDeclineLabel.getHeight());
+        autoDeclineLabel.setVisible(false);
+        stage.addActor(autoDeclineLabel);
+        autoDeclineLabel.setSize(font.getScaleX() * 16, font.getScaleY() * 16);
+
         schedulePopupDisplay();
 
     }
@@ -517,6 +517,15 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                     public void run() {
                         // Hide the popup
                         hideTimedPopup();
+                        if (!popup.acceptClicked() && !popup.declineClicked()) {
+                            autoDeclineLabel.setVisible(true);
+                            scheduler.schedule(new Runnable() {
+                                @Override
+                                public void run() {
+                                    autoDeclineLabel.setVisible(false); // Remove the label from the display
+                                }
+                            }, 10, TimeUnit.SECONDS);
+                        }
                     }
                 }, 15, TimeUnit.SECONDS); // Schedule to hide the popup after 15 seconds
             }
