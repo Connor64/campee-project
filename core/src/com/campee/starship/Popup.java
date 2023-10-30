@@ -16,6 +16,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
+import java.util.ArrayList;
+
 public class Popup {
     private Stage stage;
     public boolean visible;
@@ -30,13 +32,10 @@ public class Popup {
     private boolean isDeclineButtonHovered = false;
     private final TextButton acceptButton;
     private final TextButton declineButton;
-    private GameplayScreen gameplayScreen;
-    private int declineCount;
 
     public Popup(final GameplayScreen screen, final String notificationMessage) {
         stage = new Stage();
         shapeRenderer = new ShapeRenderer();
-        this.gameplayScreen = screen;
         visible = false;
         acceptClicked = false;
         declineClicked = false;
@@ -96,6 +95,9 @@ public class Popup {
                 acceptClicked = true;
                 screen.playerAttributes.orderInProgress = true;
                 screen.playerAttributes.array.add(screen.order.arrayToString());
+
+
+
                 visible = false;
             }
             @Override
@@ -116,12 +118,8 @@ public class Popup {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 declineClicked = true;
-                declineCount++;
                 if (screen.playerAttributes.array.size() <= 1) {
                     screen.playerAttributes.orderInProgress = false;
-                }
-                if (declineCount >= 3) {
-                    gameplayScreen.showGameOverScreen();
                 }
                 //use this for the other thing
                 //screen.playerAttributes.array.remove(1);
@@ -160,6 +158,11 @@ public class Popup {
         messageLabel.setVisible(false);
     }
 
+    public void showGameStatsQ(ArrayList<String> message) {
+        gameStatsMessage.setText((CharSequence) message);
+        gameStatsMessage.setVisible(true);
+        messageLabel.setVisible(false);
+    }
 
     public void showGameStatsMessage(String message) {
         gameStatsMessage.setText(message);

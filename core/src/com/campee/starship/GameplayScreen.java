@@ -50,7 +50,6 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     public int coinCounter;
     public Coin[] coins;
     private boolean visibleText;
-    private int declineCount;
 
     private int totalOrdersCompleted;
 
@@ -103,8 +102,6 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         this.GAME = game;
         batch = game.batch;
         visibleText = true;
-        declineCount = 0;
-
 
         timeCount = new int[5];
         orderTimeLeft = new int[5];
@@ -220,6 +217,28 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             }
         });
 
+        //Make game stats button
+        gameStatsButton = new TextButton("Game Stats", buttonStyle);
+        gameStatsButton.setPosition(Gdx.graphics.getWidth() - 220, 10);
+        gameStatsButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                visibleText = false;
+                String gameStatsMessage = "GAME OVER! \nTotal Coins Collected: " + coinCounter
+                        + "\nTotal Orders Completed: " + totalOrdersCompleted;
+                popup.showGameStatsMessage(gameStatsMessage);
+                popup.showGameStatsQ(visibleQ);
+                popup.hideNextOrderMessage();
+                popup.hideAcceptButton();
+                popup.hideDeclineButton();
+                popup.show();
+                popup.render();
+                multiplexer.addProcessor(popup.getStage());
+
+            }
+        });
+
+
 
         // Make next order button
         nextOrderButton = new TextButton("Next Order", buttonStyle);
@@ -258,10 +277,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         stage.addActor(backButton);
         stage.addActor(nextOrderButton);
-
-
-
-
+        stage.addActor(gameStatsButton);
 
         multiplexer = new InputMultiplexer();
         multiplexer.addProcessor(stage);
@@ -305,33 +321,12 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         font.getData().setScale(0.5f);
     }
 
-    public void showGameOverScreen() {
-        visibleText = false;
-        String gameStatsMessage = "GAME OVER! \nTotal Coins Collected: " + coinCounter
-                + "\nTotal Orders Completed: " + totalOrdersCompleted;
-        popup.showGameStatsMessage(gameStatsMessage);
-        popup.showGameStatsMessage(order.arrayToString());
-        popup.hideNextOrderMessage();
-        popup.hideAcceptButton();
-        popup.hideDeclineButton();
-        popup.show();
-        popup.render();
-        multiplexer.addProcessor(popup.getStage());
-    }
-
-
     @Override
     public void render(float delta) {
         // System.out.println(player.body.getPosition());
         /* ========================== UPDATE ============================ */
 
-
         // If the popup is not visible, update the player and world
-        if (declineCount >= 3) {
-            // Show game over screen when declineCount reaches 3
-            showGameOverScreen();
-        }
-
         if (!popup.isVisible()) {
             player.update(delta, keyProcessor);
             player.checkBounds(levelWidth, levelHeight);
@@ -367,7 +362,6 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         batch.setProjectionMatrix(camera.combined);
 
         stage.act(delta);
-
 
         /* ========================== DRAW ============================ */
 
@@ -412,14 +406,12 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                             order.setDroppedOff(true);
                             dropoffLabel.setVisible(false);
                             order.setPickedUp(false);
-                            declineCount++;
                         }
                         if (playerAttributes.array.size() <= 1) {
                             playerAttributes.orderInProgress = false;
                             order.setPickedUp(false);
                             dropoffLabel.setVisible(false);
                             pickupLabel.setVisible(false);
-
                         } else {
                             pickupObject.sprite.draw(batch);
                             order.setDroppedOff(false);
