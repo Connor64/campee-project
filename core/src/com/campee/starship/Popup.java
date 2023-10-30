@@ -96,7 +96,6 @@ public class Popup {
                 acceptClicked = true;
                 screen.playerAttributes.orderInProgress = true;
                 screen.playerAttributes.array.add(screen.order.arrayToString());
-
                 visible = false;
             }
             @Override
@@ -160,6 +159,7 @@ public class Popup {
         // Hide the "Next Order" message
         messageLabel.setVisible(false);
     }
+
 
     public void showGameStatsMessage(String message) {
         gameStatsMessage.setText(message);

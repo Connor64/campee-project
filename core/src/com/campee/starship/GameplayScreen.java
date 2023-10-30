@@ -260,6 +260,9 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         stage.addActor(nextOrderButton);
 
 
+
+
+
         multiplexer = new InputMultiplexer();
         multiplexer.addProcessor(stage);
         multiplexer.addProcessor(keyProcessor);
@@ -307,6 +310,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         String gameStatsMessage = "GAME OVER! \nTotal Coins Collected: " + coinCounter
                 + "\nTotal Orders Completed: " + totalOrdersCompleted;
         popup.showGameStatsMessage(gameStatsMessage);
+        popup.showGameStatsMessage(order.arrayToString());
         popup.hideNextOrderMessage();
         popup.hideAcceptButton();
         popup.hideDeclineButton();
@@ -314,8 +318,6 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         popup.render();
         multiplexer.addProcessor(popup.getStage());
     }
-
-
 
 
     @Override
