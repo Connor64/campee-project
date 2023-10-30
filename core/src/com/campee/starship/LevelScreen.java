@@ -10,17 +10,23 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.badlogic.gdx.utils.viewport.ScalingViewport;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 public class LevelScreen extends ScreenAdapter {
     private final Game game;
     private Stage stage;
+    private ScrollPane scrollPane;
+    private CustomScrollPane scrollBar;
 
     public LevelScreen(final Game game) {
         this.game = game;
-        stage = new Stage(new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
+        //stage = new Stage(new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
+        stage = new Stage(new ScreenViewport());
 
         Table outerTable = new Table();
         outerTable.setFillParent(true);
@@ -50,18 +56,17 @@ public class LevelScreen extends ScreenAdapter {
             innerTable.add(rowTable).row();
         }
 
-        // Create a ScrollPane with the innerTable as its content
-        ScrollPane scrollPane = new ScrollPane(innerTable);
-        scrollPane.setScrollingDisabled(true, false); // Disable horizontal scrolling, enable vertical scrolling
-        scrollPane.setForceScroll(false, true); // Allow scrolling only when content overflows vertically
+        CustomScrollPane customScrollPane = new CustomScrollPane(innerTable, stage);
+        customScrollPane.setScrollingDisabled(true, false);
+        customScrollPane.setFillParent(true);
 
-        // Set the ScrollPane to fill the outerTable and expand both vertically and horizontally
-        scrollPane.setFillParent(true);
-
-        // Add the ScrollPane to the outerTable
-        outerTable.add(scrollPane).expand().fill().pad(20);
-
+        //customScrollPane.setTouchable(Touchable.enabled);
+        stage.addActor(customScrollPane);
         Gdx.input.setInputProcessor(stage);
+
+        //scrollPane.debug();
+        //innerTable.debug();
+        //outerTable.debug();
     }
 
     private Label.LabelStyle createTitleLabelStyle(Color color) {
@@ -115,13 +120,20 @@ public class LevelScreen extends ScreenAdapter {
         pixmap.fill();
         return pixmap;
     }
+    private Pixmap createPixmap(Color color, int width, int height) {
+        Pixmap pixmap = new Pixmap(width, height, Pixmap.Format.RGBA8888);
+        pixmap.setColor(color);
+        pixmap.fill();
+        return pixmap;
+    }
 
     @Override
     public void render(float delta) {
         Gdx.gl.glClearColor(0.7f, 0.9f, 1f, 1);
         Gdx.gl.glClear(Gdx.gl20.GL_COLOR_BUFFER_BIT);
 
-        stage.act(delta);
+        stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 80f));
+        //stage.act(delta);
         stage.draw();
     }
 
