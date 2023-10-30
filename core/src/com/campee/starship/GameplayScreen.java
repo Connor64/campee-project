@@ -58,6 +58,9 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     public Label warningLabel;
     public Label pickupLabel;
     public Label dropoffLabel;
+    public Label minOrderLabel;
+    //public Label dropoffLabel;
+
 
     private Timer timer;
     private TimerTask timerTask;
@@ -281,6 +284,12 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         Label.LabelStyle labelStyle = new Label.LabelStyle(font, Color.BLACK);
         labelStyle.font = skin.getFont("default-font");
         skin.add("default", labelStyle);
+
+        minOrderLabel = new Label("Orders Completed", labelStyle);
+        minOrderLabel.setSize(font.getScaleX() * 16, font.getScaleY() * 16);
+        minOrderLabel.setPosition(Gdx.graphics.getWidth()/2,Gdx.graphics.getHeight());
+        minOrderLabel.setVisible(true);
+
         //incomingOrder = new TimedPopup("Your message here", 30.0f, skin); // 5 seconds duration
         //popup.show(); // Show the initial popup
         schedulePopupDisplay();

@@ -7,10 +7,12 @@ public class LevelData implements Serializable {
     private static final long serialVersionUID = 1L;
     public Tile[][][] layers;
     public String levelName;
+    public int minOrders;
+    public float goalTime;
     public int width;
     public int height;
 
-    public LevelData(ArrayList<Tile[][]> layers, String levelName, int width, int height) {
+    public LevelData(ArrayList<Tile[][]> layers, String levelName, int minOrders, float goalTime, int width, int height) {
         this.layers = new Tile[layers.size()][width][height];
 
         for (int i = 0; i < layers.size(); i++) {
@@ -22,7 +24,10 @@ public class LevelData implements Serializable {
         }
 
         this.levelName = levelName;
+        this.minOrders = minOrders;
+        this.goalTime = goalTime;
         this.width = width;
         this.height = height;
     }
 }
+
