@@ -17,6 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
@@ -30,6 +31,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class GameplayScreen extends ApplicationAdapter implements Screen {
 
@@ -59,6 +63,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     private TimerTask timerTask;
     private int[] timeCount;
     private int[] orderTimeLeft;
+
+    //private TimedPopup incomingOrder;
 
     public GameObject pickupObject;
     public GameObject dropoffObject;
@@ -105,6 +111,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         tileSprites = new ArrayList<>();
         LevelData levelData = loadLevel();
 
+
+
         // TODO: Add serializable field to level data for the tilesize
         levelWidth = (levelData.width / 2) * 16;
         levelHeight = (levelData.height / 2) * 16;
@@ -130,8 +138,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         // Define side panel properties
         sidePanelWidth = Gdx.graphics.getWidth() / 5; // Width
         sidePanelX = Gdx.graphics.getWidth() - sidePanelWidth; // Position the panel on the right side
-        sidePanelY = 60; // Y position
-        sidePanelHeight = Gdx.graphics.getHeight() - 150; // Height
+        sidePanelY = 100; // Y position
+        sidePanelHeight = Gdx.graphics.getHeight() - 110; // Height
         sidePanelColor = new Color(0.2f, 0.2f, 0.2f, 0.5f); // Background color (RGBA)
 
         coin = new Coin(world, 0, 0);
@@ -153,7 +161,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         order = new Order(stage, game, orderA[0], orderA[1], orderA[2], time, orderArray);
         order.setDroppedOff(false);
         order.setPickedUp(false);
-        popup = new Popup(this, order.arrayToString());
+        popup = new Popup(this, order.arrayToString(), 15.0f);
         order.setPickupBounds(-levelWidth + 50, -levelHeight + 50, 16, 16);
         order.setDropoffBounds(levelWidth - 100, levelHeight - 100, 16, 16);
 
@@ -235,11 +243,13 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         });
 
         stage.addActor(backButton);
-        stage.addActor(nextOrderButton);
+        //stage.addActor(nextOrderButton);
 
         multiplexer = new InputMultiplexer();
         multiplexer.addProcessor(stage);
         multiplexer.addProcessor(keyProcessor);
+        multiplexer.addProcessor(popup.getStage());
+
 
         Gdx.input.setInputProcessor(multiplexer);
 
@@ -264,6 +274,17 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         dropoffLabel.setVisible(false);
         stage.addActor(dropoffLabel);
         dropoffLabel.setSize(font.getScaleX() * 16, font.getScaleY() * 16);
+
+        // timed incoming order label
+        Skin skin = new Skin();
+        skin.add("default-font", font);
+        Label.LabelStyle labelStyle = new Label.LabelStyle(font, Color.BLACK);
+        labelStyle.font = skin.getFont("default-font");
+        skin.add("default", labelStyle);
+        //incomingOrder = new TimedPopup("Your message here", 30.0f, skin); // 5 seconds duration
+        //popup.show(); // Show the initial popup
+        schedulePopupDisplay();
+
     }
 
     @Override
@@ -285,7 +306,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         /* ========================== UPDATE ============================ */
 
         // If the popup is not visible, update the player and world
-        if (!popup.isVisible()) {
+        //if (!popup.isVisible()) {
             player.update(delta, keyProcessor);
             player.checkBounds(levelWidth, levelHeight);
             world.step(1/60f, 6, 2); // Physics calculations
@@ -315,8 +336,9 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                     warningLabel.setVisible(false);
                 }
 //            }
-        }
+       // }
         batch.setProjectionMatrix(camera.combined);
+        popup.update(delta);
 
         stage.act(delta);
 
@@ -458,12 +480,49 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             font.draw(batch, items[i], sidePanelX + 10, sidePanelY + sidePanelHeight - 70 * i);
 
         }
-
         stage.draw();
         popup.render();
+        //popup.draw();
 
         batch.end();
     }
+
+    // Trigger the timed popup to show
+    public void showTimedPopup() {
+        //popup.setPosition(Gdx.graphics.getWidth() - 300, 0);
+        popup.show(); // Display the popup
+        try {
+            order.setArray(orderArray);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        order.seti(count);
+        count++;
+        popup.setMessage(order.arrayToString());
+    }
+
+    public void hideTimedPopup() {
+        popup.hide(); // Display the popup
+    }
+
+    // Schedule the popup to display every 1 minute
+    private void schedulePopupDisplay() {
+        final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+        scheduler.scheduleAtFixedRate(new Runnable() {
+            @Override
+            public void run() {
+                showTimedPopup(); // Show the popup
+                scheduler.schedule(new Runnable() {
+                    @Override
+                    public void run() {
+                        // Hide the popup
+                        hideTimedPopup();
+                    }
+                }, 15, TimeUnit.SECONDS); // Schedule to hide the popup after 15 seconds
+            }
+        }, 0, 30, TimeUnit.SECONDS); // Schedule the next popup 30 seconds after the first one
+    }
+
 
     @Override
     public void resize(int width, int height) {
@@ -485,6 +544,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     @Override
     public void dispose() {
         batch.dispose();
+        //incomingOrder.dispose();
         multiplexer.removeProcessor(stage);
     }
 
