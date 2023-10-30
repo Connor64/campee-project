@@ -287,7 +287,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         minOrderLabel = new Label("Orders Completed", labelStyle);
         minOrderLabel.setSize(font.getScaleX() * 16, font.getScaleY() * 16);
-        minOrderLabel.setPosition(Gdx.graphics.getWidth()/2,Gdx.graphics.getHeight());
+        minOrderLabel.setPosition(Gdx.graphics.getWidth() / 2 - minOrderLabel.getWidth() / 2, Gdx.graphics.getHeight() - minOrderLabel.getHeight());
+        //minOrderLabel.setPosition(Gdx.graphics.getWidth()/2,Gdx.graphics.getHeight());
         minOrderLabel.setVisible(true);
 
         //incomingOrder = new TimedPopup("Your message here", 30.0f, skin); // 5 seconds duration
@@ -313,6 +314,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     public void render(float delta) {
        // System.out.println(player.body.getPosition());
         /* ========================== UPDATE ============================ */
+
+        //minOrderLabel.setVisible(true);
 
         // If the popup is not visible, update the player and world
         //if (!popup.isVisible()) {
@@ -346,6 +349,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                 }
 //            }
        // }
+
         batch.setProjectionMatrix(camera.combined);
         popup.update(delta);
 
@@ -357,6 +361,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         /* ===== Draw game objects ===== */
         batch.begin();
+
+        //minOrderLabel.setVisible(true);
 
         for (Sprite sprite : tileSprites) {
             sprite.draw(batch);
