@@ -33,7 +33,6 @@ import java.util.TimerTask;
 
 public class GameplayScreen extends ApplicationAdapter implements Screen {
 
-    private int threeStrikes;
     private TextButton backButton;
     private TextButton nextOrderButton;
     private TextButton gameStatsButton;
@@ -51,6 +50,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     public int coinCounter;
     public Coin[] coins;
     private boolean visibleText;
+    private int declineCount;
 
     private int totalOrdersCompleted;
 
@@ -103,7 +103,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         this.GAME = game;
         batch = game.batch;
         visibleText = true;
-        threeStrikes = 0;
+        declineCount = 0;
+
 
         timeCount = new int[5];
         orderTimeLeft = new int[5];
@@ -313,6 +314,10 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         popup.render();
         multiplexer.addProcessor(popup.getStage());
     }
+
+
+
+
     @Override
     public void render(float delta) {
         // System.out.println(player.body.getPosition());
@@ -320,6 +325,11 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
 
         // If the popup is not visible, update the player and world
+        if (declineCount >= 3) {
+            // Show game over screen when declineCount reaches 3
+            showGameOverScreen();
+        }
+
         if (!popup.isVisible()) {
             player.update(delta, keyProcessor);
             player.checkBounds(levelWidth, levelHeight);
@@ -400,12 +410,14 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                             order.setDroppedOff(true);
                             dropoffLabel.setVisible(false);
                             order.setPickedUp(false);
+                            declineCount++;
                         }
                         if (playerAttributes.array.size() <= 1) {
                             playerAttributes.orderInProgress = false;
                             order.setPickedUp(false);
                             dropoffLabel.setVisible(false);
                             pickupLabel.setVisible(false);
+
                         } else {
                             pickupObject.sprite.draw(batch);
                             order.setDroppedOff(false);
