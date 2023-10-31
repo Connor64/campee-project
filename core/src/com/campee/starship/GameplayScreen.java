@@ -137,8 +137,6 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         for (int i = 0; i < coins.length; i++) {
             int x = (int) ((Math.random() * (levelWidth - (-levelWidth))) + (-levelWidth));
             int y = (int) ((Math.random() * (levelHeight - (-levelHeight))) + (-levelHeight));
-            System.out.println(x);
-            System.out.println(y);
             coins[i] = new Coin(world, x, y);
             coins[i].getSprite().setPosition(x, y);
         }
@@ -286,7 +284,6 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
     @Override
     public void render(float delta) {
-        System.out.println(player.body.getPosition());
         /* ========================== UPDATE ============================ */
 
         // If the popup is not visible, update the player and world
