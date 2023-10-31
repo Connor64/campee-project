@@ -17,6 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
@@ -30,6 +31,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class GameplayScreen extends ApplicationAdapter implements Screen {
 
@@ -55,11 +59,14 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     public Label warningLabel;
     public Label pickupLabel;
     public Label dropoffLabel;
+    public Label autoDeclineLabel;
 
     private Timer timer;
     private TimerTask timerTask;
-    private int timeCount = 0;
-    private int orderTimeLeft = 6;
+    private int[] timeCount;
+    private int[] orderTimeLeft;
+
+    //private TimedPopup incomingOrder;
 
     public GameObject pickupObject;
     public GameObject dropoffObject;
@@ -98,8 +105,15 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         this.GAME = game;
         batch = game.batch;
 
+        timeCount = new int[5];
+        orderTimeLeft = new int[5];
+        Arrays.fill(timeCount, 0);
+        Arrays.fill(orderTimeLeft, 6);
+
         tileSprites = new ArrayList<>();
         LevelData levelData = loadLevel();
+
+
 
         // TODO: Add serializable field to level data for the tilesize
         levelWidth = (levelData.width / 2) * 16;
@@ -126,8 +140,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         // Define side panel properties
         sidePanelWidth = Gdx.graphics.getWidth() / 5; // Width
         sidePanelX = Gdx.graphics.getWidth() - sidePanelWidth; // Position the panel on the right side
-        sidePanelY = 60; // Y position
-        sidePanelHeight = Gdx.graphics.getHeight() - 150; // Height
+        sidePanelY = 100; // Y position
+        sidePanelHeight = Gdx.graphics.getHeight() - 110; // Height
         sidePanelColor = new Color(0.2f, 0.2f, 0.2f, 0.5f); // Background color (RGBA)
 
         coin = new Coin(world, 0, 0);
@@ -148,7 +162,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         order = new Order();
         orderArray = new ArrayList<>();
         order.setArray(orderArray);
-        System.out.println(orderArray);
+        Collections.shuffle(orderArray);
+        //System.out.println(orderArray);
         orderA = order.arrayToArray();
         order.seti(order.i++);
         int time = Integer.parseInt(orderA[3]);
@@ -238,11 +253,13 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         });
 
         stage.addActor(backButton);
-        stage.addActor(nextOrderButton);
+        //stage.addActor(nextOrderButton);
 
         multiplexer = new InputMultiplexer();
         multiplexer.addProcessor(stage);
         multiplexer.addProcessor(keyProcessor);
+        multiplexer.addProcessor(popup.getStage());
+
 
         Gdx.input.setInputProcessor(multiplexer);
 
@@ -258,15 +275,27 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         // pickup label
         pickupLabel = new Label("Press P to pickup!", indicatorStyle);
+        //pickupLabel.setPosition(Gdx.graphics.getWidth() - pickupLabel.getWidth() - 550, 10);
         pickupLabel.setVisible(false);
         stage.addActor(pickupLabel);
         pickupLabel.setSize(font.getScaleX() * 16, font.getScaleY() * 16);
 
         // dropoff label
         dropoffLabel = new Label("Press O to dropoff!", indicatorStyle);
+        //dropoffLabel.setPosition(Gdx.graphics.getWidth() - dropoffLabel.getWidth() - 550, 10);
         dropoffLabel.setVisible(false);
         stage.addActor(dropoffLabel);
         dropoffLabel.setSize(font.getScaleX() * 16, font.getScaleY() * 16);
+
+        //auto decline after order timeout label
+        autoDeclineLabel = new Label("Order Timeout! Declined.", indicatorStyle);
+        autoDeclineLabel.setPosition(Gdx.graphics.getWidth() - autoDeclineLabel.getWidth(), 10);
+        autoDeclineLabel.setVisible(false);
+        stage.addActor(autoDeclineLabel);
+        autoDeclineLabel.setSize(font.getScaleX() * 16, font.getScaleY() * 16);
+
+        schedulePopupDisplay();
+
     }
 
     @Override
@@ -287,7 +316,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         /* ========================== UPDATE ============================ */
 
         // If the popup is not visible, update the player and world
-        if (!popup.isVisible()) {
+        //if (!popup.isVisible()) {
             player.update(delta, keyProcessor);
             player.checkBounds(levelWidth, levelHeight);
             world.step(1/60f, 6, 2); // Physics calculations
@@ -317,8 +346,9 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                     warningLabel.setVisible(false);
                 }
 //            }
-        }
+       // }
         batch.setProjectionMatrix(camera.combined);
+        //popup.update(delta);
 
         stage.act(delta);
 
@@ -373,50 +403,57 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
 
         if (playerAttributes.orderInProgress) {
-            String[] s = order.stringToArray(playerAttributes.array.get(1));
-            int time;
-            boolean twoName = false;
-            try {
-                time = Integer.parseInt(s[4]);
-            } catch (NumberFormatException num) {
-                time = Integer.parseInt(s[5]);
-                twoName = true;
-            }
-            if (time <= 0) {
-                if(!order.isDroppedOff()) {
-                    order.setDroppedOff(true);
-                    dropoffLabel.setVisible(false);
-                    order.setPickedUp(false);
+            for (int i = 1; i < playerAttributes.array.size(); i++ ) {
+                String[] s = order.stringToArray(playerAttributes.array.get(i));
+                int time;
+                boolean twoName = false;
+                try {
+                    time = Integer.parseInt(s[4]);
+                } catch (NumberFormatException num) {
+                    time = Integer.parseInt(s[5]);
+                    twoName = true;
                 }
-                playerAttributes.array.remove(1);
-                if (playerAttributes.array.size() <= 1) {
-                    playerAttributes.orderInProgress = false;
-                    order.setPickedUp(false);
-                    dropoffLabel.setVisible(false);
-                    pickupLabel.setVisible(false);
+                if (time <= 0) {
+                    if (i == 1) {
+                        if (!order.isDroppedOff()) {
+                            order.setDroppedOff(true);
+                            dropoffLabel.setVisible(false);
+                            pickupLabel.setVisible(false);
+                            order.setPickedUp(false);
+                        }
+                        if (playerAttributes.array.size() <= 1) {
+                            playerAttributes.orderInProgress = false;
+                            order.setPickedUp(false);
+                            dropoffLabel.setVisible(false);
+                            pickupLabel.setVisible(false);
+                        } else {
+                            //System.out.println("hehe i am here");
+                            pickupObject.sprite.draw(batch);
+                            order.setDroppedOff(false);
+                            order.setPickedUp(false);
+                        }
+                    }
+                    playerAttributes.array.remove(i);
                 } else {
-                    pickupObject.sprite.draw(batch);
-                    order.setDroppedOff(false);
-                    order.setPickedUp(false);
-                }
-            } else {
-                if (timeCount % 40 == 0) {
-                    time -= 1;
-                    orderTimeLeft = time;
-                }
-                timeCount++;
-                if (!twoName) {
-                    s[4] = String.valueOf(time);
-                } else {
-                    s[5] = String.valueOf(time);
-                }
+                    if (timeCount[i - 1] % 40 == 0) {
+                        time -= 1;
+                        orderTimeLeft[i - 1] = time;
+                    }
+                    timeCount[i - 1]++;
 
-                StringBuilder sb = new StringBuilder();
-                for (String thing : s) {
-                    sb.append(thing);
-                    sb.append(" ");
+                    if (!twoName) {
+                        s[4] = String.valueOf(time);
+                    } else {
+                        s[5] = String.valueOf(time);
+                    }
+
+                    StringBuilder sb = new StringBuilder();
+                    for (String thing : s) {
+                        sb.append(thing);
+                        sb.append(" ");
+                    }
+                    playerAttributes.array.set(i, sb.toString());
                 }
-                playerAttributes.array.set(1, sb.toString());
             }
         }
 
@@ -424,24 +461,6 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             if (!order.isPickedUp()) {
                 pickupObject.sprite.draw(batch);
                 if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getPickupBounds())) {
-//                    pickupLabel.setPosition(pickupObject.sprite.getX(), pickupObject.sprite.getY());
-//                    pickupLabel.setPosition(0, 0);
-//                    if ((order.getPickupBounds().getX() - pickupLabel.getWidth()) < -levelWidth) {
-//                        System.out.println("die");
-//                        pickupLabel.setX(-levelWidth + pickupLabel.getWidth());
-//                    }
-//                    if ((order.getPickupBounds().getX() + pickupLabel.getWidth()) > levelWidth) {
-//                        System.out.println("a");
-//                        pickupLabel.setX(levelWidth - pickupLabel.getWidth());
-//                    }
-//                    if ((order.getPickupBounds().getY() + pickupLabel.getHeight()) > levelHeight) {
-//                        System.out.println("eh");
-//                        pickupLabel.setY(levelHeight - pickupLabel.getHeight());
-//                    }
-//                    if ((order.getPickupBounds().getY() - pickupLabel.getHeight()) < -levelHeight) {
-//                        System.out.println("yes");
-//                        pickupLabel.setY(-levelHeight + pickupLabel.getHeight());
-//                    }
                     pickupLabel.setVisible(true);
                     if (keyProcessor.pPressed) {
                         order.setPickedUp(true);
@@ -486,25 +505,76 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         String[] items = playerAttributes.array.toArray(new String[0]);
 
+        font.setColor(Color.WHITE);
         font.draw(batch, "Order List:", sidePanelX + 10, sidePanelY + sidePanelHeight - 10);
 
         for (int i = 1; i < items.length; i++) {
-            if (i == 1 && orderTimeLeft <= 5 && orderTimeLeft > 0) {
-                if (order.isPickedUp()) {
+            if (orderTimeLeft[i - 1] <= 5 && orderTimeLeft[i - 1] > 0) {
+                //if (order.isPickedUp()) {
                     font.setColor(Color.RED);
-                }
+               // }
             } else {
                 font.setColor(Color.WHITE);
             }
             font.draw(batch, items[i], sidePanelX + 10, sidePanelY + sidePanelHeight - 70 * i);
 
         }
-
         stage.draw();
         popup.render();
+        //popup.draw();
 
         batch.end();
     }
+
+    // Trigger the timed popup to show
+    public void showTimedPopup() {
+        //popup.setPosition(Gdx.graphics.getWidth() - 300, 0);
+        popup.show(); // Display the popup
+        try {
+            order.setArray(orderArray);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        order.seti(count);
+        count++;
+        popup.setMessage(order.arrayToString());
+        popup.acceptClicked = false;
+        popup.declineClicked = false;
+    }
+
+    public void hideTimedPopup() {
+        popup.hide(); // Display the popup
+    }
+
+    // Schedule the popup to display every 1 minute
+    private void schedulePopupDisplay() {
+        final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+        scheduler.scheduleAtFixedRate(new Runnable() {
+            @Override
+            public void run() {
+                showTimedPopup(); // Show the popup
+                scheduler.schedule(new Runnable() {
+                    @Override
+                    public void run() {
+                        // Hide the popup
+                        hideTimedPopup();
+                        System.out.println("accepted?"+popup.acceptClicked());
+                        System.out.println("declined?"+popup.declineClicked());
+                        if (!popup.acceptClicked() && !popup.declineClicked()) {
+                            autoDeclineLabel.setVisible(true);
+                            scheduler.schedule(new Runnable() {
+                                @Override
+                                public void run() {
+                                    autoDeclineLabel.setVisible(false); // Remove the label from the display
+                                }
+                            }, 4, TimeUnit.SECONDS);
+                        }
+                    }
+                }, 10, TimeUnit.SECONDS); // Schedule to hide the popup after 10 seconds
+            }
+        }, 0, 15, TimeUnit.SECONDS); // Schedule the next popup 15 seconds after the first one
+    }
+
 
     @Override
     public void resize(int width, int height) {
@@ -526,6 +596,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     @Override
     public void dispose() {
         batch.dispose();
+        //incomingOrder.dispose();
         multiplexer.removeProcessor(stage);
     }
 

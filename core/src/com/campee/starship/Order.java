@@ -74,13 +74,12 @@ public class Order {
 
     public void setArray(ArrayList<String> array) throws FileNotFoundException {
         Scanner scanner = new Scanner(new File("Level1Orders.txt"));
-        System.out.println("here");
         while (scanner.hasNext()) {
             String line = scanner.nextLine();
             array.add(line);
             //String[] words = line.split("\\|");
         }
-        Collections.shuffle(array);
+
 
 
 
