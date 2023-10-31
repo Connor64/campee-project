@@ -21,14 +21,14 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 public class Popup extends HorizontalGroup {
     private Stage stage;
-    private float duration; // Duration of the popup in seconds
-    private float timeElapsed; // Time elapsed since the popup was shown
+    //private float duration; // Duration of the popup in seconds
+    //private float timeElapsed; // Time elapsed since the popup was shown
     public boolean visible;
     private ShapeRenderer shapeRenderer;
     private BitmapFont font;
     private Label messageLabel;
-    private boolean acceptClicked;
-    private boolean declineClicked;
+    boolean acceptClicked;
+    boolean declineClicked;
     private boolean isAcceptButtonHovered = false;
     private boolean isDeclineButtonHovered = false;
     float popupWidth;
@@ -36,10 +36,10 @@ public class Popup extends HorizontalGroup {
     float popupX;
     float popupY;
 
-    public Popup(final GameplayScreen screen, final String notificationMessage, float duration) {
+    public Popup(final GameplayScreen screen, final String notificationMessage) {
         stage = new Stage();
-        this.duration = duration;
-        timeElapsed = 0;
+        //this.duration = duration;
+        //timeElapsed = 0;
 
         shapeRenderer = new ShapeRenderer();
         visible = false;
@@ -80,16 +80,6 @@ public class Popup extends HorizontalGroup {
         declineButton.setWidth(75);
         declineButton.setHeight(25);
 
-//        space(80); // Add horizontal spacing
-//
-//        // Add components to the horizontal group
-//        addActor(acceptButton);
-//        space(80); // Add horizontal spacing
-//
-//        addActor(declineButton);
-//        add(acceptButton).pad(10);
-//        add(declineButton).pad(50);
-
 
         // Set button positions
         acceptButton.setPosition(620, popupY);
@@ -102,8 +92,6 @@ public class Popup extends HorizontalGroup {
                 acceptClicked = true;
                 screen.playerAttributes.orderInProgress = true;
                 screen.playerAttributes.array.add(screen.order.arrayToString());
-
-
 
                 visible = false;
             }
@@ -158,18 +146,18 @@ public class Popup extends HorizontalGroup {
 
     public void show() {
         visible = true;
-        timeElapsed = 0;
-        stage.act();
+        //timeElapsed = 0;
+        //stage.act();
     }
 
-    public void update(float delta) {
-        if (visible) {
-            timeElapsed += delta;
-            if (timeElapsed >= duration) {
-                hide();
-            }
-        }
-    }
+//    public void update(float delta) {
+//        if (visible) {
+//            timeElapsed += delta;
+//            if (timeElapsed >= duration) {
+//                hide();
+//            }
+//        }
+//    }
 
     public void hide() {
         visible = false;
@@ -208,21 +196,19 @@ public class Popup extends HorizontalGroup {
             popupY = 0; // Position the popup at the bottom
             shapeRenderer.rect(popupX, popupY, popupWidth, popupHeight); // Define the popup area
             shapeRenderer.end();
+            //Gdx.gl.glDisable(GL20.GL_BLEND);
 
-
-
-            //add(shapeRenderer.).expandX().pad(10);
 
             stage.act();
             stage.draw();
         }
     }
 
-    public void draw() {
-        if (visible) {
-            stage.draw();
-        }
-    }
+//    public void draw() {
+//        if (visible) {
+//            stage.draw();
+//        }
+//    }
 
     public Pixmap createRoundedRectanglePixmap(int width, int height, int cornerRadius, Color color) {
         Pixmap pixmap = new Pixmap(width, height, Pixmap.Format.RGBA8888);
@@ -240,7 +226,7 @@ public class Popup extends HorizontalGroup {
     }
 
 
-    public void dispose() {
-        stage.dispose();
-    }
+//    public void dispose() {
+//        stage.dispose();
+//    }
 }

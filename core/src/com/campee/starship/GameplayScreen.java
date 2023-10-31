@@ -162,7 +162,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         order = new Order(stage, game, orderA[0], orderA[1], orderA[2], time, orderArray);
         order.setDroppedOff(false);
         order.setPickedUp(false);
-        popup = new Popup(this, order.arrayToString(), 15.0f);
+        popup = new Popup(this, order.arrayToString());
         order.setPickupBounds(-levelWidth + 50, -levelHeight + 50, 16, 16);
         order.setDropoffBounds(levelWidth - 100, levelHeight - 100, 16, 16);
 
@@ -266,19 +266,21 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         // pickup label
         pickupLabel = new Label("Press P to pickup!", indicatorStyle);
+        //pickupLabel.setPosition(Gdx.graphics.getWidth() - pickupLabel.getWidth() - 550, 10);
         pickupLabel.setVisible(false);
         stage.addActor(pickupLabel);
         pickupLabel.setSize(font.getScaleX() * 16, font.getScaleY() * 16);
 
         // dropoff label
         dropoffLabel = new Label("Press O to dropoff!", indicatorStyle);
+        //dropoffLabel.setPosition(Gdx.graphics.getWidth() - dropoffLabel.getWidth() - 550, 10);
         dropoffLabel.setVisible(false);
         stage.addActor(dropoffLabel);
         dropoffLabel.setSize(font.getScaleX() * 16, font.getScaleY() * 16);
 
         //auto decline after order timeout label
         autoDeclineLabel = new Label("Order Timeout! Declined.", indicatorStyle);
-        //autoDeclineLabel.setPosition(Gdx.graphics.getWidth() / 2 - autoDeclineLabel.getWidth() / 2, Gdx.graphics.getHeight() - autoDeclineLabel.getHeight());
+        autoDeclineLabel.setPosition(Gdx.graphics.getWidth() - autoDeclineLabel.getWidth(), 10);
         autoDeclineLabel.setVisible(false);
         stage.addActor(autoDeclineLabel);
         autoDeclineLabel.setSize(font.getScaleX() * 16, font.getScaleY() * 16);
@@ -338,7 +340,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 //            }
        // }
         batch.setProjectionMatrix(camera.combined);
-        popup.update(delta);
+        //popup.update(delta);
 
         stage.act(delta);
 
@@ -382,6 +384,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                         if (!order.isDroppedOff()) {
                             order.setDroppedOff(true);
                             dropoffLabel.setVisible(false);
+                            pickupLabel.setVisible(false);
                             order.setPickedUp(false);
                         }
                         if (playerAttributes.array.size() <= 1) {
@@ -390,6 +393,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                             dropoffLabel.setVisible(false);
                             pickupLabel.setVisible(false);
                         } else {
+                            //System.out.println("hehe i am here");
                             pickupObject.sprite.draw(batch);
                             order.setDroppedOff(false);
                             order.setPickedUp(false);
@@ -499,6 +503,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         order.seti(count);
         count++;
         popup.setMessage(order.arrayToString());
+        popup.acceptClicked = false;
+        popup.declineClicked = false;
     }
 
     public void hideTimedPopup() {
@@ -517,6 +523,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                     public void run() {
                         // Hide the popup
                         hideTimedPopup();
+                        System.out.println("accepted?"+popup.acceptClicked());
+                        System.out.println("declined?"+popup.declineClicked());
                         if (!popup.acceptClicked() && !popup.declineClicked()) {
                             autoDeclineLabel.setVisible(true);
                             scheduler.schedule(new Runnable() {
@@ -524,12 +532,12 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                                 public void run() {
                                     autoDeclineLabel.setVisible(false); // Remove the label from the display
                                 }
-                            }, 10, TimeUnit.SECONDS);
+                            }, 4, TimeUnit.SECONDS);
                         }
                     }
-                }, 15, TimeUnit.SECONDS); // Schedule to hide the popup after 15 seconds
+                }, 10, TimeUnit.SECONDS); // Schedule to hide the popup after 10 seconds
             }
-        }, 0, 30, TimeUnit.SECONDS); // Schedule the next popup 30 seconds after the first one
+        }, 0, 15, TimeUnit.SECONDS); // Schedule the next popup 15 seconds after the first one
     }
 
 
