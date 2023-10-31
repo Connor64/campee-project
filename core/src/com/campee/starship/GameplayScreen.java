@@ -50,6 +50,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
     private final Popup popup;
     private Coin coin;
+    private BuildingObject[] buildings;
     public int coinCounter;
     public Coin[] coins;
 
@@ -153,6 +154,32 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             int y = (int) ((Math.random() * (levelHeight - (-levelHeight))) + (-levelHeight));
             coins[i] = new Coin(world, x, y);
             coins[i].getSprite().setPosition(x, y);
+        }
+
+        // making multiple buildings
+        // TODO: change so its not a random location
+        buildings = new BuildingObject[3];
+        String spriteList[] = new String[3];
+        spriteList[0] = "pmu.PNG";
+        spriteList[1] = "haas.PNG";
+        spriteList[2] = "msee.PNG";
+        for (int i = 0; i < buildings.length; i++) {
+            int x = (int) ((Math.random() * (levelWidth - (-levelWidth))) + (-levelWidth));
+            int y = (int) ((Math.random() * (levelHeight - (-levelHeight))) + (-levelHeight));
+            // most convoluted thing ever need to change
+            if (x < 0) {
+                x = x + 128;
+            } else {
+                x = x - 128;
+            }
+            if (y < 0) {
+                y = y + 128;
+            } else {
+                y = y - 128;
+            }
+            buildings[i] = new BuildingObject(world, x, y);
+            buildings[i].setSprite(spriteList[i]);
+            buildings[i].sprite.setPosition(x, y);
         }
 
         visibleQ = new ArrayList<>();
@@ -379,27 +406,43 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             }
         }
 
-//        Rectangle rockBounds = rock.sprite.getBoundingRectangle();
-//        float rockBottom = rock.sprite.getY();
-        Rectangle agg = new Rectangle(rock.sprite.getX(), rock.sprite.getY(), rock.sprite.getWidth(), rock.sprite.getHeight() / 2);
-//        if ((player.getSprite().getX() >= rock.sprite.getX() - rock.sprite.getWidth()) && (player.getSprite().getX()) <= (rock.sprite.getX())) {
-////        if ((player.body.getPosition().x >= rockBounds.getX()) && ((player.body.getPosition().x) <= (rockBounds.getX() + rockBounds.getWidth()))) {
-//            // if the player is within the width of the rock
-//            if ((player.body.getPosition().y + player.getSprite().getHeight() >= rockBottom) && (player.body.getPosition().y <= rockBottom + 8 )) {
-//                // if the player is trying to intersect from the bottom, bounce
+        for (BuildingObject building : buildings) {
+            building.render(batch, (int) building.sprite.getX(), (int) building.sprite.getY());
+//            Rectangle bounds = new Rectangle(building.sprite.getX(), building.sprite.getY(),
+//                    building.sprite.getWidth(), building.sprite.getHeight() / 2);
+            if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), building.getBounds())) {
 //                player.body.setLinearVelocity(player.body.getLinearVelocity().x, player.body.getLinearVelocity().y * -1);
-//            }
-//        }
-        // rock transparency and collisions (testing for buildings)
-        if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), agg)) {
-            player.body.setLinearVelocity(player.body.getLinearVelocity().x, player.body.getLinearVelocity().y * -1);
-            if ((player.getSprite().getX() >= (agg.getX() - agg.getWidth()) && player.getSprite().getX() <= agg.getX())) {
-                player.body.setLinearVelocity(player.body.getLinearVelocity().x * -1, player.body.getLinearVelocity().y);
+//                if ((player.getSprite().getX() >= (bounds.getX() - bounds.getWidth()) && player.getSprite().getX() <= bounds.getX())) {
+//                    player.body.setLinearVelocity(player.body.getLinearVelocity().x * -1, player.body.getLinearVelocity().y);
+//                }
+                building.setTransparent(true);
+            } else {
+                building.setTransparent(false);
             }
-            rock.sprite.setAlpha(0.4f);
-        } else {
-            rock.sprite.setAlpha(1);
         }
+
+
+//        Rectangle rockBounds = rock.sprite.getBoundingRectangle();
+////        float rockBottom = rock.sprite.getY();
+//        Rectangle agg = new Rectangle(rock.sprite.getX(), rock.sprite.getY(), rock.sprite.getWidth(), rock.sprite.getHeight() / 2);
+////        if ((player.getSprite().getX() >= rock.sprite.getX() - rock.sprite.getWidth()) && (player.getSprite().getX()) <= (rock.sprite.getX())) {
+//////        if ((player.body.getPosition().x >= rockBounds.getX()) && ((player.body.getPosition().x) <= (rockBounds.getX() + rockBounds.getWidth()))) {
+////            // if the player is within the width of the rock
+////            if ((player.body.getPosition().y + player.getSprite().getHeight() >= rockBottom) && (player.body.getPosition().y <= rockBottom + 8 )) {
+////                // if the player is trying to intersect from the bottom, bounce
+////                player.body.setLinearVelocity(player.body.getLinearVelocity().x, player.body.getLinearVelocity().y * -1);
+////            }
+////        }
+//        // rock transparency and collisions (testing for buildings)
+//        if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), agg)) {
+//            player.body.setLinearVelocity(player.body.getLinearVelocity().x, player.body.getLinearVelocity().y * -1);
+//            if ((player.getSprite().getX() >= (agg.getX() - agg.getWidth()) && player.getSprite().getX() <= agg.getX())) {
+//                player.body.setLinearVelocity(player.body.getLinearVelocity().x * -1, player.body.getLinearVelocity().y);
+//            }
+//            rock.sprite.setAlpha(0.4f);
+//        } else {
+//            rock.sprite.setAlpha(1);
+//        }
 
 
         if (playerAttributes.orderInProgress) {

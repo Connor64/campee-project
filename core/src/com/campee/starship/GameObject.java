@@ -55,15 +55,9 @@ public class GameObject {
         bounds.set(x, y, width, height);
     }
 
-//    public float getX() {
-//        float x = this.getX();
-//        return x;
-//    }
-//
-//    public float getY() {
-//        float y = this.getY();
-//        return y;
-//    }
+    public Sprite getSprite() {
+        return this.sprite;
+    }
 
     public float setHeight(float h) {
         height = h;
