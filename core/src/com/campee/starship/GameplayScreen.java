@@ -43,6 +43,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     private World world;
     private int levelWidth;
     private int levelHeight;
+    public int minOrders;
+    public float goalTime;
 
     private Player player;
     public PlayerAttributes playerAttributes;
@@ -118,6 +120,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         // TODO: Add serializable field to level data for the tilesize
         levelWidth = (levelData.width / 2) * 16;
         levelHeight = (levelData.height / 2) * 16;
+        minOrders = 5/*levelData.minOrders*/;
+        goalTime = 300/*levelData.goalTime*/;
 
         stage = new Stage();
         keyProcessor = new KeyProcessor();
@@ -286,11 +290,13 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         labelStyle.font = skin.getFont("default-font");
         skin.add("default", labelStyle);
 
-        minOrderLabel = new Label("Orders Completed", labelStyle);
+        minOrderLabel = new Label("Orders Completed: "+playerAttributes.ordersCompleted+"/"+minOrders, indicatorStyle);
         minOrderLabel.setSize(font.getScaleX() * 16, font.getScaleY() * 16);
-        minOrderLabel.setPosition(Gdx.graphics.getWidth() / 2 - minOrderLabel.getWidth() / 2, Gdx.graphics.getHeight() - minOrderLabel.getHeight());
-        //minOrderLabel.setPosition(Gdx.graphics.getWidth()/2,Gdx.graphics.getHeight());
+        //minOrderLabel.setPosition(Gdx.graphics.getWidth() / 2 - minOrderLabel.getWidth() / 2, Gdx.graphics.getHeight() - minOrderLabel.getHeight());
+        minOrderLabel.setPosition(Gdx.graphics.getWidth()/2- 120,Gdx.graphics.getHeight() - minOrderLabel.getHeight()-17);
         minOrderLabel.setVisible(true);
+        stage.addActor(minOrderLabel);
+        //minOrderLabel.setText("Orders Completed: "+playerAttributes.ordersCompleted+"/"+minOrders);
 
         //auto decline after order timeout label
         autoDeclineLabel = new Label("Order Timeout! Declined.", indicatorStyle);
@@ -461,6 +467,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                     if (keyProcessor.oPressed) {
                         order.setPickedUp(false);
                         order.setDroppedOff(true);
+                        playerAttributes.ordersCompleted++;
+                        minOrderLabel.setText("Orders Completed: "+playerAttributes.ordersCompleted+"/"+minOrders);
                         playerAttributes.array.remove(1);
                         if (playerAttributes.array.size() <= 1) {
                             playerAttributes.orderInProgress = false;
@@ -471,6 +479,10 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                     dropoffLabel.setVisible(false);
                 }
             }
+        }
+        if (playerAttributes.ordersCompleted == minOrders){
+            //pause game
+            System.out.println("Goal completed!");
         }
 
         batch.end();
@@ -491,6 +503,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         font.setColor(Color.WHITE);
         font.draw(batch, "Order List:", sidePanelX + 10, sidePanelY + sidePanelHeight - 10);
+        //System.out.println("orders completed:"+playerAttributes.getOrdersCompleted());
 
         for (int i = 1; i < items.length; i++) {
             if (orderTimeLeft[i - 1] <= 5 && orderTimeLeft[i - 1] > 0) {
@@ -542,8 +555,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                     public void run() {
                         // Hide the popup
                         hideTimedPopup();
-                        System.out.println("accepted?"+popup.acceptClicked());
-                        System.out.println("declined?"+popup.declineClicked());
+                        //System.out.println("accepted?"+popup.acceptClicked());
+                        //System.out.println("declined?"+popup.declineClicked());
                         if (!popup.acceptClicked() && !popup.declineClicked()) {
                             autoDeclineLabel.setVisible(true);
                             scheduler.schedule(new Runnable() {
