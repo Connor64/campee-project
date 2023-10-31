@@ -19,7 +19,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
-public class Popup extends HorizontalGroup {
+public class Popup {
     private Stage stage;
     //private float duration; // Duration of the popup in seconds
     //private float timeElapsed; // Time elapsed since the popup was shown
@@ -27,8 +27,8 @@ public class Popup extends HorizontalGroup {
     private ShapeRenderer shapeRenderer;
     private BitmapFont font;
     private Label messageLabel;
-    boolean acceptClicked;
-    boolean declineClicked;
+    public boolean acceptClicked;
+    public boolean declineClicked;
     private boolean isAcceptButtonHovered = false;
     private boolean isDeclineButtonHovered = false;
     float popupWidth;
