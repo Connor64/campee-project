@@ -158,7 +158,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         // making multiple buildings
         // TODO: change so its not a random location
-        buildings = new BuildingObject[3];
+        buildings = new BuildingObject[1];
         String spriteList[] = new String[3];
         spriteList[0] = "pmu.PNG";
         spriteList[1] = "haas.PNG";
@@ -408,9 +408,29 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         for (BuildingObject building : buildings) {
             building.render(batch, (int) building.sprite.getX(), (int) building.sprite.getY());
-//            Rectangle bounds = new Rectangle(building.sprite.getX(), building.sprite.getY(),
-//                    building.sprite.getWidth(), building.sprite.getHeight() / 2);
-            if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), building.getBounds())) {
+            Rectangle bounds = building.getBounds();
+            bounds.setHeight(bounds.getHeight() / 2);
+            if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), bounds)) {
+                float playerTop = player.body.getPosition().y + player.sprite.getHeight();
+                float buildingBottom = building.getBounds().y;
+//                if (playerBottom + player.body.getLinearVelocity().y < buildingTop && playerBottom > buildingTop) {
+//                    // Bounce off only if the player is moving downward
+////                    if (player.body.getLinearVelocity().y < 0) {
+//                        // Reverse the player's vertical velocity
+//                        player.body.setLinearVelocity(player.body.getLinearVelocity().x, player.body.getLinearVelocity().y * -1);
+////                    }
+//                    }
+
+                int bounceThreshold = 0;
+                if (buildingBottom < 0) {
+                    bounceThreshold = 8;
+                } else {
+                    bounceThreshold = -8;
+                }
+                if ((playerTop > buildingBottom) && (playerTop < (buildingBottom + bounceThreshold))) {
+                    System.out.println("yes");
+                    player.body.setLinearVelocity(player.body.getLinearVelocity().x, player.body.getLinearVelocity().y * -1);
+                }
 //                player.body.setLinearVelocity(player.body.getLinearVelocity().x, player.body.getLinearVelocity().y * -1);
 //                if ((player.getSprite().getX() >= (bounds.getX() - bounds.getWidth()) && player.getSprite().getX() <= bounds.getX())) {
 //                    player.body.setLinearVelocity(player.body.getLinearVelocity().x * -1, player.body.getLinearVelocity().y);
