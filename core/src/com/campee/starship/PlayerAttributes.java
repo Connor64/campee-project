@@ -11,14 +11,16 @@ public class PlayerAttributes {
     public boolean orderInProgress;
     public int highScore;
     public int score;
+    public int ordersCompleted;
     public Queue<String> orderQueue;
     public ArrayList<String> array;
 
 
-    public PlayerAttributes(boolean orderInProgress, int highScore, int score, Queue<String> orderQueue, ArrayList<String> array) {
+    public PlayerAttributes(boolean orderInProgress, int ordersCompleted, int highScore, int score, Queue<String> orderQueue, ArrayList<String> array) {
         this.orderInProgress = orderInProgress;
         this.highScore = highScore;
         this.score = score;
+        this.ordersCompleted = ordersCompleted;
         this.orderQueue = orderQueue;
         this.array = array;
     }
@@ -29,6 +31,7 @@ public class PlayerAttributes {
         this.orderInProgress = false;
         this.highScore = 0;
         this.score = 0;
+        this.ordersCompleted = 0;
         this.orderQueue = null;
         this.array = new ArrayList<>();
         //array.add("Queue");
@@ -67,6 +70,10 @@ public class PlayerAttributes {
 
     public void setScore(int score) {
         this.score = score;
+    }
+
+    public int getOrdersCompleted() {
+        return ordersCompleted;
     }
 
     public Queue<String> getOrderQueue() {

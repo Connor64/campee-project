@@ -43,6 +43,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     private World world;
     private int levelWidth;
     private int levelHeight;
+    public int minOrders;
+    public float goalTime;
 
     private Player player;
     public PlayerAttributes playerAttributes;
@@ -58,6 +60,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     public Label warningLabel;
     public Label pickupLabel;
     public Label dropoffLabel;
+    public Label minOrderLabel;
     public Label autoDeclineLabel;
 
     private Timer timer;
@@ -117,6 +120,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         // TODO: Add serializable field to level data for the tilesize
         levelWidth = (levelData.width / 2) * 16;
         levelHeight = (levelData.height / 2) * 16;
+        minOrders = 2/*levelData.minOrders*/;
+        goalTime = 300/*levelData.goalTime*/;
 
         stage = new Stage();
         keyProcessor = new KeyProcessor();
@@ -278,6 +283,15 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         stage.addActor(dropoffLabel);
         dropoffLabel.setSize(font.getScaleX() * 16, font.getScaleY() * 16);
 
+        // min orders label
+        minOrderLabel = new Label("Orders Completed: "+playerAttributes.ordersCompleted+"/"+minOrders, indicatorStyle);
+        minOrderLabel.setSize(font.getScaleX() * 16, font.getScaleY() * 16);
+        //minOrderLabel.setPosition(Gdx.graphics.getWidth() / 2 - minOrderLabel.getWidth() / 2, Gdx.graphics.getHeight() - minOrderLabel.getHeight());
+        minOrderLabel.setPosition(Gdx.graphics.getWidth()/2- 120,Gdx.graphics.getHeight() - minOrderLabel.getHeight()-17);
+        minOrderLabel.setVisible(true);
+        stage.addActor(minOrderLabel);
+        //minOrderLabel.setText("Orders Completed: "+playerAttributes.ordersCompleted+"/"+minOrders);
+
         //auto decline after order timeout label
         autoDeclineLabel = new Label("Order Timeout! Declined.", indicatorStyle);
         autoDeclineLabel.setPosition(Gdx.graphics.getWidth() - autoDeclineLabel.getWidth(), 10);
@@ -307,8 +321,13 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
        // System.out.println(player.body.getPosition());
         /* ========================== UPDATE ============================ */
 
+        //minOrderLabel.setVisible(true);
+
         // If the popup is not visible, update the player and world
         //if (!popup.isVisible()) {
+
+        //If game stats screen is not visible, keep the game going (else pause)
+        //if (!gameStatsScreen.isVisible()) {
             player.update(delta, keyProcessor);
             player.checkBounds(levelWidth, levelHeight);
             world.step(1/60f, 6, 2); // Physics calculations
@@ -339,6 +358,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                 }
 //            }
        // }
+
         batch.setProjectionMatrix(camera.combined);
         //popup.update(delta);
 
@@ -350,6 +370,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         /* ===== Draw game objects ===== */
         batch.begin();
+
+        //minOrderLabel.setVisible(true);
 
         for (Sprite sprite : tileSprites) {
             sprite.draw(batch);
@@ -442,6 +464,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                     if (keyProcessor.oPressed) {
                         order.setPickedUp(false);
                         order.setDroppedOff(true);
+                        playerAttributes.ordersCompleted++;
+                        minOrderLabel.setText("Orders Completed: "+playerAttributes.ordersCompleted+"/"+minOrders);
                         playerAttributes.array.remove(1);
                         if (playerAttributes.array.size() <= 1) {
                             playerAttributes.orderInProgress = false;
@@ -453,6 +477,11 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                 }
             }
         }
+
+//        if (playerAttributes.ordersCompleted == minOrders){
+//            //show game stats screen, pause game as part of this (if condition above)
+//            System.out.println("Level completed!");
+//        }
 
         batch.end();
 
@@ -472,6 +501,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         font.setColor(Color.WHITE);
         font.draw(batch, "Order List:", sidePanelX + 10, sidePanelY + sidePanelHeight - 10);
+        //System.out.println("orders completed:"+playerAttributes.getOrdersCompleted());
 
         for (int i = 1; i < items.length; i++) {
             if (orderTimeLeft[i - 1] <= 5 && orderTimeLeft[i - 1] > 0) {
@@ -523,8 +553,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                     public void run() {
                         // Hide the popup
                         hideTimedPopup();
-                        System.out.println("accepted?"+popup.acceptClicked());
-                        System.out.println("declined?"+popup.declineClicked());
+                        //System.out.println("accepted?"+popup.acceptClicked());
+                        //System.out.println("declined?"+popup.declineClicked());
                         if (!popup.acceptClicked() && !popup.declineClicked()) {
                             autoDeclineLabel.setVisible(true);
                             scheduler.schedule(new Runnable() {
