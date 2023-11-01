@@ -17,6 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
@@ -30,6 +31,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class GameplayScreen extends ApplicationAdapter implements Screen {
 
@@ -39,6 +43,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     private World world;
     private int levelWidth;
     private int levelHeight;
+    public int minOrders;
+    public float goalTime;
 
     private Player player;
     public PlayerAttributes playerAttributes;
@@ -46,7 +52,9 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
     private final Popup popup;
     private Coin coin;
+    private BuildingObject[] buildings;
     public int coinCounter;
+    public Coin[] coins;
 
     private GameObject log;
     private GameObject rock;
@@ -54,11 +62,18 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     public Label warningLabel;
     public Label pickupLabel;
     public Label dropoffLabel;
+    public Label minOrderLabel;
+    public Label autoDeclineLabel;
+    public Label orderTimeoutLabel;
 
     private Timer timer;
     private TimerTask timerTask;
     private int[] timeCount;
     private int[] orderTimeLeft;
+    float messageTimer = 0.0f;
+    final float MESSAGE_DURATION = 3.0f;
+
+    //private TimedPopup incomingOrder;
 
     public GameObject pickupObject;
     public GameObject dropoffObject;
@@ -93,7 +108,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     private String[] orderA;
     private ArrayList<Sprite> tileSprites;
 
-    public GameplayScreen(final MoonshipGame game) throws IOException, ClassNotFoundException {
+    public GameplayScreen(final MoonshipGame game, String fileName) throws IOException, ClassNotFoundException {
         this.GAME = game;
         batch = game.batch;
 
@@ -102,12 +117,17 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         Arrays.fill(timeCount, 0);
         Arrays.fill(orderTimeLeft, 6);
 
+
         tileSprites = new ArrayList<>();
-        LevelData levelData = loadLevel();
+        LevelData levelData = loadLevel(fileName);
+
+
 
         // TODO: Add serializable field to level data for the tilesize
         levelWidth = (levelData.width / 2) * 16;
         levelHeight = (levelData.height / 2) * 16;
+        minOrders = 2/*levelData.minOrders*/;
+        goalTime = 300/*levelData.goalTime*/;
 
         stage = new Stage();
         keyProcessor = new KeyProcessor();
@@ -130,12 +150,49 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         // Define side panel properties
         sidePanelWidth = Gdx.graphics.getWidth() / 5; // Width
         sidePanelX = Gdx.graphics.getWidth() - sidePanelWidth; // Position the panel on the right side
-        sidePanelY = 60; // Y position
-        sidePanelHeight = Gdx.graphics.getHeight() - 150; // Height
+        sidePanelY = 100; // Y position
+        sidePanelHeight = Gdx.graphics.getHeight() - 110; // Height
         sidePanelColor = new Color(0.2f, 0.2f, 0.2f, 0.5f); // Background color (RGBA)
 
         coin = new Coin(world, 0, 0);
         coinCounter = 0;
+        // making a coin array
+        coins = new Coin[5];
+        for (int i = 0; i < coins.length; i++) {
+            int x = (int) ((Math.random() * (levelWidth - (-levelWidth))) + (-levelWidth));
+            int y = (int) ((Math.random() * (levelHeight - (-levelHeight))) + (-levelHeight));
+            coins[i] = new Coin(world, x, y);
+            coins[i].getSprite().setPosition(x, y);
+        }
+
+        // making multiple buildings
+        // TODO: change so its not a random location
+        buildings = new BuildingObject[3];
+        String spriteList[] = new String[3];
+        spriteList[0] = "PMU.PNG";
+        spriteList[1] = "HAAS.PNG";
+        spriteList[2] = "MSEE.PNG";
+        for (int i = 0; i < buildings.length; i++) {
+            int x = (int) ((Math.random() * (levelWidth - (-levelWidth))) + (-levelWidth));
+            int y = (int) ((Math.random() * (levelHeight - (-levelHeight))) + (-levelHeight));
+            // most convoluted thing ever need to change
+            if (x < 0) {
+                x = x + 128;
+            } else {
+                x = x - 128;
+            }
+            if (y < 0) {
+                y = y + 128;
+            } else {
+                y = y - 128;
+            }
+            buildings[i] = new BuildingObject(world, x, y);
+            buildings[i].setSprite(spriteList[i]);
+            String sprite = spriteList[i];
+            buildings[i].setName(sprite.substring(0, (sprite.length() - 4)));
+            System.out.println(buildings[i].getName());
+            buildings[i].sprite.setPosition(x, y);
+        }
 
         visibleQ = new ArrayList<>();
         playerAttributes.setArray(visibleQ);
@@ -144,7 +201,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         order = new Order();
         orderArray = new ArrayList<>();
         order.setArray(orderArray);
-        System.out.println(orderArray);
+        Collections.shuffle(orderArray);
+        //System.out.println(orderArray);
         orderA = order.arrayToArray();
         order.seti(order.i++);
         int time = Integer.parseInt(orderA[3]);
@@ -234,11 +292,13 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         });
 
         stage.addActor(backButton);
-        stage.addActor(nextOrderButton);
+        //stage.addActor(nextOrderButton);
 
         multiplexer = new InputMultiplexer();
         multiplexer.addProcessor(stage);
         multiplexer.addProcessor(keyProcessor);
+        multiplexer.addProcessor(popup.getStage());
+
 
         Gdx.input.setInputProcessor(multiplexer);
 
@@ -247,6 +307,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         font.setColor(0, 0, 0, 1);
         font.getData().setScale(0.5f, 0.5f);
         Label.LabelStyle indicatorStyle = new Label.LabelStyle(font, Color.BLACK);
+        Label.LabelStyle warningStyle = new Label.LabelStyle(font, Color.MAROON);
         warningLabel = new Label("Careful!", indicatorStyle);
         warningLabel.setVisible(false);
         stage.addActor(warningLabel);
@@ -254,15 +315,43 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         // pickup label
         pickupLabel = new Label("Press P to pickup!", indicatorStyle);
+        //pickupLabel.setPosition(Gdx.graphics.getWidth() - pickupLabel.getWidth() - 550, 10);
         pickupLabel.setVisible(false);
         stage.addActor(pickupLabel);
         pickupLabel.setSize(font.getScaleX() * 16, font.getScaleY() * 16);
 
         // dropoff label
         dropoffLabel = new Label("Press O to dropoff!", indicatorStyle);
+        //dropoffLabel.setPosition(Gdx.graphics.getWidth() - dropoffLabel.getWidth() - 550, 10);
         dropoffLabel.setVisible(false);
         stage.addActor(dropoffLabel);
         dropoffLabel.setSize(font.getScaleX() * 16, font.getScaleY() * 16);
+
+        // min orders label
+        minOrderLabel = new Label("Orders Completed: "+playerAttributes.ordersCompleted+"/"+minOrders, indicatorStyle);
+        minOrderLabel.setSize(font.getScaleX() * 16, font.getScaleY() * 16);
+        //minOrderLabel.setPosition(Gdx.graphics.getWidth() / 2 - minOrderLabel.getWidth() / 2, Gdx.graphics.getHeight() - minOrderLabel.getHeight());
+        minOrderLabel.setPosition(Gdx.graphics.getWidth()/2- 120,Gdx.graphics.getHeight() - minOrderLabel.getHeight()-17);
+        minOrderLabel.setVisible(true);
+        stage.addActor(minOrderLabel);
+        //minOrderLabel.setText("Orders Completed: "+playerAttributes.ordersCompleted+"/"+minOrders);
+
+        orderTimeoutLabel = new Label("Time ran out. Begin next delivery!", warningStyle);
+        orderTimeoutLabel.setPosition(Gdx.graphics.getWidth()/2- 180,Gdx.graphics.getHeight() - minOrderLabel.getHeight()-45);
+        orderTimeoutLabel.setVisible(false);
+        stage.addActor(orderTimeoutLabel);
+        orderTimeoutLabel.setSize(font.getScaleX() * 16, font.getScaleY() * 16);
+
+
+        //auto decline after order timeout label
+        autoDeclineLabel = new Label("Order Timeout! Declined.", indicatorStyle);
+        autoDeclineLabel.setPosition(Gdx.graphics.getWidth() - autoDeclineLabel.getWidth(), 10);
+        autoDeclineLabel.setVisible(false);
+        stage.addActor(autoDeclineLabel);
+        autoDeclineLabel.setSize(font.getScaleX() * 16, font.getScaleY() * 16);
+
+        schedulePopupDisplay();
+
     }
 
     @Override
@@ -280,42 +369,18 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
     @Override
     public void render(float delta) {
-       // System.out.println(player.body.getPosition());
         /* ========================== UPDATE ============================ */
 
         // If the popup is not visible, update the player and world
-        if (!popup.isVisible()) {
-            player.update(delta, keyProcessor);
-            player.checkBounds(levelWidth, levelHeight);
-            world.step(1/60f, 6, 2); // Physics calculations
+        //if (!popup.isVisible()) {
+        player.update(delta, keyProcessor);
+        player.checkBounds(levelWidth, levelHeight);
+        world.step(1 / 60f, 6, 2); // Physics calculations
 
-            camera.follow(player.position, levelWidth, levelHeight);
+        camera.follow(player.position, levelWidth, levelHeight);
 
-            // screen boundary collisions
-            Rectangle playerBounds = player.sprite.getBoundingRectangle();
-            float threshold = 50;
-
-            // visual indicator that the player is almost off the screen
-//            if (!pickupLabel.isVisible() && !dropoffLabel.isVisible()) {
-                if (playerBounds.getX() <= -(levelWidth + threshold)) {
-                    warningLabel.setPosition(levelWidth - (levelWidth - warningLabel.getWidth()), levelHeight / 2f);
-                    warningLabel.setVisible(true);
-                } else if (playerBounds.getY() >= (levelWidth - threshold)) {
-                    warningLabel.setPosition((levelWidth - (3 * warningLabel.getWidth())), levelHeight / 2f);
-                    warningLabel.setVisible(true);
-                } else if ((playerBounds.getX() + player.getWidth()) <= (-levelHeight + threshold)) {
-                    warningLabel.setPosition(levelWidth / 2f, levelHeight - (levelHeight - warningLabel.getHeight()));
-                    warningLabel.setVisible(true);
-                } else if ((playerBounds.getY() + player.getHeight()) >= (levelHeight - threshold)) {
-                    warningLabel.setPosition(levelWidth / 2f, levelHeight - warningLabel.getHeight());
-                    warningLabel.setVisible(true);
-                } else {
-                    // remove the label
-                    warningLabel.setVisible(false);
-                }
-//            }
-        }
         batch.setProjectionMatrix(camera.combined);
+        //popup.update(delta);
 
         stage.act(delta);
 
@@ -326,22 +391,184 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         /* ===== Draw game objects ===== */
         batch.begin();
 
+
         for (Sprite sprite : tileSprites) {
             sprite.draw(batch);
         }
 
+
         player.render(batch);
-        rock.render(batch, 20, 200);
+        rock.render(batch, 20, -100);
         log.render(batch, 0, 10);
 
         // coin collision
-        if (!coin.collected) {
-            coin.render(batch, 100, 100);
-            if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), coin.getSprite().getBoundingRectangle())) {
-                coin.setCollected(true);
-                coinCounter++;
+        for (Coin coin : coins) {
+            if (!coin.collected) {
+                coin.render(batch, (int) coin.getSprite().getX(), (int) coin.getSprite().getY());
+                if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), coin.getSprite().getBoundingRectangle())) {
+                    coin.setCollected(true);
+                    coinCounter++;
+                }
             }
         }
+
+        // building collisions and transparency
+        for (BuildingObject building : buildings) {
+            building.render(batch, (int) building.sprite.getX(), (int) building.sprite.getY());
+            if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), building.getBounds())) {
+                building.setTransparent(true);
+                Rectangle collisionBounds = new Rectangle(building.getBounds());
+                collisionBounds.setHeight(collisionBounds.getHeight() / 2);
+                if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), collisionBounds)) {
+                    if (Math.abs(player.body.getLinearVelocity().x) > 0) {
+                        player.body.setLinearVelocity(player.body.getLinearVelocity().x * -1, player.body.getLinearVelocity().y);
+                    }
+                    if (Math.abs(player.body.getLinearVelocity().y) > 0) {
+                        player.body.setLinearVelocity(player.body.getLinearVelocity().x, player.body.getLinearVelocity().y * -1);
+                    }
+                }
+            } else {
+                building.setTransparent(false);
+            }
+        }
+
+//        if (playerAttributes.orderInProgress) {
+//            for (int i = 1; i < playerAttributes.array.size(); i++ ) {
+//                // go through all the orders in the current player queue
+//                String[] s = order.stringToArray(playerAttributes.array.get(i));
+//                String str3 = s[3];
+//                String str2 = s[2];
+//                String currDrop = str3.substring(0, str3.length() - 6);
+//                String currPick = str2.substring(0, str2.length() - 3);
+//                int currTime = Integer.parseInt(s[4]);
+//
+//                for (BuildingObject building : buildings) {
+//                    if (currPick.equals(building.getName()) && ) {
+//                        building.setPickupLocation(true);
+//                    } else {
+//                        building.setDropoffLocation(false);
+//                    }
+//                    if (currDrop.equals(building.getName()) && currTime > 0) {
+//                        building.setDropoffLocation(true);
+//                    } else {
+//                        building.setDropoffLocation(false);
+//                    }
+//
+//                    if (!order.isPickedUp() && order.getPickupLocation().equals(building.getName())) {
+//                        // if order is not picked up and the building in the list is the pickuplocation,
+//                        if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), building.getBounds())) {
+//                            // if the player is near the pickup location
+//                            pickupLabel.setVisible(true);
+//                            if (keyProcessor.pPressed) {
+//                                building.setPickupLocation(false);
+//                                order.setPickedUp(true);
+//                                order.setDroppedOff(false);
+//                                pickupLabel.setVisible(false);
+//                            }
+//                        } else {
+//                            pickupLabel.setVisible(false);
+//                        }
+//                    } else if (order.getDropoffBounds().equals(building.getName()) && !order.isDroppedOff()) {
+//                        if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), building.getBounds())) {
+//                            dropoffLabel.setVisible(true);
+//                            if (keyProcessor.oPressed) {
+//                                building.setDropoffLocation(false);
+//                                order.setPickedUp(false);
+//                                order.setDroppedOff(true);
+//                                playerAttributes.array.remove(1);
+//                                if (playerAttributes.array.size() <= 1) {
+//                                    playerAttributes.orderInProgress = false;
+//                                }
+//                                dropoffLabel.setVisible(false);
+//                            }
+//                        } else {
+//                            dropoffLabel.setVisible(false);
+//                        }
+//                    }
+//                }
+//
+//
+//            }
+//        }
+
+            // set all buildings to not pickup/dropoff if no queued orders
+            if (playerAttributes.array.size() <= 1) {
+                for (BuildingObject building : buildings) {
+                    building.setDropoffLocation(false);
+                    building.setPickupLocation(false);
+                }
+            }
+
+            //  building dropoff and pickup pin stuff
+            if (playerAttributes.orderInProgress) {
+                for (int i = 1; i < playerAttributes.array.size(); i++) {
+                    String[] s = order.stringToArray(playerAttributes.array.get(1));
+                    String str3 = s[3];
+                    String str2 = s[2];
+                    String currDrop = str3.substring(0, str3.length() - 6);
+                    String currPick = str2.substring(0, str2.length() - 3);
+                    for (BuildingObject building : buildings) {
+                        // assign the building to the correct order
+                        if (building.getName().equals(currPick) && !order.isPickedUp()) {
+                            building.setPickupLocation(true);
+                            order.setPickupBounds(building.getBounds().getX(), building.getBounds().getY(), building.getWidth(), building.getHeight());
+                        } else {
+                            building.setPickupLocation(false);
+                        }
+                        if (building.getName().equals(currDrop) && !order.isDroppedOff() && order.isPickedUp()) {
+                            building.setDropoffLocation(true);
+                            order.setDropoffBounds(building.getBounds().getX(), building.getBounds().getY(), building.getWidth(), building.getHeight());
+                        } else {
+                            building.setDropoffLocation(false);
+                        }
+                    }
+                    if (!order.isPickedUp()) {
+                        if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getPickupBounds())) {
+                            pickupLabel.setPosition(16, 16);
+                            pickupLabel.setVisible(true);
+                            if (keyProcessor.pPressed) {
+                                order.setPickedUp(true);
+                                order.setDroppedOff(false);
+                                pickupLabel.setVisible(false);
+                            }
+                        } else {
+                            pickupLabel.setVisible(false);
+                        }
+                    } else if (!order.isDroppedOff()) {
+                        if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getDropoffBounds())) {
+                            dropoffLabel.setPosition(16, 16);
+                            dropoffLabel.setVisible(true);
+                            if (keyProcessor.oPressed) {
+                                order.setPickedUp(false);
+                                order.setDroppedOff(true);
+                                playerAttributes.ordersCompleted++;
+                                minOrderLabel.setText("Orders Completed: "+playerAttributes.ordersCompleted+"/"+minOrders);
+//                                playerAttributes.array.remove(1);
+//                                if (playerAttributes.array.size() <= 1) {
+//                                    playerAttributes.orderInProgress = false;
+//                                }
+                                playerAttributes.array.remove(1);
+                                if (playerAttributes.array.size() <= 1) {
+                                    playerAttributes.orderInProgress = false;
+                                }
+                                dropoffLabel.setVisible(false);
+                            }
+                        } else {
+                            dropoffLabel.setVisible(false);
+                        }
+                    }
+                }
+            }  else {
+                // set everything to false
+                order.setPickedUp(false);
+                order.setDroppedOff(false);
+                for (BuildingObject building : buildings) {
+                    building.setDropoffLocation(false);
+                    building.setPickupLocation(false);
+                }
+            }
+
+
 
         if (playerAttributes.orderInProgress) {
             for (int i = 1; i < playerAttributes.array.size(); i++ ) {
@@ -359,6 +586,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                         if (!order.isDroppedOff()) {
                             order.setDroppedOff(true);
                             dropoffLabel.setVisible(false);
+                            pickupLabel.setVisible(false);
                             order.setPickedUp(false);
                         }
                         if (playerAttributes.array.size() <= 1) {
@@ -367,14 +595,15 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                             dropoffLabel.setVisible(false);
                             pickupLabel.setVisible(false);
                         } else {
-                            pickupObject.sprite.draw(batch);
                             order.setDroppedOff(false);
                             order.setPickedUp(false);
                         }
                     }
                     playerAttributes.array.remove(i);
+                    orderTimeoutLabel.setVisible(true);
+                    messageTimer = 0.0f;
                 } else {
-                    if (timeCount[i - 1] % 40 == 0) {
+                    if (timeCount[i - 1] % 60 == 0) {
                         time -= 1;
                         orderTimeLeft[i - 1] = time;
                     }
@@ -395,37 +624,50 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                 }
             }
         }
-        if (playerAttributes.array.size() > 1) {
-            if (!order.isPickedUp()) {
-                pickupObject.sprite.draw(batch);
-                if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getPickupBounds())) {
-                    pickupLabel.setVisible(true);
-                    if (keyProcessor.pPressed) {
-                        order.setPickedUp(true);
-                        order.setDroppedOff(false);
-                        pickupLabel.setVisible(false);
-                    }
-                } else {
-                    pickupLabel.setVisible(false);
-                }
-            } else if (!order.isDroppedOff()) {
-                dropoffObject.sprite.draw(batch);
-                if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getDropoffBounds())) {
-                    dropoffLabel.setVisible(true);
-                    if (keyProcessor.oPressed) {
-                        order.setPickedUp(false);
-                        order.setDroppedOff(true);
-                        playerAttributes.array.remove(1);
-                        if (playerAttributes.array.size() <= 1) {
-                            playerAttributes.orderInProgress = false;
-                        }
-                        dropoffLabel.setVisible(false);
-                    }
-                } else {
-                    dropoffLabel.setVisible(false);
-                }
+
+        if (orderTimeoutLabel.isVisible()) {
+            messageTimer += delta;
+            if (messageTimer >= MESSAGE_DURATION) {
+                orderTimeoutLabel.setVisible(false);
             }
         }
+//        if (playerAttributes.array.size() > 1) {
+//            if (!order.isPickedUp()) {
+//                pickupObject.sprite.draw(batch);
+//                if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getPickupBounds())) {
+//                    pickupLabel.setVisible(true);
+//                    if (keyProcessor.pPressed) {
+//                        order.setPickedUp(true);
+//                        order.setDroppedOff(false);
+//                        pickupLabel.setVisible(false);
+//                    }
+//                } else {
+//                    pickupLabel.setVisible(false);
+//                }
+//            } else if (!order.isDroppedOff()) {
+//                if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getDropoffBounds())) {
+//                    dropoffLabel.setVisible(true);
+//                    if (keyProcessor.oPressed) {
+//                        order.setPickedUp(false);
+//                        order.setDroppedOff(true);
+//                        playerAttributes.ordersCompleted++;
+//                        minOrderLabel.setText("Orders Completed: "+playerAttributes.ordersCompleted+"/"+minOrders);
+//                        playerAttributes.array.remove(1);
+//                        if (playerAttributes.array.size() <= 1) {
+//                            playerAttributes.orderInProgress = false;
+//                        }
+//                        dropoffLabel.setVisible(false);
+//                    }
+//                } else {
+//                    dropoffLabel.setVisible(false);
+//                }
+//            }
+//        }
+
+//        if (playerAttributes.ordersCompleted == minOrders){
+//            //show game stats screen, pause game as part of this (if condition above)
+//            System.out.println("Level completed!");
+//        }
 
         batch.end();
 
@@ -445,24 +687,73 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         font.setColor(Color.WHITE);
         font.draw(batch, "Order List:", sidePanelX + 10, sidePanelY + sidePanelHeight - 10);
+        //System.out.println("orders completed:"+playerAttributes.getOrdersCompleted());
 
         for (int i = 1; i < items.length; i++) {
             if (orderTimeLeft[i - 1] <= 5 && orderTimeLeft[i - 1] > 0) {
                 //if (order.isPickedUp()) {
-                    font.setColor(Color.RED);
-               // }
+                font.setColor(Color.RED);
+                // }
             } else {
                 font.setColor(Color.WHITE);
             }
             font.draw(batch, items[i], sidePanelX + 10, sidePanelY + sidePanelHeight - 70 * i);
 
         }
-
         stage.draw();
         popup.render();
+        //popup.draw();
 
         batch.end();
     }
+
+    // Trigger the timed popup to show
+    public void showTimedPopup() {
+        //popup.setPosition(Gdx.graphics.getWidth() - 300, 0);
+        popup.show(); // Display the popup
+        try {
+            order.setArray(orderArray);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        order.seti(count);
+        count++;
+        popup.setMessage(order.arrayToString());
+        popup.acceptClicked = false;
+        popup.declineClicked = false;
+    }
+
+    public void hideTimedPopup() {
+        popup.hide(); // Display the popup
+    }
+
+    // Schedule the popup to display every 1 minute
+    private void schedulePopupDisplay() {
+        final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+        scheduler.scheduleAtFixedRate(new Runnable() {
+            @Override
+            public void run() {
+                showTimedPopup(); // Show the popup
+                scheduler.schedule(new Runnable() {
+                    @Override
+                    public void run() {
+                        // Hide the popup
+                        hideTimedPopup();
+                        if (!popup.acceptClicked() && !popup.declineClicked()) {
+                            autoDeclineLabel.setVisible(true);
+                            scheduler.schedule(new Runnable() {
+                                @Override
+                                public void run() {
+                                    autoDeclineLabel.setVisible(false); // Remove the label from the display
+                                }
+                            }, 4, TimeUnit.SECONDS);
+                        }
+                    }
+                }, 10, TimeUnit.SECONDS); // Schedule to hide the popup after 10 seconds
+            }
+        }, 0, 15, TimeUnit.SECONDS); // Schedule the next popup 15 seconds after the first one
+    }
+
 
     @Override
     public void resize(int width, int height) {
@@ -484,6 +775,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     @Override
     public void dispose() {
         batch.dispose();
+        //incomingOrder.dispose();
         multiplexer.removeProcessor(stage);
     }
 
@@ -516,8 +808,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         return stage;
     }
 
-    public LevelData loadLevel() throws IOException, ClassNotFoundException {
-        InputStream fileStream = Files.newInputStream(new File(Gdx.files.internal("levels/level3.lvl").path()).toPath());
+    public LevelData loadLevel(String fileName) throws IOException, ClassNotFoundException {
+        InputStream fileStream = Files.newInputStream(new File(Gdx.files.internal("levels/" + fileName + ".lvl").path()).toPath());
         ObjectInputStream inputStream = new ObjectInputStream(fileStream);
 
         LevelData levelData = (LevelData) inputStream.readObject();

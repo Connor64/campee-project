@@ -31,7 +31,7 @@ public class Player extends GameObject {
         body = world.createBody(bodyDef);
 
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(dimension.x / 2, dimension.y / 2);
+        shape.setAsBox(dimension.x, dimension.y / 2);
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
@@ -107,7 +107,7 @@ public class Player extends GameObject {
 
     private void updateSpritePosition() {
         position = body.getPosition();
-        sprite.setPosition(position.x, position.y);
+        sprite.setBounds(position.x, position.y, sprite.getWidth(), sprite.getHeight());
     }
 
     public Sprite getSprite() {

@@ -11,24 +11,36 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 public class Popup {
     private Stage stage;
+    //private float duration; // Duration of the popup in seconds
+    //private float timeElapsed; // Time elapsed since the popup was shown
     public boolean visible;
     private ShapeRenderer shapeRenderer;
     private BitmapFont font;
     private Label messageLabel;
-    private boolean acceptClicked;
-    private boolean declineClicked;
+    public boolean acceptClicked;
+    public boolean declineClicked;
     private boolean isAcceptButtonHovered = false;
     private boolean isDeclineButtonHovered = false;
+    float popupWidth;
+    float popupHeight;
+    float popupX;
+    float popupY;
 
     public Popup(final GameplayScreen screen, final String notificationMessage) {
         stage = new Stage();
+        //this.duration = duration;
+        //timeElapsed = 0;
+
         shapeRenderer = new ShapeRenderer();
         visible = false;
         acceptClicked = false;
@@ -38,13 +50,13 @@ public class Popup {
 
         // Set font color and scale
         font.setColor(1, 1, 0, 1);
-        font.getData().setScale(1.5f);
+        font.getData().setScale(1.25f);
 
         messageLabel = new Label(notificationMessage, new Label.LabelStyle(font, Color.WHITE));
-        messageLabel.setFontScale(1.5f);
-        messageLabel.setPosition(Gdx.graphics.getWidth() / 2 - messageLabel.getWidth() / 2, Gdx.graphics.getHeight() / 2 + 100);
+        messageLabel.setFontScale(1f);
+        messageLabel.setPosition(670, popupY + 15);
 
-
+        //add(messageLabel).padRight(100).padTop(5);
 
         Pixmap acceptBackgroundPixmap = createRoundedRectanglePixmap(200, 50, 10, Color.GREEN); // Adjust size and color
         TextButton.TextButtonStyle acceptButtonStyle = new TextButton.TextButtonStyle();
@@ -63,14 +75,15 @@ public class Popup {
         final TextButton acceptButton = new TextButton("Accept", acceptButtonStyle);
         final TextButton declineButton = new TextButton("Decline", declineButtonStyle);
 
-        acceptButton.setWidth(100);
-        acceptButton.setHeight(50);
-        declineButton.setWidth(100);
-        declineButton.setHeight(50);
+        acceptButton.setWidth(75);
+        acceptButton.setHeight(25);
+        declineButton.setWidth(75);
+        declineButton.setHeight(25);
+
 
         // Set button positions
-        acceptButton.setPosition(Gdx.graphics.getWidth() / 2 - 100, Gdx.graphics.getHeight() / 2 - 25);
-        declineButton.setPosition(Gdx.graphics.getWidth() / 2 + 20, Gdx.graphics.getHeight() / 2 - 25);
+        acceptButton.setPosition(620, popupY);
+        declineButton.setPosition(720, popupY);
 
         // Add click listeners to buttons
         acceptButton.addListener(new ClickListener() {
@@ -79,8 +92,6 @@ public class Popup {
                 acceptClicked = true;
                 screen.playerAttributes.orderInProgress = true;
                 screen.playerAttributes.array.add(screen.order.arrayToString());
-
-
 
                 visible = false;
             }
@@ -135,7 +146,18 @@ public class Popup {
 
     public void show() {
         visible = true;
+        //timeElapsed = 0;
+        //stage.act();
     }
+
+//    public void update(float delta) {
+//        if (visible) {
+//            timeElapsed += delta;
+//            if (timeElapsed >= duration) {
+//                hide();
+//            }
+//        }
+//    }
 
     public void hide() {
         visible = false;
@@ -161,15 +183,32 @@ public class Popup {
             // Clear the background
             Gdx.gl.glEnable(GL20.GL_BLEND);
             Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+//            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+//            shapeRenderer.setColor(new Color(0, 0, 0, 0.7f));
+//            shapeRenderer.rect(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+//            shapeRenderer.end();
+
             shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-            shapeRenderer.setColor(new Color(0, 0, 0, 0.7f));
-            shapeRenderer.rect(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+            shapeRenderer.setColor(new Color(0, 0, 0, 0.5f)); // Adjust the alpha (transparency) value here
+            popupWidth = 190; // Set the width of the popup
+            popupHeight = 100; // Set the height of the popup
+            popupX = Gdx.graphics.getWidth() - popupWidth; // Position the popup at the right edge
+            popupY = 0; // Position the popup at the bottom
+            shapeRenderer.rect(popupX, popupY, popupWidth, popupHeight); // Define the popup area
             shapeRenderer.end();
+            //Gdx.gl.glDisable(GL20.GL_BLEND);
+
 
             stage.act();
             stage.draw();
         }
     }
+
+//    public void draw() {
+//        if (visible) {
+//            stage.draw();
+//        }
+//    }
 
     public Pixmap createRoundedRectanglePixmap(int width, int height, int cornerRadius, Color color) {
         Pixmap pixmap = new Pixmap(width, height, Pixmap.Format.RGBA8888);
@@ -185,4 +224,9 @@ public class Popup {
 
         return pixmap;
     }
+
+
+//    public void dispose() {
+//        stage.dispose();
+//    }
 }
