@@ -103,7 +103,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     private String[] orderA;
     private ArrayList<Sprite> tileSprites;
 
-    public GameplayScreen(final MoonshipGame game) throws IOException, ClassNotFoundException {
+    public GameplayScreen(final MoonshipGame game, String fileName) throws IOException, ClassNotFoundException {
         this.GAME = game;
         batch = game.batch;
 
@@ -113,7 +113,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         Arrays.fill(orderTimeLeft, 6);
 
         tileSprites = new ArrayList<>();
-        LevelData levelData = loadLevel();
+        LevelData levelData = loadLevel(fileName);
 
 
 
@@ -624,8 +624,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         return stage;
     }
 
-    public LevelData loadLevel() throws IOException, ClassNotFoundException {
-        InputStream fileStream = Files.newInputStream(new File(Gdx.files.internal("levels/level3.lvl").path()).toPath());
+    public LevelData loadLevel(String fileName) throws IOException, ClassNotFoundException {
+        InputStream fileStream = Files.newInputStream(new File(Gdx.files.internal("levels/" + fileName + ".lvl").path()).toPath());
         ObjectInputStream inputStream = new ObjectInputStream(fileStream);
 
         LevelData levelData = (LevelData) inputStream.readObject();
