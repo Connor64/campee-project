@@ -62,6 +62,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     public Label dropoffLabel;
     public Label minOrderLabel;
     public Label autoDeclineLabel;
+    public Label orderTimeoutLabel;
 
     private Timer timer;
     private TimerTask timerTask;
@@ -292,6 +293,13 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         stage.addActor(minOrderLabel);
         //minOrderLabel.setText("Orders Completed: "+playerAttributes.ordersCompleted+"/"+minOrders);
 
+        orderTimeoutLabel = new Label("Time ran out before delivery was complete!", indicatorStyle);
+        orderTimeoutLabel.setPosition(Gdx.graphics.getWidth() - orderTimeoutLabel.getWidth(), 10);
+        orderTimeoutLabel.setVisible(false);
+        stage.addActor(orderTimeoutLabel);
+        orderTimeoutLabel.setSize(font.getScaleX() * 16, font.getScaleY() * 16);
+
+
         //auto decline after order timeout label
         autoDeclineLabel = new Label("Order Timeout! Declined.", indicatorStyle);
         autoDeclineLabel.setPosition(Gdx.graphics.getWidth() - autoDeclineLabel.getWidth(), 10);
@@ -318,46 +326,34 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
     @Override
     public void render(float delta) {
-       // System.out.println(player.body.getPosition());
-        /* ========================== UPDATE ============================ */
 
-        //minOrderLabel.setVisible(true);
+        player.update(delta, keyProcessor);
+        player.checkBounds(levelWidth, levelHeight);
+        world.step(1/60f, 6, 2); // Physics calculations
 
-        // If the popup is not visible, update the player and world
-        //if (!popup.isVisible()) {
+        camera.follow(player.position, levelWidth, levelHeight);
 
-        //If game stats screen is not visible, keep the game going (else pause)
-        //if (!gameStatsScreen.isVisible()) {
-            player.update(delta, keyProcessor);
-            player.checkBounds(levelWidth, levelHeight);
-            world.step(1/60f, 6, 2); // Physics calculations
+        // screen boundary collisions
+        Rectangle playerBounds = player.sprite.getBoundingRectangle();
+        float threshold = 50;
 
-            camera.follow(player.position, levelWidth, levelHeight);
-
-            // screen boundary collisions
-            Rectangle playerBounds = player.sprite.getBoundingRectangle();
-            float threshold = 50;
-
-            // visual indicator that the player is almost off the screen
-//            if (!pickupLabel.isVisible() && !dropoffLabel.isVisible()) {
-                if (playerBounds.getX() <= -(levelWidth + threshold)) {
-                    warningLabel.setPosition(levelWidth - (levelWidth - warningLabel.getWidth()), levelHeight / 2f);
-                    warningLabel.setVisible(true);
-                } else if (playerBounds.getY() >= (levelWidth - threshold)) {
-                    warningLabel.setPosition((levelWidth - (3 * warningLabel.getWidth())), levelHeight / 2f);
-                    warningLabel.setVisible(true);
-                } else if ((playerBounds.getX() + player.getWidth()) <= (-levelHeight + threshold)) {
-                    warningLabel.setPosition(levelWidth / 2f, levelHeight - (levelHeight - warningLabel.getHeight()));
-                    warningLabel.setVisible(true);
-                } else if ((playerBounds.getY() + player.getHeight()) >= (levelHeight - threshold)) {
-                    warningLabel.setPosition(levelWidth / 2f, levelHeight - warningLabel.getHeight());
-                    warningLabel.setVisible(true);
-                } else {
-                    // remove the label
-                    warningLabel.setVisible(false);
-                }
-//            }
-       // }
+        // visual indicator that the player is almost off the screen
+        if (playerBounds.getX() <= -(levelWidth + threshold)) {
+            warningLabel.setPosition(levelWidth - (levelWidth - warningLabel.getWidth()), levelHeight / 2f);
+            warningLabel.setVisible(true);
+        } else if (playerBounds.getY() >= (levelWidth - threshold)) {
+            warningLabel.setPosition((levelWidth - (3 * warningLabel.getWidth())), levelHeight / 2f);
+            warningLabel.setVisible(true);
+        } else if ((playerBounds.getX() + player.getWidth()) <= (-levelHeight + threshold)) {
+            warningLabel.setPosition(levelWidth / 2f, levelHeight - (levelHeight - warningLabel.getHeight()));
+            warningLabel.setVisible(true);
+        } else if ((playerBounds.getY() + player.getHeight()) >= (levelHeight - threshold)) {
+            warningLabel.setPosition(levelWidth / 2f, levelHeight - warningLabel.getHeight());
+            warningLabel.setVisible(true);
+        } else {
+            // remove the label
+            warningLabel.setVisible(false);
+        }
 
         batch.setProjectionMatrix(camera.combined);
         //popup.update(delta);
@@ -371,7 +367,6 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         /* ===== Draw game objects ===== */
         batch.begin();
 
-        //minOrderLabel.setVisible(true);
 
         for (Sprite sprite : tileSprites) {
             sprite.draw(batch);
@@ -506,8 +501,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         for (int i = 1; i < items.length; i++) {
             if (orderTimeLeft[i - 1] <= 5 && orderTimeLeft[i - 1] > 0) {
                 //if (order.isPickedUp()) {
-                    font.setColor(Color.RED);
-               // }
+                font.setColor(Color.RED);
+                // }
             } else {
                 font.setColor(Color.WHITE);
             }
@@ -553,8 +548,6 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                     public void run() {
                         // Hide the popup
                         hideTimedPopup();
-                        //System.out.println("accepted?"+popup.acceptClicked());
-                        //System.out.println("declined?"+popup.declineClicked());
                         if (!popup.acceptClicked() && !popup.declineClicked()) {
                             autoDeclineLabel.setVisible(true);
                             scheduler.schedule(new Runnable() {
@@ -563,6 +556,26 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                                     autoDeclineLabel.setVisible(false); // Remove the label from the display
                                 }
                             }, 4, TimeUnit.SECONDS);
+                        }
+                        if (playerAttributes.orderInProgress) {
+                            for (int i = 1; i < playerAttributes.array.size(); i++) {
+                                String[] s = order.stringToArray(playerAttributes.array.get(i));
+                                int time;
+                                try {
+                                    time = Integer.parseInt(s[4]);
+                                } catch (NumberFormatException num) {
+                                    time = Integer.parseInt(s[5]);
+                                }
+                                if (time <= 0) {
+                                    orderTimeoutLabel.setVisible(true);
+                                    scheduler.schedule(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            orderTimeoutLabel.setVisible(false); // Remove the label from the display
+                                        }
+                                    }, 4, TimeUnit.SECONDS);
+                                }
+                            }
                         }
                     }
                 }, 10, TimeUnit.SECONDS); // Schedule to hide the popup after 10 seconds
