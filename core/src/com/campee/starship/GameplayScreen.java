@@ -158,11 +158,11 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         // making multiple buildings
         // TODO: change so its not a random location
-        buildings = new BuildingObject[2];
+        buildings = new BuildingObject[3];
         String spriteList[] = new String[3];
-        spriteList[0] = "pmu.PNG";
-        spriteList[1] = "haas.PNG";
-        spriteList[2] = "msee.PNG";
+        spriteList[0] = "PMU.PNG";
+        spriteList[1] = "HAAS.PNG";
+        spriteList[2] = "MSEE.PNG";
         for (int i = 0; i < buildings.length; i++) {
             int x = (int) ((Math.random() * (levelWidth - (-levelWidth))) + (-levelWidth));
             int y = (int) ((Math.random() * (levelHeight - (-levelHeight))) + (-levelHeight));
@@ -464,43 +464,6 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 //            }
 //        }
 
-//        if (playerAttributes.array.size() > 1) {
-//            for (BuildingObject building : buildings) {
-//                if (order.getPickupLocation().equals(building.getName()) && !order.isPickedUp()) {
-//                    building.setPickupLocation(true);
-//                }
-//            }
-//
-//            if (!order.isPickedUp()) {
-//                if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getPickupBounds())) {
-//                    pickupLabel.setVisible(true);
-//                    if (keyProcessor.pPressed) {
-//                        order.setPickedUp(true);
-//                        order.setDroppedOff(false);
-//                        pickupLabel.setVisible(false);
-//                    }
-//                } else {
-//                    pickupLabel.setVisible(false);
-//                }
-//            } else if (!order.isDroppedOff()) {
-//                dropoffObject.sprite.draw(batch);
-//                if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getDropoffBounds())) {
-//                    dropoffLabel.setVisible(true);
-//                    if (keyProcessor.oPressed) {
-//                        order.setPickedUp(false);
-//                        order.setDroppedOff(true);
-//                        playerAttributes.array.remove(1);
-//                        if (playerAttributes.array.size() <= 1) {
-//                            playerAttributes.orderInProgress = false;
-//                        }
-//                        dropoffLabel.setVisible(false);
-//                    }
-//                } else {
-//                    dropoffLabel.setVisible(false);
-//                }
-//            }
-//        }
-
             // set all buildings to not pickup/dropoff if no queued orders
             if (playerAttributes.array.size() <= 1) {
                 for (BuildingObject building : buildings) {
@@ -512,15 +475,20 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             //  building dropoff and pickup pin stuff
             if (playerAttributes.orderInProgress) {
                 for (int i = 1; i < playerAttributes.array.size(); i++) {
+                    String[] s = order.stringToArray(playerAttributes.array.get(i));
+                    String str3 = s[3];
+                    String str2 = s[2];
+                    String currDrop = str3.substring(0, str3.length() - 6);
+                    String currPick = str2.substring(0, str2.length() - 3);
                     for (BuildingObject building : buildings) {
                         // assign the building to the correct order
-                        if (building.getName().equals(order.getPickupLocation()) && !order.isPickedUp()) {
+                        if (building.getName().equals(currPick) && !order.isPickedUp()) {
                             building.setPickupLocation(true);
                             order.setPickupBounds(building.getBounds().getX(), building.getBounds().getY(), building.getWidth(), building.getHeight());
                         } else {
                             building.setPickupLocation(false);
                         }
-                        if (building.getName().equals(order.getDropoffLocation()) && !order.isDroppedOff() && order.isPickedUp()) {
+                        if (building.getName().equals(currDrop) && !order.isDroppedOff() && order.isPickedUp()) {
                             building.setDropoffLocation(true);
                             order.setDropoffBounds(building.getBounds().getX(), building.getBounds().getY(), building.getWidth(), building.getHeight());
                         } else {

@@ -23,14 +23,14 @@ public class BuildingObject extends GameObject {
         dropoffLocation = false;
         transparent = false;
 
-        Texture pickupTexture = new Texture(Gdx.files.internal("pickup pin.PNG"));
+        Texture pickupTexture = new Texture(Gdx.files.internal("pickup flag.PNG"));
         pickupTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         TextureRegion pickUpRegion = new TextureRegion(pickupTexture, 0, 0, pickupTexture.getWidth(), pickupTexture.getHeight());
         pickSprite = new Sprite(pickUpRegion);
         pickSprite.setOrigin(pickSprite.getX() / 2,pickSprite.getY() / 2);
         pickSprite.setPosition(0, 0);
 
-        Texture dropoffTexture = new Texture(Gdx.files.internal("dropoff pin.PNG"));
+        Texture dropoffTexture = new Texture(Gdx.files.internal("dropoff flag.PNG"));
         dropoffTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         TextureRegion dropOffRegion = new TextureRegion(dropoffTexture, 0, 0, dropoffTexture.getWidth(), dropoffTexture.getHeight());
         dropSprite = new Sprite(dropOffRegion);
