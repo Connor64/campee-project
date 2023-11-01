@@ -7,8 +7,8 @@ public class LevelData implements Serializable {
     private static final long serialVersionUID = 1L;
     public Tile[][][] layers;
     public String levelName;
-    public int minOrders;
-    public float goalTime;
+    //public int minOrders;
+    //public float goalTime;
     public int width;
     public int height;
 
@@ -24,8 +24,8 @@ public class LevelData implements Serializable {
         }
 
         this.levelName = levelName;
-        this.minOrders = minOrders;
-        this.goalTime = goalTime;
+        //this.minOrders = minOrders;
+        //this.goalTime = goalTime;
         this.width = width;
         this.height = height;
     }

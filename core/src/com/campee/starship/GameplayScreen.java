@@ -120,7 +120,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         // TODO: Add serializable field to level data for the tilesize
         levelWidth = (levelData.width / 2) * 16;
         levelHeight = (levelData.height / 2) * 16;
-        minOrders = 5/*levelData.minOrders*/;
+        minOrders = 2/*levelData.minOrders*/;
         goalTime = 300/*levelData.goalTime*/;
 
         stage = new Stage();
@@ -284,12 +284,6 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         dropoffLabel.setSize(font.getScaleX() * 16, font.getScaleY() * 16);
 
         // min orders label
-        Skin skin = new Skin();
-        skin.add("default-font", font);
-        Label.LabelStyle labelStyle = new Label.LabelStyle(font, Color.BLACK);
-        labelStyle.font = skin.getFont("default-font");
-        skin.add("default", labelStyle);
-
         minOrderLabel = new Label("Orders Completed: "+playerAttributes.ordersCompleted+"/"+minOrders, indicatorStyle);
         minOrderLabel.setSize(font.getScaleX() * 16, font.getScaleY() * 16);
         //minOrderLabel.setPosition(Gdx.graphics.getWidth() / 2 - minOrderLabel.getWidth() / 2, Gdx.graphics.getHeight() - minOrderLabel.getHeight());
@@ -331,6 +325,9 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         // If the popup is not visible, update the player and world
         //if (!popup.isVisible()) {
+
+        //If game stats screen is not visible, keep the game going (else pause)
+        //if (!gameStatsScreen.isVisible()) {
             player.update(delta, keyProcessor);
             player.checkBounds(levelWidth, levelHeight);
             world.step(1/60f, 6, 2); // Physics calculations
@@ -480,10 +477,11 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                 }
             }
         }
-        if (playerAttributes.ordersCompleted == minOrders){
-            //pause game
-            System.out.println("Goal completed!");
-        }
+
+//        if (playerAttributes.ordersCompleted == minOrders){
+//            //show game stats screen, pause game as part of this (if condition above)
+//            System.out.println("Level completed!");
+//        }
 
         batch.end();
 
