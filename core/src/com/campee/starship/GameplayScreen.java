@@ -47,6 +47,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     public int minOrders;
     public float goalTime;
 
+    public boolean win;
+
     private Player player;
     public PlayerAttributes playerAttributes;
     private ArrayList<String> visibleQ;
@@ -125,6 +127,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         Arrays.fill(orderTimeLeft, 6);
         //gameStatsMessage = "";
 
+        win = false;
 
         tileSprites = new ArrayList<>();
         LevelData levelData = loadLevel(fileName);
@@ -255,7 +258,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                 }
                 String orderIDsMessage = orderIDsStringBuilder.toString();
 
-                String gameStatsMessage = "GAME OVER! \nTotal Coins Collected: " + coinCounter
+                String gameStatsMessage = "GAME STATS! \nTotal Coins Collected: " + coinCounter
                         + "\nTotal Orders Completed: " + totalOrdersCompleted;
                 gamepopup.showGameStatsMessage(gameStatsMessage);
                 gamepopup.showOrderCompletedList(orderIDsMessage);
@@ -303,7 +306,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         });
 
         stage.addActor(backButton);
-        stage.addActor(gameStatsButton);
+        //stage.addActor(gameStatsButton);
         //stage.addActor(nextOrderButton);
 
         multiplexer = new InputMultiplexer();
@@ -349,7 +352,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         //minOrderLabel.setText("Orders Completed: "+playerAttributes.ordersCompleted+"/"+minOrders);
 
         orderTimeoutLabel = new Label("Time ran out. Begin next delivery!", warningStyle);
-        orderTimeoutLabel.setPosition(Gdx.graphics.getWidth()/2- 180,Gdx.graphics.getHeight() - minOrderLabel.getHeight()-45);
+        orderTimeoutLabel.setPosition(Gdx.graphics.getWidth()/2- 180,Gdx.graphics.getHeight() - minOrderLabel.getHeight()-52);
         orderTimeoutLabel.setVisible(false);
         stage.addActor(orderTimeoutLabel);
         orderTimeoutLabel.setSize(font.getScaleX() * 16, font.getScaleY() * 16);
@@ -384,180 +387,177 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         // System.out.println(player.body.getPosition());
         /* ========================== UPDATE ============================ */
 
-        player.update(delta, keyProcessor);
-        player.checkBounds(levelWidth, levelHeight);
-        world.step(1/60f, 6, 2); // Physics calculations
-
-        camera.follow(player.position, levelWidth, levelHeight);
-
         //If game stats screen is not visible, keep the game going (else pause)
         //if (!gameStatsScreen.isVisible()) {
+        if (!gamepopup.isVisible()) {
+            player.update(delta, keyProcessor);
+            player.checkBounds(levelWidth, levelHeight);
+            world.step(1 / 60f, 6, 2); // Physics calculations
 
-        // screen boundary collisions
-        Rectangle playerBounds = player.sprite.getBoundingRectangle();
-        float threshold = 50;
+            camera.follow(player.position, levelWidth, levelHeight);
 
-        // visual indicator that the player is almost off the screen
-        if (playerBounds.getX() <= -(levelWidth + threshold)) {
-            warningLabel.setPosition(levelWidth - (levelWidth - warningLabel.getWidth()), levelHeight / 2f);
-            warningLabel.setVisible(true);
-        } else if (playerBounds.getY() >= (levelWidth - threshold)) {
-            warningLabel.setPosition((levelWidth - (3 * warningLabel.getWidth())), levelHeight / 2f);
-            warningLabel.setVisible(true);
-        } else if ((playerBounds.getX() + player.getWidth()) <= (-levelHeight + threshold)) {
-            warningLabel.setPosition(levelWidth / 2f, levelHeight - (levelHeight - warningLabel.getHeight()));
-            warningLabel.setVisible(true);
-        } else if ((playerBounds.getY() + player.getHeight()) >= (levelHeight - threshold)) {
-            warningLabel.setPosition(levelWidth / 2f, levelHeight - warningLabel.getHeight());
-            warningLabel.setVisible(true);
-        } else {
-            // remove the label
-            warningLabel.setVisible(false);
-        }
+            // screen boundary collisions
+            Rectangle playerBounds = player.sprite.getBoundingRectangle();
+            float threshold = 50;
 
-        batch.setProjectionMatrix(camera.combined);
-        //popup.update(delta);
+            // visual indicator that the player is almost off the screen
+            if (playerBounds.getX() <= -(levelWidth + threshold)) {
+                warningLabel.setPosition(levelWidth - (levelWidth - warningLabel.getWidth()), levelHeight / 2f);
+                warningLabel.setVisible(true);
+            } else if (playerBounds.getY() >= (levelWidth - threshold)) {
+                warningLabel.setPosition((levelWidth - (3 * warningLabel.getWidth())), levelHeight / 2f);
+                warningLabel.setVisible(true);
+            } else if ((playerBounds.getX() + player.getWidth()) <= (-levelHeight + threshold)) {
+                warningLabel.setPosition(levelWidth / 2f, levelHeight - (levelHeight - warningLabel.getHeight()));
+                warningLabel.setVisible(true);
+            } else if ((playerBounds.getY() + player.getHeight()) >= (levelHeight - threshold)) {
+                warningLabel.setPosition(levelWidth / 2f, levelHeight - warningLabel.getHeight());
+                warningLabel.setVisible(true);
+            } else {
+                // remove the label
+                warningLabel.setVisible(false);
+            }
 
-        stage.act(delta);
+            batch.setProjectionMatrix(camera.combined);
+            //popup.update(delta);
 
-        /* ========================== DRAW ============================ */
+            stage.act(delta);
 
-        ScreenUtils.clear(Color.PINK);
+            /* ========================== DRAW ============================ */
 
-        /* ===== Draw game objects ===== */
-        batch.begin();
+            ScreenUtils.clear(Color.PINK);
+
+            /* ===== Draw game objects ===== */
+            batch.begin();
 
 
-        for (Sprite sprite : tileSprites) {
-            sprite.draw(batch);
-        }
+            for (Sprite sprite : tileSprites) {
+                sprite.draw(batch);
+            }
 
-        player.render(batch);
-        rock.render(batch, 20, 200);
-        log.render(batch, 0, 10);
+            player.render(batch);
+            rock.render(batch, 20, 200);
+            log.render(batch, 0, 10);
 
-        // coin collision
-        for (Coin coin : coins) {
-            if (!coin.collected) {
-                coin.render(batch, (int) coin.getSprite().getX(), (int) coin.getSprite().getY());
-                if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), coin.getSprite().getBoundingRectangle())) {
-                    coin.setCollected(true);
-                    coinCounter++;
+            // coin collision
+            for (Coin coin : coins) {
+                if (!coin.collected) {
+                    coin.render(batch, (int) coin.getSprite().getX(), (int) coin.getSprite().getY());
+                    if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), coin.getSprite().getBoundingRectangle())) {
+                        coin.setCollected(true);
+                        coinCounter++;
+                    }
                 }
             }
-        }
 
-        if (playerAttributes.orderInProgress) {
-            for (int i = 1; i < playerAttributes.array.size(); i++) {
-                String[] s = order.stringToArray(playerAttributes.array.get(i));
-                int time;
-                boolean twoName = false;
-                try {
-                    time = Integer.parseInt(s[4]);
-                } catch (NumberFormatException num) {
-                    time = Integer.parseInt(s[5]);
-                    twoName = true;
-                }
-                if (time <= 0) {
-                    if (i == 1) {
-                        if (!order.isDroppedOff()) {
-                            order.setDroppedOff(true);
-                            dropoffLabel.setVisible(false);
-                            pickupLabel.setVisible(false);
-                            order.setPickedUp(false);
-                        }
-                        if (playerAttributes.array.size() <= 1) {
-                            playerAttributes.orderInProgress = false;
-                            order.setPickedUp(false);
-                            dropoffLabel.setVisible(false);
-                            pickupLabel.setVisible(false);
-                        } else {
-                            //System.out.println("hehe i am here");
-                            pickupObject.sprite.draw(batch);
-                            order.setDroppedOff(false);
-                            order.setPickedUp(false);
-                        }
+            if (playerAttributes.orderInProgress) {
+                for (int i = 1; i < playerAttributes.array.size(); i++) {
+                    String[] s = order.stringToArray(playerAttributes.array.get(i));
+                    int time;
+                    boolean twoName = false;
+                    try {
+                        time = Integer.parseInt(s[4]);
+                    } catch (NumberFormatException num) {
+                        time = Integer.parseInt(s[5]);
+                        twoName = true;
                     }
-                    playerAttributes.array.remove(i);
-                    orderTimeoutLabel.setVisible(true);
-                    messageTimer = 0.0f;
-                } else {
-                    if (timeCount[i - 1] % 60 == 0) {
-                        time -= 1;
-                        orderTimeLeft[i - 1] = time;
-                    }
-                    timeCount[i - 1]++;
-
-                    if (!twoName) {
-                        s[4] = String.valueOf(time);
+                    if (time <= 0) {
+                        if (i == 1) {
+                            if (!order.isDroppedOff()) {
+                                order.setDroppedOff(true);
+                                dropoffLabel.setVisible(false);
+                                pickupLabel.setVisible(false);
+                                order.setPickedUp(false);
+                            }
+                            if (playerAttributes.array.size() <= 1) {
+                                playerAttributes.orderInProgress = false;
+                                order.setPickedUp(false);
+                                dropoffLabel.setVisible(false);
+                                pickupLabel.setVisible(false);
+                            } else {
+                                //System.out.println("hehe i am here");
+                                pickupObject.sprite.draw(batch);
+                                order.setDroppedOff(false);
+                                order.setPickedUp(false);
+                            }
+                        }
+                        playerAttributes.array.remove(i);
+                        orderTimeoutLabel.setVisible(true);
+                        messageTimer = 0.0f;
                     } else {
-                        s[5] = String.valueOf(time);
-                    }
+                        if (timeCount[i - 1] % 60 == 0) {
+                            time -= 1;
+                            orderTimeLeft[i - 1] = time;
+                        }
+                        timeCount[i - 1]++;
 
-                    StringBuilder sb = new StringBuilder();
-                    for (String thing : s) {
-                        sb.append(thing);
-                        sb.append(" ");
+                        if (!twoName) {
+                            s[4] = String.valueOf(time);
+                        } else {
+                            s[5] = String.valueOf(time);
+                        }
+
+                        StringBuilder sb = new StringBuilder();
+                        for (String thing : s) {
+                            sb.append(thing);
+                            sb.append(" ");
+                        }
+                        playerAttributes.array.set(i, sb.toString());
                     }
-                    playerAttributes.array.set(i, sb.toString());
                 }
             }
-        }
-        if (orderTimeoutLabel.isVisible()) {
-            messageTimer += delta;
-            if (messageTimer >= MESSAGE_DURATION) {
-                orderTimeoutLabel.setVisible(false);
+            if (orderTimeoutLabel.isVisible()) {
+                messageTimer += delta;
+                if (messageTimer >= MESSAGE_DURATION) {
+                    orderTimeoutLabel.setVisible(false);
+                }
             }
-        }
-        if (playerAttributes.array.size() > 1) {
-            if (!order.isPickedUp()) {
-                pickupObject.sprite.draw(batch);
-                if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getPickupBounds())) {
-                    pickupLabel.setVisible(true);
-                    if (keyProcessor.pPressed) {
-                        order.setPickedUp(true);
-                        order.setDroppedOff(false);
+            if (playerAttributes.array.size() > 1) {
+                if (!order.isPickedUp()) {
+                    pickupObject.sprite.draw(batch);
+                    if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getPickupBounds())) {
+                        pickupLabel.setVisible(true);
+                        if (keyProcessor.pPressed) {
+                            order.setPickedUp(true);
+                            order.setDroppedOff(false);
+                            pickupLabel.setVisible(false);
+                        }
+                    } else {
                         pickupLabel.setVisible(false);
                     }
-                } else {
-                    pickupLabel.setVisible(false);
-                }
-            } else if (!order.isDroppedOff()) {
-                dropoffObject.sprite.draw(batch);
-                if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getDropoffBounds())) {
-                    dropoffLabel.setVisible(true);
-                    if (keyProcessor.oPressed) {
-                        order.setPickedUp(false);
-                        order.setDroppedOff(true);
-                        playerAttributes.ordersCompleted++;
-                        minOrderLabel.setText("Orders Completed: "+playerAttributes.ordersCompleted+"/"+minOrders);
-                        playerAttributes.array.remove(1);
-                        totalOrdersCompleted++;
-                        String orderID = order.getOrderString();
-                        System.out.println("order id: " + orderID);
-                        if (!deliveredOrderIDs.contains(orderID)) {
-                            deliveredOrderIDs.add(orderID);
-                            System.out.println("Order " + orderID + " has been delivered and added to the list.");
-                        }
-                        System.out.println("Order List: " + deliveredOrderIDs);
+                } else if (!order.isDroppedOff()) {
+                    dropoffObject.sprite.draw(batch);
+                    if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getDropoffBounds())) {
+                        dropoffLabel.setVisible(true);
+                        if (keyProcessor.oPressed) {
+                            order.setPickedUp(false);
+                            order.setDroppedOff(true);
+                            playerAttributes.ordersCompleted++;
+                            minOrderLabel.setText("Orders Completed: " + playerAttributes.ordersCompleted + "/" + minOrders);
+                            playerAttributes.array.remove(1);
+                            totalOrdersCompleted++;
+                            String orderID = order.getOrderString();
+                            System.out.println("order id: " + orderID);
+                            if (!deliveredOrderIDs.contains(orderID)) {
+                                deliveredOrderIDs.add(orderID);
+                                System.out.println("Order " + orderID + " has been delivered and added to the list.");
+                            }
+                            System.out.println("Order List: " + deliveredOrderIDs);
 
-                        if (playerAttributes.array.size() <= 1) {
-                            playerAttributes.orderInProgress = false;
+                            if (playerAttributes.array.size() <= 1) {
+                                playerAttributes.orderInProgress = false;
+                            }
+                            dropoffLabel.setVisible(false);
                         }
+                    } else {
                         dropoffLabel.setVisible(false);
                     }
-                } else {
-                    dropoffLabel.setVisible(false);
                 }
             }
-        }
 
-//        if (playerAttributes.ordersCompleted == minOrders){
-//            //show game stats screen, pause game as part of this (if condition above)
-//            System.out.println("Level completed!");
-//        }
 
-        batch.end();
+            batch.end();
+
 
         /* Draw UI elements */
         batch.begin();
@@ -573,35 +573,69 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         String[] items = playerAttributes.array.toArray(new String[0]);
 
-        if (visibleText) {
-            font.setColor(Color.WHITE);
-            font.draw(batch, "Order List:", sidePanelX + 10, sidePanelY + sidePanelHeight - 10);
-            float coinCountTextX = sidePanelX - font.getRegion().getRegionWidth() - 110;
-            float coinCountTextY = sidePanelY - 20;
-            font.draw(batch, "Coins Collected: " + coinCounter, coinCountTextX, coinCountTextY);
+        //if (visibleText) {
+        font.setColor(Color.WHITE);
+        font.draw(batch, "Order List:", sidePanelX + 10, sidePanelY + sidePanelHeight - 10);
+        float coinCountTextX = Gdx.graphics.getWidth()/2- 90/*sidePanelX - font.getRegion().getRegionWidth() - 110*/;
+        float coinCountTextY = Gdx.graphics.getHeight() - minOrderLabel.getHeight()-25/*sidePanelY - 20*/;
+        font.draw(batch, "Coins Collected: " + coinCounter, coinCountTextX, coinCountTextY);
         //System.out.println("orders completed:"+playerAttributes.getOrdersCompleted());
 
 
-
-            for (int i = 1; i < items.length; i++) {
-                if (orderTimeLeft[i - 1] <= 5 && orderTimeLeft[i - 1] > 0) {
-                    //if (order.isPickedUp()) {
-                    font.setColor(Color.RED);
-                    // }
-                } else {
-                    font.setColor(Color.WHITE);
-                }
-                font.draw(batch, items[i], sidePanelX + 10, sidePanelY + sidePanelHeight - 70 * i);
-
+        for (int i = 1; i < items.length; i++) {
+            if (orderTimeLeft[i - 1] <= 5 && orderTimeLeft[i - 1] > 0) {
+                //if (order.isPickedUp()) {
+                font.setColor(Color.RED);
+                // }
+            } else {
+                font.setColor(Color.WHITE);
             }
+            font.draw(batch, items[i], sidePanelX + 10, sidePanelY + sidePanelHeight - 70 * i);
+
         }
+        //}
 
         stage.draw();
         popup.render();
         gamepopup.render();
         //popup.draw();
         batch.end();
+    }
+        if (playerAttributes.ordersCompleted == minOrders) {
+            //if time >= 0:
+            //show game stats screen, pause game as part of this (if condition in render)
+            win = true;
+            showGameResult();
+            //else:
+            //show keep playing popup
+        }
 }
+
+    //show game stats screen
+    public void showGameResult() {
+        visibleText = false;
+        StringBuilder orderIDsStringBuilder = new StringBuilder("Successfully Delivered:\n");
+        for (String orderID : deliveredOrderIDs) {
+            orderIDsStringBuilder.append(orderID).append("\n");
+        }
+        String orderIDsMessage = orderIDsStringBuilder.toString();
+        String levelResult;
+        if (win){
+            levelResult = "Congrats, level completed!";
+        } else {
+            levelResult = "Game Over! :(";
+        }
+
+        String gameStatsMessage = "GAME STATS: \nTotal Coins Collected: " + coinCounter
+                + "\nTotal Orders Completed: " + totalOrdersCompleted;
+        gamepopup.showGameStatsMessage(gameStatsMessage);
+        gamepopup.showOrderCompletedList(orderIDsMessage);
+        gamepopup.showLevelResultMessage(levelResult);
+        gamepopup.show();
+        gamepopup.render();
+        multiplexer.addProcessor(gamepopup.getStage());
+        //System.out.println("Level completed!");
+    }
 
     // Trigger the timed popup to show
     public void showTimedPopup() {

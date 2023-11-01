@@ -25,6 +25,7 @@ public class GamePopup {
     private BitmapFont gameStatsfont;
     private Label gameStatsMessage;
     private Label ordersCompletedLabel;
+    private Label levelResultMessage;
 
     public GamePopup(final GameplayScreen screen, final String notificationMessage) {
         stage = new Stage();
@@ -37,13 +38,18 @@ public class GamePopup {
         gameStatsfont.getData().setScale(1f);
         gameStatsMessage = new Label(notificationMessage, new Label.LabelStyle(gameStatsfont, Color.YELLOW));
         gameStatsMessage.setFontScale(0.5f);
-        gameStatsMessage.setPosition(250, 500);
+        gameStatsMessage.setPosition(250, 475);
 
         ordersCompletedLabel = new Label("", new Label.LabelStyle(gameStatsfont, Color.YELLOW));
         ordersCompletedLabel.setFontScale(0.5f);
         ordersCompletedLabel.setPosition(50, 400);
-        stage.addActor(ordersCompletedLabel);
 
+        levelResultMessage = new Label("", new Label.LabelStyle(gameStatsfont, Color.YELLOW));
+        levelResultMessage.setFontScale(1f);
+        levelResultMessage.setPosition(Gdx.graphics.getWidth()/2 - levelResultMessage.getWidth() - 300, 550);
+
+        stage.addActor(levelResultMessage);
+        stage.addActor(ordersCompletedLabel);
         stage.addActor(gameStatsMessage);
     }
 
@@ -59,6 +65,11 @@ public class GamePopup {
         gameStatsMessage.setVisible(true);
         ordersCompletedLabel.setText(message);
         ordersCompletedLabel.setVisible(true);
+    }
+
+    public void showLevelResultMessage(String message) {
+        levelResultMessage.setText(message);
+        levelResultMessage.setVisible(true);
     }
 
     public void hideOrderCompletedList() {
