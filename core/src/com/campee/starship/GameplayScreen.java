@@ -497,6 +497,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                     }
                     if (!order.isPickedUp()) {
                         if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getPickupBounds())) {
+                            pickupLabel.setPosition(16, 16);
                             pickupLabel.setVisible(true);
                             if (keyProcessor.pPressed) {
                                 order.setPickedUp(true);
@@ -508,6 +509,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                         }
                     } else if (!order.isDroppedOff()) {
                         if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getDropoffBounds())) {
+                            dropoffLabel.setPosition(16, 16);
                             dropoffLabel.setVisible(true);
                             if (keyProcessor.oPressed) {
                                 order.setPickedUp(false);
