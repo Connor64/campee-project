@@ -1,5 +1,5 @@
 24601|Panera|Windsor|30
-c0d3r|Panera|Walc|50
+c0d3r|Panera|Walc|100
 5t4ck|Cosi|Honors|25
 h4ckr|Starbucks|CL50|40
 f1l3s|Third St|Union|50

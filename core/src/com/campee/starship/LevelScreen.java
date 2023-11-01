@@ -1,53 +1,86 @@
 package com.campee.starship;
+
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.GlyphLayout;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.*;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.badlogic.gdx.utils.viewport.ScalingViewport;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-public class LevelScreen implements Screen {
-    private final MoonshipGame game;
-    private OrthographicCamera camera;
-    private ShapeRenderer shapeRenderer;
-    private SpriteBatch batch;
-    private BitmapFont font;
+public class LevelScreen extends ScreenAdapter {
+    private final Game game;
     private Stage stage;
+    private ScrollPane scrollPane;
+    private CustomScrollPane scrollBar;
+    private BitmapFont font;
     private TextButton backButton; // Add a TextButton for the "BACK" button
-    private TextButton beginButton;
     private TextButton settingsButton;
+    private TextButton levelButton;
     private ExtendViewport viewport;
     private boolean isBackButtonHovered = false;
     private boolean isSettingButtonHovered = false;
-    private boolean isDemoButtonHovered = false;
+    private boolean isButtonHovered = false;
+    private Stage stage2;
 
     public LevelScreen(final Game game) {
-        this.game = (MoonshipGame) game;
-        camera = new OrthographicCamera();
-        camera.setToOrtho(false, 800, 600);
-        shapeRenderer = new ShapeRenderer();
-        batch = new SpriteBatch();
+        this.game = game;
+        stage = new Stage(new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
+        //stage = new Stage(new ScreenViewport());
         font = new BitmapFont();
         font.setColor(Color.BLACK);
         viewport = new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        stage = new Stage(viewport);
+
+        Table outerTable = new Table();
+        outerTable.setFillParent(true);
+        stage.addActor(outerTable);
+
+        Table innerTable = new Table();
+        outerTable.add(innerTable).center();
+
+        FileHandle levelsFolder = Gdx.files.internal("levels");
+        FileHandle[] levelFiles = levelsFolder.list();
+
+        Label titleLabel = new Label("LEVEL SELECT SCREEN", createTitleLabelStyle(Color.BLACK));
+
+        // Add title label to the top of the window with some padding
+        innerTable.add(titleLabel).padTop(50).colspan(3).center().row();
+
+        for (int i = 0; i < levelFiles.length; i += 3) {
+            Table rowTable = new Table(); // Create a new table for each row
+
+            // Add up to three level widgets in this row
+            for (int j = i; j < Math.min(i + 3, levelFiles.length); j++) {
+                Table levelWidget = createLevelWidget(levelFiles[j].nameWithoutExtension());
+                rowTable.add(levelWidget).pad(40).center();
+            }
+
+            // Add the rowTable to the innerTable
+            innerTable.add(rowTable).row();
+        }
+
+        CustomScrollPane customScrollPane = new CustomScrollPane(innerTable, stage);
+        customScrollPane.setScrollingDisabled(true, false);
+        customScrollPane.setFillParent(true);
+
+        //customScrollPane.setTouchable(Touchable.enabled);
+
+        stage.addActor(customScrollPane);
+        stage.setScrollFocus(scrollPane);
         Gdx.input.setInputProcessor(stage);
-        // Create BACK button similar to PLAY button in TitleScreen
+
         BitmapFont buttonFont = new BitmapFont();
         TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
         buttonFont.getData().setScale(1.5f);
@@ -77,61 +110,6 @@ public class LevelScreen implements Screen {
                 backButton.setColor(Color.WHITE);
             }
         });
-        stage.addActor(backButton);
-        TextButton.TextButtonStyle beginButtonStyle = new TextButton.TextButtonStyle();
-        beginButtonStyle.font = buttonFont;
-        beginButtonStyle.fontColor = Color.BLACK;
-        Pixmap beginButtonPixmap = createRoundedRectanglePixmap(150, 60, 15, Color.valueOf("98FF98"));
-        beginButtonStyle.up = new TextureRegionDrawable(new TextureRegion(new Texture(beginButtonPixmap)));
-
-
-        float screenWidth = Gdx.graphics.getWidth();
-        float screenHeight = Gdx.graphics.getHeight();
-        float buttonX = 30;
-        //float buttonY = (screenHeight - buttonHeight) / 2;
-//        float buttonHeight = 60;
-//        float buttonWidth = 150;
-//        float screenWidth = Gdx.graphics.getWidth();
-//        float screenHeight = Gdx.graphics.getHeight();
-//        float buttonX = 30;
-//        float buttonY = (screenHeight - buttonHeight) / 2;
-
-        beginButton = new TextButton("BEGIN DEMO", beginButtonStyle);
-        //beginButton.setPosition(buttonX, buttonY);
-        beginButton.setPosition(30, Gdx.graphics.getHeight() - 80);
-        //beginButton.setPosition(30, Gdx.graphics.getHeight() - 80);
-        //beginButton.setSize(Gdx.graphics.getWidth() - 180, Gdx.graphics.getHeight() - 80);
-        beginButton.setSize(150, 60);
-        beginButton.addListener(new InputListener() {
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                // Switch back to the title screen when the BACK button is clicked
-                try {
-                    game.setScreen(new GameplayScreen((MoonshipGame) game)); // Change to the screen you want
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
-                }
-                return true;
-            }
-            @Override
-            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
-                super.enter(event, x, y, pointer, fromActor);
-                isDemoButtonHovered = true;
-                beginButton.setColor(Color.LIGHT_GRAY);
-            }
-            @Override
-            public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
-                super.exit(event, x, y, pointer, toActor);
-                isDemoButtonHovered = false;
-                beginButton.setColor(Color.WHITE);
-            }
-        });
-
-        stage.addActor(beginButton);
-
         TextButton.TextButtonStyle settingsButtonStyle = new TextButton.TextButtonStyle();
         settingsButtonStyle.font = buttonFont;
         settingsButtonStyle.fontColor = Color.BLACK;
@@ -161,92 +139,130 @@ public class LevelScreen implements Screen {
         });
 
         stage.addActor(settingsButton);
+        stage.addActor(backButton);
+
+        //scrollPane.debug();
+        //innerTable.debug();
+        //outerTable.debug();
     }
 
-    @Override
-    public void show() {
+    private Label.LabelStyle createTitleLabelStyle(Color color) {
+        Label.LabelStyle style = new Label.LabelStyle();
+        style.font = new BitmapFont();
+        style.fontColor = color;
+        return style;
     }
+    private Table createLevelWidget(final String levelName) {
+        Table levelWidget = new Table();
+//        levelWidget.setBackground(new TextureRegionDrawable(new TextureRegion(new Texture(createPixmap(new Color(0.8f, 0.6f, 1f, 1f))))));
+
+        // Create a label
+        Label label = new Label(levelName, createLabelStyle(Color.BLACK));
+        label.setFontScale(1.2f);
+
+        // Create a button
+        TextButton.TextButtonStyle levelButtonStyle = new TextButton.TextButtonStyle();
+        BitmapFont levelButtonFont = new BitmapFont();
+        levelButtonFont.getData().setScale(1f);
+        levelButtonStyle.font = levelButtonFont;
+        levelButtonStyle.fontColor = Color.BLACK;
+        levelButtonStyle.up = new TextureRegionDrawable(new TextureRegion(new Texture(createRoundedRectanglePixmap(100, 45, 15, Color.YELLOW))));
+        //levelButtonStyle.down = new TextureRegionDrawable(new TextureRegion(new Texture(createRoundedRectanglePixmap(150, 60, 15, Color.YELLOW))));
+
+        final TextButton levelButton = new TextButton("UNLOCKED", levelButtonStyle);
+        levelButton.setSize(10, 20);
+        levelButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                try {
+                    game.setScreen(new GameplayScreen((MoonshipGame) game, levelName));
+                    //System.out.println("hereeee");
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                } catch (ClassNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+//                return true;
+            }
+            @Override
+            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+                super.enter(event, x, y, pointer, fromActor);
+                isButtonHovered = true;
+                levelButton.setColor(Color.LIGHT_GRAY);
+            }
+            @Override
+            public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
+                super.exit(event, x, y, pointer, toActor);
+                isButtonHovered = false;
+                levelButton.setColor(Color.WHITE);
+            }
+        });
+
+        // Add the label to the top center of the table
+        levelWidget.add(label).padBottom(30).colspan(3).center().row();
+
+        // Add the button slightly towards the bottom of the rectangle
+        levelWidget.add(levelButton).padBottom(30).colspan(3).center().row();
+
+        // Set background for the table
+        levelWidget.setBackground(new TextureRegionDrawable(new TextureRegion(new Texture(createPixmap(new Color(0.8f, 0.6f, 1f, 1f))))));
+
+        // Adjust padding and other properties as needed
+        levelWidget.pad(30);
+
+        return levelWidget;
+    }
+
+    private Label.LabelStyle createLabelStyle(Color color) {
+        Label.LabelStyle style = new Label.LabelStyle();
+        style.font = new BitmapFont();
+        style.fontColor = color;
+        return style;
+    }
+
+    private TextButton.TextButtonStyle createButtonStyle(Color upColor, Color downColor) {
+        TextButton.TextButtonStyle style = new TextButton.TextButtonStyle();
+        style.font = new BitmapFont();
+        style.up = new TextureRegionDrawable(new TextureRegion(new Texture(createPixmap(upColor))));
+        style.down = new TextureRegionDrawable(new TextureRegion(new Texture(createPixmap(downColor))));
+        return style;
+    }
+
+    private Pixmap createPixmap(Color color) {
+        Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+        pixmap.setColor(color);
+        pixmap.fill();
+        return pixmap;
+    }
+    private Pixmap createPixmap(Color color, int width, int height) {
+        Pixmap pixmap = new Pixmap(width, height, Pixmap.Format.RGBA8888);
+        pixmap.setColor(color);
+        pixmap.fill();
+        return pixmap;
+    }
+
     @Override
     public void render(float delta) {
         Gdx.gl.glClearColor(0.7f, 0.9f, 1f, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        shapeRenderer.setProjectionMatrix(camera.combined);
-        shapeRenderer.begin(ShapeType.Filled);
+        Gdx.gl.glClear(Gdx.gl20.GL_COLOR_BUFFER_BIT);
 
-        float boxWidth = 200;
-        //float boxHeight = 150;
-        float boxHeight = 200;
-        float boxSpacing = 50;
-        float startY = (camera.viewportHeight - boxHeight) / 2;
-
-        shapeRenderer.setColor(new Color(0.8f, 0.6f, 1f, 1f));
-        shapeRenderer.rect(boxSpacing, startY, boxWidth, boxHeight); // Level 1 box
-        shapeRenderer.rect(boxSpacing * 2 + boxWidth, startY, boxWidth, boxHeight); // Level 2 box
-        shapeRenderer.rect(boxSpacing * 3 + boxWidth * 2, startY, boxWidth, boxHeight); // Level 3 box
-        shapeRenderer.end();
-        batch.setProjectionMatrix(camera.combined);
-        batch.begin();
-        GlyphLayout layout = new GlyphLayout();
-        layout.setText(font, "LEVEL SELECT SCREEN");
-        float textX = (camera.viewportWidth - layout.width) / 2;
-        float textY = camera.viewportHeight - 50;
-        font.draw(batch, "LEVEL SELECT SCREEN", textX, textY);
-
-        layout.setText(font, "LEVEL 1");
-        float level1X = boxSpacing + (boxWidth - layout.width) / 2;
-        //float level1Y = startY + boxHeight / 2 + font.getLineHeight() / 2;
-        float level1Y = startY + boxHeight / 2 + font.getLineHeight() / 2 + 50;
-        font.getData().setScale(2f);
-        font.draw(batch, "LEVEL 1", level1X, level1Y);
-
-        layout.setText(font, "LEVEL 2");
-        float level2X = boxSpacing * 2 + boxWidth + (boxWidth - layout.width) / 2;
-        //float level2Y = startY + boxHeight / 2 + font.getLineHeight() / 2;
-        float level2Y = startY + boxHeight / 2 + font.getLineHeight() / 2 + 50;
-        font.draw(batch, "LEVEL 2", level2X, level2Y);
-
-        layout.setText(font, "LEVEL 3");
-        float level3X = boxSpacing * 3 + boxWidth * 2 + (boxWidth - layout.width) / 2;
-        //float level3Y = startY + boxHeight / 2 + font.getLineHeight() / 2;
-        float level3Y = startY + boxHeight / 2 + font.getLineHeight() / 2 + 50;
-        font.draw(batch, "LEVEL 3", level3X, level3Y);
-
-        batch.end();
-        stage.act(delta);
+        stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 80f));
+        //stage.act(delta);
         stage.draw();
     }
+
     @Override
     public void resize(int width, int height) {
         viewport.update(width, height, true);
         backButton.setPosition(30, viewport.getWorldHeight() - 80); // Update button position on resize
-        //beginButton.setPosition(viewport.getWorldWidth() - 180, viewport.getWorldHeight() - 80);
-        float buttonWidth = 150;
-        float buttonHeight = 60;
-        float buttonXPercentage = 0.19f; // 90% from the left side of the screen
-        float buttonYPercentage = 0.4f;
-        float buttonX = viewport.getWorldWidth() * buttonXPercentage - buttonWidth / 2;
-        float buttonY = viewport.getWorldHeight() * buttonYPercentage - buttonHeight / 2;
-
-        beginButton.setSize(buttonWidth, buttonHeight);
-        beginButton.setPosition(buttonX, buttonY);
-        //beginButton.setPosition(viewport.getWorldWidth() - 700, viewport.getWorldHeight() - 80);
         settingsButton.setPosition(viewport.getWorldWidth() - 180, viewport.getWorldHeight() - 80);
+        stage.getViewport().update(width, height, true);
     }
 
-    @Override
-    public void pause() {
-    }
-    @Override
-    public void resume() {
-    }
-    @Override
-    public void hide() {
-    }
     @Override
     public void dispose() {
-        shapeRenderer.dispose();
-        batch.dispose();
-        font.dispose();
         stage.dispose();
     }
     public Pixmap createRoundedRectanglePixmap(int width, int height, int cornerRadius, Color color) {
