@@ -462,7 +462,6 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         mainTimer.setText(str);
         mainTimer.setVisible(true);
 
-        if ()
 
         // building collisions and transparency
         for (BuildingObject building : buildings) {
