@@ -353,30 +353,6 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         camera.follow(player.position, levelWidth, levelHeight);
 
-        // screen boundary collisions
-        Rectangle playerBounds = player.sprite.getBoundingRectangle();
-        float threshold = 50;
-
-        // visual indicator that the player is almost off the screen
-//            if (!pickupLabel.isVisible() && !dropoffLabel.isVisible()) {
-        if (playerBounds.getX() <= -(levelWidth + threshold)) {
-            warningLabel.setPosition(levelWidth - (levelWidth - warningLabel.getWidth()), levelHeight / 2f);
-            warningLabel.setVisible(true);
-        } else if (playerBounds.getY() >= (levelWidth - threshold)) {
-            warningLabel.setPosition((levelWidth - (3 * warningLabel.getWidth())), levelHeight / 2f);
-            warningLabel.setVisible(true);
-        } else if ((playerBounds.getX() + player.getWidth()) <= (-levelHeight + threshold)) {
-            warningLabel.setPosition(levelWidth / 2f, levelHeight - (levelHeight - warningLabel.getHeight()));
-            warningLabel.setVisible(true);
-        } else if ((playerBounds.getY() + player.getHeight()) >= (levelHeight - threshold)) {
-            warningLabel.setPosition(levelWidth / 2f, levelHeight - warningLabel.getHeight());
-            warningLabel.setVisible(true);
-        } else {
-            // remove the label
-            warningLabel.setVisible(false);
-        }
-//            }
-        // }
         batch.setProjectionMatrix(camera.combined);
         //popup.update(delta);
 
