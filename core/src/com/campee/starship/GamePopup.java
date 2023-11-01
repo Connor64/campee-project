@@ -25,6 +25,7 @@ public class GamePopup {
     private BitmapFont gameStatsfont;
     private Label gameStatsMessage;
     private Label ordersCompletedLabel;
+    private Label ordersOutOfTimeLabel;
 
     public GamePopup(final GameplayScreen screen, final String notificationMessage) {
         stage = new Stage();
@@ -42,8 +43,13 @@ public class GamePopup {
         ordersCompletedLabel = new Label("", new Label.LabelStyle(gameStatsfont, Color.YELLOW));
         ordersCompletedLabel.setFontScale(0.5f);
         ordersCompletedLabel.setPosition(50, 400);
-        stage.addActor(ordersCompletedLabel);
 
+        ordersOutOfTimeLabel = new Label("", new Label.LabelStyle(gameStatsfont, Color.YELLOW));
+        ordersOutOfTimeLabel .setFontScale(0.5f);
+        ordersOutOfTimeLabel .setPosition(500, 400);
+
+        stage.addActor(ordersCompletedLabel);
+        stage.addActor(ordersOutOfTimeLabel);
         stage.addActor(gameStatsMessage);
     }
 
@@ -52,12 +58,20 @@ public class GamePopup {
         gameStatsMessage.setText(message);
         gameStatsMessage.setVisible(true);
         ordersCompletedLabel.setVisible(true);
+        ordersOutOfTimeLabel.setVisible(true);
     }
 
     public void showOrderCompletedList(String message) {
-        ordersCompletedLabel.setText("");
-        gameStatsMessage.setVisible(true);
         ordersCompletedLabel.setText(message);
+        gameStatsMessage.setVisible(true);
+        ordersOutOfTimeLabel.setVisible(true);
+        ordersCompletedLabel.setVisible(true);
+    }
+
+    public void showOutoffTimeList(String message) {
+        ordersOutOfTimeLabel.setText(message);
+        gameStatsMessage.setVisible(true);
+        ordersOutOfTimeLabel.setVisible(true);
         ordersCompletedLabel.setVisible(true);
     }
 

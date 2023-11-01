@@ -51,6 +51,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     public PlayerAttributes playerAttributes;
     private ArrayList<String> visibleQ;
     private ArrayList<String> deliveredOrderIDs;
+    private ArrayList<String> outOfTimeOrdersIDs;
 
     private final Popup popup;
     private final GamePopup gamepopup;
@@ -179,6 +180,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         playerAttributes.setArray(visibleQ);
         playerAttributes.orderInProgress = false;
         deliveredOrderIDs = new ArrayList<>();
+        outOfTimeOrdersIDs = new ArrayList<>();
 
         totalOrdersCompleted = 0;
         order = new Order();
@@ -244,7 +246,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         //Make game stats button
         gameStatsButton = new TextButton("Game Stats", buttonStyle);
-        gameStatsButton.setPosition(Gdx.graphics.getWidth() - 300, 10);
+        gameStatsButton.setPosition(Gdx.graphics.getWidth() - 600, 10);
         gameStatsButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -255,10 +257,18 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                 }
                 String orderIDsMessage = orderIDsStringBuilder.toString();
 
+                StringBuilder timeOrderIDsStringBuilder = new StringBuilder("Out of Time Orders:\n");
+                for (String orderID : outOfTimeOrdersIDs) {
+                    timeOrderIDsStringBuilder.append(orderID).append("\n");
+                }
+                String notInTimeorderIDsMessage = timeOrderIDsStringBuilder.toString();
+
                 String gameStatsMessage = "GAME OVER! \nTotal Coins Collected: " + coinCounter
                         + "\nTotal Orders Completed: " + totalOrdersCompleted;
+
                 gamepopup.showGameStatsMessage(gameStatsMessage);
                 gamepopup.showOrderCompletedList(orderIDsMessage);
+                gamepopup.showOutoffTimeList(notInTimeorderIDsMessage);
                 gamepopup.show();
                 gamepopup.render();
                 multiplexer.addProcessor(gamepopup.getStage());
@@ -478,9 +488,11 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                             order.setPickedUp(false);
                         }
                     }
+                    outOfTimeOrdersIDs.add(order.getOrderString());
                     playerAttributes.array.remove(i);
                     orderTimeoutLabel.setVisible(true);
                     messageTimer = 0.0f;
+
                 } else {
                     if (timeCount[i - 1] % 60 == 0) {
                         time -= 1;
