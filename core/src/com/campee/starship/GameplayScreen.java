@@ -22,6 +22,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
+
 import java.util.Collections;
 
 
@@ -53,6 +54,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     public PlayerAttributes playerAttributes;
     private ArrayList<String> visibleQ;
     private ArrayList<String> deliveredOrderIDs;
+    private ArrayList<String> outOfTimeOrdersIDs;
 
     private final Popup popup;
     private final GamePopup gamepopup;
@@ -107,7 +109,9 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     private BitmapFont font;
     //final String gameStatsMessage;
 
-    /** The width/height of the virtual resolution of the screen. */
+    /**
+     * The width/height of the virtual resolution of the screen.
+     */
     private final int VIRTUAL_WIDTH = 480, VIRTUAL_HEIGHT = 270;
 
     private ArrayList<String> orderArray;
@@ -131,7 +135,6 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         tileSprites = new ArrayList<>();
         LevelData levelData = loadLevel(fileName);
-
 
 
         // TODO: Add serializable field to level data for the tilesize
@@ -182,6 +185,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         playerAttributes.setArray(visibleQ);
         playerAttributes.orderInProgress = false;
         deliveredOrderIDs = new ArrayList<>();
+        outOfTimeOrdersIDs = new ArrayList<>();
 
         totalOrdersCompleted = 0;
         order = new Order();
@@ -214,7 +218,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         dropoffObject.sprite.setPosition(order.getDropoffBounds().getX(), order.getDropoffBounds().getY());
 
         // Make button style
-        Pixmap backgroundPixmap = createRoundedRectanglePixmap(200, 50, 10, new Color (0.9f, 0, 0.9f, 0.6f)); // Adjust size and color
+        Pixmap backgroundPixmap = createRoundedRectanglePixmap(200, 50, 10, new Color(0.9f, 0, 0.9f, 0.6f)); // Adjust size and color
         TextButton.TextButtonStyle buttonStyle = new TextButton.TextButtonStyle();
         buttonStyle.up = new TextureRegionDrawable(new TextureRegion(new Texture(backgroundPixmap)));
         BitmapFont buttonFont = new BitmapFont();
@@ -231,12 +235,14 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                 System.out.println("clicked back");
                 game.setScreen(new LevelScreen(game));
             }
+
             @Override
             public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
                 super.enter(event, x, y, pointer, fromActor);
                 isBackButtonHovered = true;
                 backButton.setColor(Color.LIGHT_GRAY);
             }
+
             @Override
             public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
                 super.exit(event, x, y, pointer, toActor);
@@ -247,7 +253,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         //Make game stats button
         gameStatsButton = new TextButton("Game Stats", buttonStyle);
-        gameStatsButton.setPosition(Gdx.graphics.getWidth() - 300, 10);
+        gameStatsButton.setPosition(Gdx.graphics.getWidth() - 600, 10);
         gameStatsButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -260,14 +266,21 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
                 String gameStatsMessage = "GAME STATS! \nTotal Coins Collected: " + coinCounter
                         + "\nTotal Orders Completed: " + totalOrdersCompleted;
+                StringBuilder timeOrderIDsStringBuilder = new StringBuilder("Out of Time Orders:\n");
+                for (String orderID : outOfTimeOrdersIDs) {
+                    timeOrderIDsStringBuilder.append(orderID).append("\n");
+                }
+                String notInTimeorderIDsMessage = timeOrderIDsStringBuilder.toString();
+
+
                 gamepopup.showGameStatsMessage(gameStatsMessage);
                 gamepopup.showOrderCompletedList(orderIDsMessage);
+                gamepopup.showOutoffTimeList(notInTimeorderIDsMessage);
                 gamepopup.show();
                 gamepopup.render();
                 multiplexer.addProcessor(gamepopup.getStage());
             }
         });
-
 
 
         // Make next order button
@@ -297,6 +310,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                 isOrderButtonHovered = true;
                 nextOrderButton.setColor(Color.LIGHT_GRAY);
             }
+
             @Override
             public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
                 super.exit(event, x, y, pointer, toActor);
@@ -343,16 +357,16 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         dropoffLabel.setSize(font.getScaleX() * 16, font.getScaleY() * 16);
 
         // min orders label
-        minOrderLabel = new Label("Orders Completed: "+playerAttributes.ordersCompleted+"/"+minOrders, indicatorStyle);
+        minOrderLabel = new Label("Orders Completed: " + playerAttributes.ordersCompleted + "/" + minOrders, indicatorStyle);
         minOrderLabel.setSize(font.getScaleX() * 16, font.getScaleY() * 16);
         //minOrderLabel.setPosition(Gdx.graphics.getWidth() / 2 - minOrderLabel.getWidth() / 2, Gdx.graphics.getHeight() - minOrderLabel.getHeight());
-        minOrderLabel.setPosition(Gdx.graphics.getWidth()/2- 120,Gdx.graphics.getHeight() - minOrderLabel.getHeight()-17);
+        minOrderLabel.setPosition(Gdx.graphics.getWidth() / 2 - 120, Gdx.graphics.getHeight() - minOrderLabel.getHeight() - 17);
         minOrderLabel.setVisible(true);
         stage.addActor(minOrderLabel);
         //minOrderLabel.setText("Orders Completed: "+playerAttributes.ordersCompleted+"/"+minOrders);
 
         orderTimeoutLabel = new Label("Time ran out. Begin next delivery!", warningStyle);
-        orderTimeoutLabel.setPosition(Gdx.graphics.getWidth()/2- 180,Gdx.graphics.getHeight() - minOrderLabel.getHeight()-52);
+        orderTimeoutLabel.setPosition(Gdx.graphics.getWidth() / 2 - 180, Gdx.graphics.getHeight() - minOrderLabel.getHeight() - 52);
         orderTimeoutLabel.setVisible(false);
         stage.addActor(orderTimeoutLabel);
         orderTimeoutLabel.setSize(font.getScaleX() * 16, font.getScaleY() * 16);
@@ -376,7 +390,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     @Override
     public void show() {
         shapeRenderer = new ShapeRenderer();
-        font = new BitmapFont(Gdx.files.internal("moonships_font.fnt"), Gdx.files.internal("moonships_font.png"), false);; // Define your BitmapFont
+        font = new BitmapFont(Gdx.files.internal("moonships_font.fnt"), Gdx.files.internal("moonships_font.png"), false);
+        ; // Define your BitmapFont
         // Set font color and scale
         font.setColor(1, 1, 0, 1);
         font.getData().setScale(0.5f);
@@ -481,9 +496,11 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                                 order.setPickedUp(false);
                             }
                         }
+                        outOfTimeOrdersIDs.add(order.getOrderString());
                         playerAttributes.array.remove(i);
                         orderTimeoutLabel.setVisible(true);
                         messageTimer = 0.0f;
+
                     } else {
                         if (timeCount[i - 1] % 60 == 0) {
                             time -= 1;
@@ -559,48 +576,48 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             batch.end();
 
 
-        /* Draw UI elements */
-        batch.begin();
+            /* Draw UI elements */
+            batch.begin();
 
-        // Render the side panel
-        Gdx.gl.glEnable(GL20.GL_BLEND);
-        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(sidePanelColor);
-        shapeRenderer.rect(sidePanelX, sidePanelY, sidePanelWidth, sidePanelHeight);
-        shapeRenderer.end();
-        Gdx.gl.glDisable(GL20.GL_BLEND);
+            // Render the side panel
+            Gdx.gl.glEnable(GL20.GL_BLEND);
+            Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+            shapeRenderer.setColor(sidePanelColor);
+            shapeRenderer.rect(sidePanelX, sidePanelY, sidePanelWidth, sidePanelHeight);
+            shapeRenderer.end();
+            Gdx.gl.glDisable(GL20.GL_BLEND);
 
-        String[] items = playerAttributes.array.toArray(new String[0]);
+            String[] items = playerAttributes.array.toArray(new String[0]);
 
-        //if (visibleText) {
-        font.setColor(Color.WHITE);
-        font.draw(batch, "Order List:", sidePanelX + 10, sidePanelY + sidePanelHeight - 10);
-        float coinCountTextX = Gdx.graphics.getWidth()/2- 90/*sidePanelX - font.getRegion().getRegionWidth() - 110*/;
-        float coinCountTextY = Gdx.graphics.getHeight() - minOrderLabel.getHeight()-25/*sidePanelY - 20*/;
-        font.draw(batch, "Coins Collected: " + coinCounter, coinCountTextX, coinCountTextY);
-        //System.out.println("orders completed:"+playerAttributes.getOrdersCompleted());
+            //if (visibleText) {
+            font.setColor(Color.WHITE);
+            font.draw(batch, "Order List:", sidePanelX + 10, sidePanelY + sidePanelHeight - 10);
+            float coinCountTextX = Gdx.graphics.getWidth() / 2 - 90/*sidePanelX - font.getRegion().getRegionWidth() - 110*/;
+            float coinCountTextY = Gdx.graphics.getHeight() - minOrderLabel.getHeight() - 25/*sidePanelY - 20*/;
+            font.draw(batch, "Coins Collected: " + coinCounter, coinCountTextX, coinCountTextY);
+            //System.out.println("orders completed:"+playerAttributes.getOrdersCompleted());
 
 
-        for (int i = 1; i < items.length; i++) {
-            if (orderTimeLeft[i - 1] <= 5 && orderTimeLeft[i - 1] > 0) {
-                //if (order.isPickedUp()) {
-                font.setColor(Color.RED);
-                // }
-            } else {
-                font.setColor(Color.WHITE);
+            for (int i = 1; i < items.length; i++) {
+                if (orderTimeLeft[i - 1] <= 5 && orderTimeLeft[i - 1] > 0) {
+                    //if (order.isPickedUp()) {
+                    font.setColor(Color.RED);
+                    // }
+                } else {
+                    font.setColor(Color.WHITE);
+                }
+                font.draw(batch, items[i], sidePanelX + 10, sidePanelY + sidePanelHeight - 70 * i);
+
             }
-            font.draw(batch, items[i], sidePanelX + 10, sidePanelY + sidePanelHeight - 70 * i);
+            //}
 
+            stage.draw();
+            popup.render();
+            gamepopup.render();
+            //popup.draw();
+            batch.end();
         }
-        //}
-
-        stage.draw();
-        popup.render();
-        gamepopup.render();
-        //popup.draw();
-        batch.end();
-    }
         if (playerAttributes.ordersCompleted == minOrders) {
             //if time >= 0:
             //show game stats screen, pause game as part of this (if condition in render)
@@ -609,7 +626,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             //else:
             //show keep playing popup
         }
-}
+    }
 
     //show game stats screen
     public void showGameResult() {
@@ -620,7 +637,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         }
         String orderIDsMessage = orderIDsStringBuilder.toString();
         String levelResult;
-        if (win){
+        if (win) {
             levelResult = "Congrats, level completed!";
         } else {
             levelResult = "Game Over! :(";
@@ -711,10 +728,10 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     /**
      * Creates a rectangular panel with rounded corners.
      *
-     * @param width Width of the panel.
-     * @param height Height of the panel.
+     * @param width        Width of the panel.
+     * @param height       Height of the panel.
      * @param cornerRadius The radius of the corners.
-     * @param color The background color of the panel.
+     * @param color        The background color of the panel.
      * @return A pixmap object of the panel.
      */
     public Pixmap createRoundedRectanglePixmap(int width, int height, int cornerRadius, Color color) {
