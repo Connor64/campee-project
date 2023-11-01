@@ -65,13 +65,41 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     public Label minOrderLabel;
     public Label autoDeclineLabel;
     public Label orderTimeoutLabel;
+    public Label mainTimer;
 
-    private Timer timer;
-    private TimerTask timerTask;
     private int[] timeCount;
     private int[] orderTimeLeft;
     float messageTimer = 0.0f;
     final float MESSAGE_DURATION = 3.0f;
+
+    // Declare variables for the countdown timer
+    private int countdownMinutes = 3; // 2 minutes
+    private int countdownSeconds = 0;
+    private Timer countdownTimer = new Timer();
+
+
+    // Create a TimerTask to decrement the countdown timer
+    private TimerTask countdownTask = new TimerTask() {
+        @Override
+        public void run() {
+            if (countdownSeconds > 0) {
+                countdownSeconds--;
+            } else {
+                if (countdownMinutes > 0) {
+                    countdownMinutes--;
+                    countdownSeconds = 59;
+                } else {
+                    // Countdown has reached 0
+                    //game over = true !
+                    System.out.println("end of time");
+                    this.cancel(); // Stop the timer
+                }
+            }
+        }
+    };
+
+
+
 
     //private TimedPopup incomingOrder;
 
@@ -111,6 +139,10 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     public GameplayScreen(final MoonshipGame game, String fileName) throws IOException, ClassNotFoundException {
         this.GAME = game;
         batch = game.batch;
+
+        // Create a Timer object to schedule the TimerTask
+        countdownTimer.scheduleAtFixedRate(countdownTask, 100, 100);
+
 
         timeCount = new int[5];
         orderTimeLeft = new int[5];
@@ -342,6 +374,14 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         stage.addActor(orderTimeoutLabel);
         orderTimeoutLabel.setSize(font.getScaleX() * 16, font.getScaleY() * 16);
 
+        String str = "Time remaining:\n" + "     " + String.valueOf(countdownMinutes) + ":" + String.valueOf(countdownSeconds);
+        mainTimer = new Label(str, indicatorStyle);
+        mainTimer.setPosition(25,Gdx.graphics.getHeight() - 90);
+        mainTimer.setVisible(true);
+        stage.addActor(mainTimer);
+        mainTimer.setSize(font.getScaleX() * 16, font.getScaleY() * 16);
+
+
 
         //auto decline after order timeout label
         autoDeclineLabel = new Label("Order Timeout! Declined.", indicatorStyle);
@@ -401,6 +441,13 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         rock.render(batch, 20, -100);
         log.render(batch, 0, 10);
 
+        // Inside the render method
+
+
+
+
+
+
         // coin collision
         for (Coin coin : coins) {
             if (!coin.collected) {
@@ -411,6 +458,11 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                 }
             }
         }
+        String str = "Time remaining:\n" + "     " + String.valueOf(countdownMinutes) + ":" + String.valueOf(countdownSeconds);
+        mainTimer.setText(str);
+        mainTimer.setVisible(true);
+
+        if ()
 
         // building collisions and transparency
         for (BuildingObject building : buildings) {
