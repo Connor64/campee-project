@@ -64,12 +64,37 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     public Label autoDeclineLabel;
     public Label orderTimeoutLabel;
 
-    private Timer timer;
-    private TimerTask timerTask;
     private int[] timeCount;
     private int[] orderTimeLeft;
     float messageTimer = 0.0f;
     final float MESSAGE_DURATION = 3.0f;
+
+    // Declare variables for the countdown timer
+    private int countdownMinutes = 2; // 2 minutes
+    private int countdownSeconds = 0;
+    private Timer countdownTimer = new Timer();
+
+
+    // Create a TimerTask to decrement the countdown timer
+    private TimerTask countdownTask = new TimerTask() {
+        @Override
+        public void run() {
+            if (countdownSeconds > 0) {
+                countdownSeconds--;
+            } else {
+                if (countdownMinutes > 0) {
+                    countdownMinutes--;
+                    countdownSeconds = 59;
+                } else {
+                    // Countdown has reached 0
+                    this.cancel(); // Stop the timer
+                }
+            }
+        }
+    };
+
+
+
 
     //private TimedPopup incomingOrder;
 
@@ -109,6 +134,10 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     public GameplayScreen(final MoonshipGame game, String fileName) throws IOException, ClassNotFoundException {
         this.GAME = game;
         batch = game.batch;
+
+        // Create a Timer object to schedule the TimerTask
+        countdownTimer.scheduleAtFixedRate(countdownTask, 1000, 1000);
+
 
         timeCount = new int[5];
         orderTimeLeft = new int[5];
@@ -371,6 +400,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         /* ===== Draw game objects ===== */
         batch.begin();
 
+        font.draw(batch, String.format("%02d:%02d", countdownMinutes, countdownSeconds), 10, Gdx.graphics.getHeight() - 20);
 
         for (Sprite sprite : tileSprites) {
             sprite.draw(batch);
