@@ -158,7 +158,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         // making multiple buildings
         // TODO: change so its not a random location
-        buildings = new BuildingObject[1];
+        buildings = new BuildingObject[2];
         String spriteList[] = new String[3];
         spriteList[0] = "pmu.PNG";
         spriteList[1] = "haas.PNG";
@@ -179,6 +179,9 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             }
             buildings[i] = new BuildingObject(world, x, y);
             buildings[i].setSprite(spriteList[i]);
+            String sprite = spriteList[i];
+            buildings[i].setName(sprite.substring(0, (sprite.length() - 4)));
+            System.out.println(buildings[i].getName());
             buildings[i].sprite.setPosition(x, y);
         }
 
@@ -344,36 +347,36 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         // If the popup is not visible, update the player and world
         //if (!popup.isVisible()) {
-            player.update(delta, keyProcessor);
-            player.checkBounds(levelWidth, levelHeight);
-            world.step(1/60f, 6, 2); // Physics calculations
+        player.update(delta, keyProcessor);
+        player.checkBounds(levelWidth, levelHeight);
+        world.step(1 / 60f, 6, 2); // Physics calculations
 
-            camera.follow(player.position, levelWidth, levelHeight);
+        camera.follow(player.position, levelWidth, levelHeight);
 
-            // screen boundary collisions
-            Rectangle playerBounds = player.sprite.getBoundingRectangle();
-            float threshold = 50;
+        // screen boundary collisions
+        Rectangle playerBounds = player.sprite.getBoundingRectangle();
+        float threshold = 50;
 
-            // visual indicator that the player is almost off the screen
+        // visual indicator that the player is almost off the screen
 //            if (!pickupLabel.isVisible() && !dropoffLabel.isVisible()) {
-                if (playerBounds.getX() <= -(levelWidth + threshold)) {
-                    warningLabel.setPosition(levelWidth - (levelWidth - warningLabel.getWidth()), levelHeight / 2f);
-                    warningLabel.setVisible(true);
-                } else if (playerBounds.getY() >= (levelWidth - threshold)) {
-                    warningLabel.setPosition((levelWidth - (3 * warningLabel.getWidth())), levelHeight / 2f);
-                    warningLabel.setVisible(true);
-                } else if ((playerBounds.getX() + player.getWidth()) <= (-levelHeight + threshold)) {
-                    warningLabel.setPosition(levelWidth / 2f, levelHeight - (levelHeight - warningLabel.getHeight()));
-                    warningLabel.setVisible(true);
-                } else if ((playerBounds.getY() + player.getHeight()) >= (levelHeight - threshold)) {
-                    warningLabel.setPosition(levelWidth / 2f, levelHeight - warningLabel.getHeight());
-                    warningLabel.setVisible(true);
-                } else {
-                    // remove the label
-                    warningLabel.setVisible(false);
-                }
+        if (playerBounds.getX() <= -(levelWidth + threshold)) {
+            warningLabel.setPosition(levelWidth - (levelWidth - warningLabel.getWidth()), levelHeight / 2f);
+            warningLabel.setVisible(true);
+        } else if (playerBounds.getY() >= (levelWidth - threshold)) {
+            warningLabel.setPosition((levelWidth - (3 * warningLabel.getWidth())), levelHeight / 2f);
+            warningLabel.setVisible(true);
+        } else if ((playerBounds.getX() + player.getWidth()) <= (-levelHeight + threshold)) {
+            warningLabel.setPosition(levelWidth / 2f, levelHeight - (levelHeight - warningLabel.getHeight()));
+            warningLabel.setVisible(true);
+        } else if ((playerBounds.getY() + player.getHeight()) >= (levelHeight - threshold)) {
+            warningLabel.setPosition(levelWidth / 2f, levelHeight - warningLabel.getHeight());
+            warningLabel.setVisible(true);
+        } else {
+            // remove the label
+            warningLabel.setVisible(false);
+        }
 //            }
-       // }
+        // }
         batch.setProjectionMatrix(camera.combined);
         //popup.update(delta);
 
@@ -406,12 +409,10 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             }
         }
 
-        // building collisions
-        // TODO: change the dropoff stuff for buildings
+        // building collisions and transparency
         for (BuildingObject building : buildings) {
             building.render(batch, (int) building.sprite.getX(), (int) building.sprite.getY());
             if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), building.getBounds())) {
-                building.setDropoffLocation(true);
                 building.setTransparent(true);
                 Rectangle collisionBounds = new Rectangle(building.getBounds());
                 collisionBounds.setHeight(collisionBounds.getHeight() / 2);
@@ -425,9 +426,169 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                 }
             } else {
                 building.setTransparent(false);
-                building.setDropoffLocation(false);
             }
         }
+
+//        if (playerAttributes.orderInProgress) {
+//            for (int i = 1; i < playerAttributes.array.size(); i++ ) {
+//                // go through all the orders in the current player queue
+//                String[] s = order.stringToArray(playerAttributes.array.get(i));
+//                String str3 = s[3];
+//                String str2 = s[2];
+//                String currDrop = str3.substring(0, str3.length() - 6);
+//                String currPick = str2.substring(0, str2.length() - 3);
+//                int currTime = Integer.parseInt(s[4]);
+//
+//                for (BuildingObject building : buildings) {
+//                    if (currPick.equals(building.getName()) && ) {
+//                        building.setPickupLocation(true);
+//                    } else {
+//                        building.setDropoffLocation(false);
+//                    }
+//                    if (currDrop.equals(building.getName()) && currTime > 0) {
+//                        building.setDropoffLocation(true);
+//                    } else {
+//                        building.setDropoffLocation(false);
+//                    }
+//
+//                    if (!order.isPickedUp() && order.getPickupLocation().equals(building.getName())) {
+//                        // if order is not picked up and the building in the list is the pickuplocation,
+//                        if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), building.getBounds())) {
+//                            // if the player is near the pickup location
+//                            pickupLabel.setVisible(true);
+//                            if (keyProcessor.pPressed) {
+//                                building.setPickupLocation(false);
+//                                order.setPickedUp(true);
+//                                order.setDroppedOff(false);
+//                                pickupLabel.setVisible(false);
+//                            }
+//                        } else {
+//                            pickupLabel.setVisible(false);
+//                        }
+//                    } else if (order.getDropoffBounds().equals(building.getName()) && !order.isDroppedOff()) {
+//                        if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), building.getBounds())) {
+//                            dropoffLabel.setVisible(true);
+//                            if (keyProcessor.oPressed) {
+//                                building.setDropoffLocation(false);
+//                                order.setPickedUp(false);
+//                                order.setDroppedOff(true);
+//                                playerAttributes.array.remove(1);
+//                                if (playerAttributes.array.size() <= 1) {
+//                                    playerAttributes.orderInProgress = false;
+//                                }
+//                                dropoffLabel.setVisible(false);
+//                            }
+//                        } else {
+//                            dropoffLabel.setVisible(false);
+//                        }
+//                    }
+//                }
+//
+//
+//            }
+//        }
+
+//        if (playerAttributes.array.size() > 1) {
+//            for (BuildingObject building : buildings) {
+//                if (order.getPickupLocation().equals(building.getName()) && !order.isPickedUp()) {
+//                    building.setPickupLocation(true);
+//                }
+//            }
+//
+//            if (!order.isPickedUp()) {
+//                if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getPickupBounds())) {
+//                    pickupLabel.setVisible(true);
+//                    if (keyProcessor.pPressed) {
+//                        order.setPickedUp(true);
+//                        order.setDroppedOff(false);
+//                        pickupLabel.setVisible(false);
+//                    }
+//                } else {
+//                    pickupLabel.setVisible(false);
+//                }
+//            } else if (!order.isDroppedOff()) {
+//                dropoffObject.sprite.draw(batch);
+//                if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getDropoffBounds())) {
+//                    dropoffLabel.setVisible(true);
+//                    if (keyProcessor.oPressed) {
+//                        order.setPickedUp(false);
+//                        order.setDroppedOff(true);
+//                        playerAttributes.array.remove(1);
+//                        if (playerAttributes.array.size() <= 1) {
+//                            playerAttributes.orderInProgress = false;
+//                        }
+//                        dropoffLabel.setVisible(false);
+//                    }
+//                } else {
+//                    dropoffLabel.setVisible(false);
+//                }
+//            }
+//        }
+
+            // set all buildings to not pickup/dropoff if no queued orders
+            if (playerAttributes.array.size() <= 1) {
+                for (BuildingObject building : buildings) {
+                    building.setDropoffLocation(false);
+                    building.setPickupLocation(false);
+                }
+            }
+
+            //  building dropoff and pickup pin stuff
+            if (playerAttributes.orderInProgress) {
+                for (int i = 1; i < playerAttributes.array.size(); i++) {
+                    for (BuildingObject building : buildings) {
+                        // assign the building to the correct order
+                        if (building.getName().equals(order.getPickupLocation()) && !order.isPickedUp()) {
+                            building.setPickupLocation(true);
+                            order.setPickupBounds(building.getBounds().getX(), building.getBounds().getY(), building.getWidth(), building.getHeight());
+                        } else {
+                            building.setPickupLocation(false);
+                        }
+                        if (building.getName().equals(order.getDropoffLocation()) && !order.isDroppedOff() && order.isPickedUp()) {
+                            building.setDropoffLocation(true);
+                            order.setDropoffBounds(building.getBounds().getX(), building.getBounds().getY(), building.getWidth(), building.getHeight());
+                        } else {
+                            building.setDropoffLocation(false);
+                        }
+                    }
+                    if (!order.isPickedUp()) {
+                        if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getPickupBounds())) {
+                            pickupLabel.setVisible(true);
+                            if (keyProcessor.pPressed) {
+                                order.setPickedUp(true);
+                                order.setDroppedOff(false);
+                                pickupLabel.setVisible(false);
+                            }
+                        } else {
+                            pickupLabel.setVisible(false);
+                        }
+                    } else if (!order.isDroppedOff()) {
+                        if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getDropoffBounds())) {
+                            dropoffLabel.setVisible(true);
+                            if (keyProcessor.oPressed) {
+                                order.setPickedUp(false);
+                                order.setDroppedOff(true);
+                                playerAttributes.array.remove(1);
+                                if (playerAttributes.array.size() <= 1) {
+                                    playerAttributes.orderInProgress = false;
+                                }
+                                dropoffLabel.setVisible(false);
+                            }
+                        } else {
+                            dropoffLabel.setVisible(false);
+                        }
+                    }
+                }
+            }  else {
+                // set everything to false
+                order.setPickedUp(false);
+                order.setDroppedOff(false);
+                for (BuildingObject building : buildings) {
+                    building.setDropoffLocation(false);
+                    building.setPickupLocation(false);
+                }
+            }
+
 
 
         if (playerAttributes.orderInProgress) {
@@ -485,37 +646,6 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             }
         }
 
-        if (playerAttributes.array.size() > 1) {
-            if (!order.isPickedUp()) {
-                pickupObject.sprite.draw(batch);
-                if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getPickupBounds())) {
-                    pickupLabel.setVisible(true);
-                    if (keyProcessor.pPressed) {
-                        order.setPickedUp(true);
-                        order.setDroppedOff(false);
-                        pickupLabel.setVisible(false);
-                    }
-                } else {
-                    pickupLabel.setVisible(false);
-                }
-            } else if (!order.isDroppedOff()) {
-                dropoffObject.sprite.draw(batch);
-                if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getDropoffBounds())) {
-                    dropoffLabel.setVisible(true);
-                    if (keyProcessor.oPressed) {
-                        order.setPickedUp(false);
-                        order.setDroppedOff(true);
-                        playerAttributes.array.remove(1);
-                        if (playerAttributes.array.size() <= 1) {
-                            playerAttributes.orderInProgress = false;
-                        }
-                        dropoffLabel.setVisible(false);
-                    }
-                } else {
-                    dropoffLabel.setVisible(false);
-                }
-            }
-        }
 
         batch.end();
 

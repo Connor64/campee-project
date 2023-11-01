@@ -15,6 +15,7 @@ public class BuildingObject extends GameObject {
     private boolean transparent;
     private Sprite pickSprite;
     private Sprite dropSprite;
+    private String name;
 
     public BuildingObject(World world, float x, float y) {
         super(world, x, y);
@@ -78,17 +79,13 @@ public class BuildingObject extends GameObject {
         this.transparent = status;
     }
 
-//    @Override
-//    public void setSprite(String spritePath) {
-//        Texture texture = new Texture(Gdx.files.internal(spritePath));
-//        texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-//        TextureRegion region = new TextureRegion(texture, 0, 0, 128,128);
-//        sprite = new Sprite(region);
-//        sprite.setOrigin(sprite.getX() / 2,sprite.getY() / 2);
-//        sprite.setPosition(0, 0);
-//        this.setHeight(sprite.getHeight());
-//        this.setWidth(sprite.getWidth());
-//    }
+    public String getName() {
+        return this.name;
+    }
+
+    public void setName(String n) {
+        name = n;
+    }
 
     @Override
     public void render(SpriteBatch batch, int x, int y) {
