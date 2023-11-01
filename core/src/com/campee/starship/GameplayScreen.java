@@ -244,7 +244,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         //Make game stats button
         gameStatsButton = new TextButton("Game Stats", buttonStyle);
-        gameStatsButton.setPosition(Gdx.graphics.getWidth() - 220, 10);
+        gameStatsButton.setPosition(Gdx.graphics.getWidth() - 300, 10);
         gameStatsButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
