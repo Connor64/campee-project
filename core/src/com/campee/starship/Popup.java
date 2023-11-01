@@ -26,6 +26,7 @@ public class Popup {
     private BitmapFont gameStatsfont;
     private Label messageLabel;
     private Label gameStatsMessage;
+    private Label ordersCompletedLabel;
     private boolean acceptClicked;
     private boolean declineClicked;
     private boolean isAcceptButtonHovered = false;
@@ -55,12 +56,12 @@ public class Popup {
         gameStatsfont.getData().setScale(1f);
         gameStatsMessage = new Label(notificationMessage, new Label.LabelStyle(gameStatsfont, Color.YELLOW));
         gameStatsMessage.setFontScale(0.5f);
+        gameStatsMessage.setPosition(250, 500);
 
-        float centerX = Gdx.graphics.getWidth() / 2 - gameStatsMessage.getWidth() / 2;
-        float centerY = Gdx.graphics.getHeight() / 2 - gameStatsMessage.getHeight() / 2;
-
-        gameStatsMessage.setPosition(centerX, centerY);
-
+        ordersCompletedLabel = new Label("", new Label.LabelStyle(gameStatsfont, Color.YELLOW));
+        ordersCompletedLabel.setFontScale(0.5f);
+        ordersCompletedLabel.setPosition(100, 500);
+        stage.addActor(ordersCompletedLabel);
 
         Pixmap acceptBackgroundPixmap = createRoundedRectanglePixmap(200, 50, 10, Color.GREEN); // Adjust size and color
         TextButton.TextButtonStyle acceptButtonStyle = new TextButton.TextButtonStyle();
@@ -95,8 +96,6 @@ public class Popup {
                 acceptClicked = true;
                 screen.playerAttributes.orderInProgress = true;
                 screen.playerAttributes.array.add(screen.order.arrayToString());
-
-
 
                 visible = false;
             }
@@ -158,16 +157,23 @@ public class Popup {
         messageLabel.setVisible(false);
     }
 
-    public void showGameStatsQ(ArrayList<String> message) {
-        gameStatsMessage.setText((CharSequence) message);
-        gameStatsMessage.setVisible(true);
-        messageLabel.setVisible(false);
-    }
-
     public void showGameStatsMessage(String message) {
         gameStatsMessage.setText(message);
         gameStatsMessage.setVisible(true);
+        ordersCompletedLabel.setVisible(true);
         messageLabel.setVisible(false);
+    }
+
+    public void showOrderCompletedList(String message) {
+        ordersCompletedLabel.setText("");
+        messageLabel.setVisible(false);
+        gameStatsMessage.setVisible(true);
+        ordersCompletedLabel.setText(message);
+        ordersCompletedLabel.setVisible(true);
+    }
+
+    public void hideOrderCompletedList() {
+        ordersCompletedLabel.setVisible(false);
     }
 
     public void hideGameStatsMessage() {

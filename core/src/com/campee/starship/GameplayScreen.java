@@ -44,8 +44,10 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     private Player player;
     public PlayerAttributes playerAttributes;
     private ArrayList<String> visibleQ;
+    private ArrayList<String> deliveredOrderIDs;
 
     private final Popup popup;
+    private final GamePopup gamepopup;
     private Coin coin;
     public int coinCounter;
     public Coin[] coins;
@@ -88,6 +90,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     private float sidePanelHeight;
     private Color sidePanelColor;
     private BitmapFont font;
+    //final String gameStatsMessage;
 
     /** The width/height of the virtual resolution of the screen. */
     private final int VIRTUAL_WIDTH = 480, VIRTUAL_HEIGHT = 270;
@@ -107,6 +110,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         orderTimeLeft = new int[5];
         Arrays.fill(timeCount, 0);
         Arrays.fill(orderTimeLeft, 6);
+        //gameStatsMessage = "";
 
         tileSprites = new ArrayList<>();
         LevelData levelData = loadLevel();
@@ -156,6 +160,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         visibleQ = new ArrayList<>();
         playerAttributes.setArray(visibleQ);
         playerAttributes.orderInProgress = false;
+        deliveredOrderIDs = new ArrayList<>();
 
         totalOrdersCompleted = 0;
         order = new Order();
@@ -176,6 +181,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
 //        order.setPickupBounds(10, 55, 16, 16);
 //        order.setDropoffBounds(22, 102, 16, 16);
+
+        gamepopup = new GamePopup(this, "");
 
         pickupObject = new GameObject(world, order.getPickupBounds().getX(), order.getPickupBounds().getY());
         pickupObject.setSprite("borger.png");
@@ -224,17 +231,19 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 visibleText = false;
+                StringBuilder orderIDsStringBuilder = new StringBuilder("Successfully Delivered:\n");
+                for (String orderID : deliveredOrderIDs) {
+                    orderIDsStringBuilder.append(orderID).append("\n");
+                }
+                String orderIDsMessage = orderIDsStringBuilder.toString();
+
                 String gameStatsMessage = "GAME OVER! \nTotal Coins Collected: " + coinCounter
                         + "\nTotal Orders Completed: " + totalOrdersCompleted;
-                popup.showGameStatsMessage(gameStatsMessage);
-                popup.showGameStatsQ(visibleQ);
-                popup.hideNextOrderMessage();
-                popup.hideAcceptButton();
-                popup.hideDeclineButton();
-                popup.show();
-                popup.render();
-                multiplexer.addProcessor(popup.getStage());
-
+                gamepopup.showGameStatsMessage(gameStatsMessage);
+                gamepopup.showOrderCompletedList(orderIDsMessage);
+                gamepopup.show();
+                gamepopup.render();
+                multiplexer.addProcessor(gamepopup.getStage());
             }
         });
 
@@ -330,7 +339,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         if (!popup.isVisible()) {
             player.update(delta, keyProcessor);
             player.checkBounds(levelWidth, levelHeight);
-            world.step(1/60f, 6, 2); // Physics calculations
+            world.step(1 / 60f, 6, 2); // Physics calculations
 
             camera.follow(player.position, levelWidth, levelHeight);
 
@@ -390,7 +399,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         }
 
         if (playerAttributes.orderInProgress) {
-            for (int i = 1; i < playerAttributes.array.size(); i++ ) {
+            for (int i = 1; i < playerAttributes.array.size(); i++) {
                 String[] s = order.stringToArray(playerAttributes.array.get(i));
                 int time;
                 boolean twoName = false;
@@ -463,6 +472,14 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                         order.setDroppedOff(true);
                         playerAttributes.array.remove(1);
                         totalOrdersCompleted++;
+                        String orderID = order.getOrderString();
+                        System.out.println("order id: " + orderID);
+                        if (!deliveredOrderIDs.contains(orderID)) {
+                            deliveredOrderIDs.add(orderID);
+                            System.out.println("Order " + orderID + " has been delivered and added to the list.");
+                        }
+                        System.out.println("Order List: " + deliveredOrderIDs);
+
                         if (playerAttributes.array.size() <= 1) {
                             playerAttributes.orderInProgress = false;
                         }
@@ -496,22 +513,24 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             float coinCountTextX = sidePanelX - font.getRegion().getRegionWidth() - 110;
             float coinCountTextY = sidePanelY - 20;
             font.draw(batch, "Coins Collected: " + coinCounter, coinCountTextX, coinCountTextY);
-        }
 
-        for (int i = 1; i < items.length; i++) {
-            if (orderTimeLeft[i - 1] <= 5 && orderTimeLeft[i - 1] > 0) {
-                //if (order.isPickedUp()) {
-                font.setColor(Color.RED);
-                // }
-            } else {
-                font.setColor(Color.WHITE);
+
+            for (int i = 1; i < items.length; i++) {
+                if (orderTimeLeft[i - 1] <= 5 && orderTimeLeft[i - 1] > 0) {
+                    //if (order.isPickedUp()) {
+                    font.setColor(Color.RED);
+                    // }
+                } else {
+                    font.setColor(Color.WHITE);
+                }
+                font.draw(batch, items[i], sidePanelX + 10, sidePanelY + sidePanelHeight - 70 * i);
+
             }
-            font.draw(batch, items[i], sidePanelX + 10, sidePanelY + sidePanelHeight - 70 * i);
-
-        }
+    }
 
         stage.draw();
         popup.render();
+        gamepopup.render();
 
         batch.end();
     }
