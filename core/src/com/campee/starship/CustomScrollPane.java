@@ -1,15 +1,12 @@
 package com.campee.starship;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 public class CustomScrollPane extends ScrollPane {
 
@@ -17,21 +14,9 @@ public class CustomScrollPane extends ScrollPane {
         super(widget);
         setupScrollBar();
         stage.addActor(this);
+//        widget.setScrollFocus(this);
     }
 
-//    private void setupScrollBar() {
-//        ScrollPaneStyle style = new ScrollPaneStyle();
-//        style.vScroll = new TextureRegionDrawable(new TextureRegion(new Texture(createPixmap(Color.GRAY))));
-//        style.vScrollKnob = new TextureRegionDrawable(new TextureRegion(new Texture(createPixmap(Color.DARK_GRAY))));
-//        setStyle(style);
-//    }
-//
-//    private Pixmap createPixmap(Color color) {
-//        Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
-//        pixmap.setColor(color);
-//        pixmap.fill();
-//        return pixmap;
-//    }
     private void setupScrollBar() {
         // Create a new skin for the scroll bar
         Skin skin = new Skin();
