@@ -63,6 +63,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     public Label minOrderLabel;
     public Label autoDeclineLabel;
     public Label orderTimeoutLabel;
+    public Label mainTimer;
 
     private int[] timeCount;
     private int[] orderTimeLeft;
@@ -70,7 +71,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     final float MESSAGE_DURATION = 3.0f;
 
     // Declare variables for the countdown timer
-    private int countdownMinutes = 2; // 2 minutes
+    private int countdownMinutes = 3; // 2 minutes
     private int countdownSeconds = 0;
     private Timer countdownTimer = new Timer();
 
@@ -87,6 +88,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                     countdownSeconds = 59;
                 } else {
                     // Countdown has reached 0
+                    //game over = true !
+                    System.out.println("end of time");
                     this.cancel(); // Stop the timer
                 }
             }
@@ -136,7 +139,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         batch = game.batch;
 
         // Create a Timer object to schedule the TimerTask
-        countdownTimer.scheduleAtFixedRate(countdownTask, 1000, 1000);
+        countdownTimer.scheduleAtFixedRate(countdownTask, 100, 100);
 
 
         timeCount = new int[5];
@@ -332,6 +335,14 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         stage.addActor(orderTimeoutLabel);
         orderTimeoutLabel.setSize(font.getScaleX() * 16, font.getScaleY() * 16);
 
+        String str = "Time remaining:\n" + "     " + String.valueOf(countdownMinutes) + ":" + String.valueOf(countdownSeconds);
+        mainTimer = new Label(str, indicatorStyle);
+        mainTimer.setPosition(25,Gdx.graphics.getHeight() - 90);
+        mainTimer.setVisible(true);
+        stage.addActor(mainTimer);
+        mainTimer.setSize(font.getScaleX() * 16, font.getScaleY() * 16);
+
+
 
         //auto decline after order timeout label
         autoDeclineLabel = new Label("Order Timeout! Declined.", indicatorStyle);
@@ -400,7 +411,6 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         /* ===== Draw game objects ===== */
         batch.begin();
 
-        font.draw(batch, String.format("%02d:%02d", countdownMinutes, countdownSeconds), 10, Gdx.graphics.getHeight() - 20);
 
         for (Sprite sprite : tileSprites) {
             sprite.draw(batch);
@@ -410,6 +420,13 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         rock.render(batch, 20, 200);
         log.render(batch, 0, 10);
 
+        // Inside the render method
+
+
+
+
+
+
         // coin collision
         if (!coin.collected) {
             coin.render(batch, 100, 100);
@@ -418,6 +435,11 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                 coinCounter++;
             }
         }
+        String str = "Time remaining:\n" + "     " + String.valueOf(countdownMinutes) + ":" + String.valueOf(countdownSeconds);
+        mainTimer.setText(str);
+        mainTimer.setVisible(true);
+
+        if ()
 
         if (playerAttributes.orderInProgress) {
             for (int i = 1; i < playerAttributes.array.size(); i++ ) {
