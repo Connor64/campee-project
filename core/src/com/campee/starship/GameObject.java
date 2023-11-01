@@ -26,7 +26,7 @@ public class GameObject {
     public boolean visible;
     public Sprite sprite;
     private World world;
-    private Body body;
+    protected Body body;
     public float height;
     public float width;
 
@@ -51,6 +51,7 @@ public class GameObject {
     public Rectangle getBounds() {
         return bounds;
     }
+
     public void setBounds(float x, float y, float width, float height) {
         bounds.set(x, y, width, height);
     }
@@ -80,9 +81,8 @@ public class GameObject {
     public void setSprite(String spritePath) {
         Texture texture = new Texture(Gdx.files.internal(spritePath));
         texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-        TextureRegion region = new TextureRegion(texture, 0, 0, 16, 16);
+        TextureRegion region = new TextureRegion(texture, 0, 0, texture.getWidth(), texture.getHeight());
         sprite = new Sprite(region);
-//        sprite.setSize(50, 50);
         sprite.setOrigin(sprite.getX() / 2,sprite.getY() / 2);
         sprite.setPosition(0, 0);
         this.setHeight(sprite.getHeight());

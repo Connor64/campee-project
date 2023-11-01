@@ -406,63 +406,28 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             }
         }
 
+        // building collisions
+        // TODO: change the dropoff stuff for buildings
         for (BuildingObject building : buildings) {
             building.render(batch, (int) building.sprite.getX(), (int) building.sprite.getY());
-            Rectangle bounds = building.getBounds();
-            bounds.setHeight(bounds.getHeight() / 2);
-            if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), bounds)) {
-                float playerTop = player.body.getPosition().y + player.sprite.getHeight();
-                float buildingBottom = building.getBounds().y;
-//                if (playerBottom + player.body.getLinearVelocity().y < buildingTop && playerBottom > buildingTop) {
-//                    // Bounce off only if the player is moving downward
-////                    if (player.body.getLinearVelocity().y < 0) {
-//                        // Reverse the player's vertical velocity
-//                        player.body.setLinearVelocity(player.body.getLinearVelocity().x, player.body.getLinearVelocity().y * -1);
-////                    }
-//                    }
-
-                int bounceThreshold = 0;
-                if (buildingBottom < 0) {
-                    bounceThreshold = 8;
-                } else {
-                    bounceThreshold = -8;
-                }
-                if ((playerTop > buildingBottom) && (playerTop < (buildingBottom + bounceThreshold))) {
-                    System.out.println("yes");
-                    player.body.setLinearVelocity(player.body.getLinearVelocity().x, player.body.getLinearVelocity().y * -1);
-                }
-//                player.body.setLinearVelocity(player.body.getLinearVelocity().x, player.body.getLinearVelocity().y * -1);
-//                if ((player.getSprite().getX() >= (bounds.getX() - bounds.getWidth()) && player.getSprite().getX() <= bounds.getX())) {
-//                    player.body.setLinearVelocity(player.body.getLinearVelocity().x * -1, player.body.getLinearVelocity().y);
-//                }
+            if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), building.getBounds())) {
+                building.setDropoffLocation(true);
                 building.setTransparent(true);
+                Rectangle collisionBounds = new Rectangle(building.getBounds());
+                collisionBounds.setHeight(collisionBounds.getHeight() / 2);
+                if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), collisionBounds)) {
+                    if (Math.abs(player.body.getLinearVelocity().x) > 0) {
+                        player.body.setLinearVelocity(player.body.getLinearVelocity().x * -1, player.body.getLinearVelocity().y);
+                    }
+                    if (Math.abs(player.body.getLinearVelocity().y) > 0) {
+                        player.body.setLinearVelocity(player.body.getLinearVelocity().x, player.body.getLinearVelocity().y * -1);
+                    }
+                }
             } else {
                 building.setTransparent(false);
+                building.setDropoffLocation(false);
             }
         }
-
-
-//        Rectangle rockBounds = rock.sprite.getBoundingRectangle();
-////        float rockBottom = rock.sprite.getY();
-//        Rectangle agg = new Rectangle(rock.sprite.getX(), rock.sprite.getY(), rock.sprite.getWidth(), rock.sprite.getHeight() / 2);
-////        if ((player.getSprite().getX() >= rock.sprite.getX() - rock.sprite.getWidth()) && (player.getSprite().getX()) <= (rock.sprite.getX())) {
-//////        if ((player.body.getPosition().x >= rockBounds.getX()) && ((player.body.getPosition().x) <= (rockBounds.getX() + rockBounds.getWidth()))) {
-////            // if the player is within the width of the rock
-////            if ((player.body.getPosition().y + player.getSprite().getHeight() >= rockBottom) && (player.body.getPosition().y <= rockBottom + 8 )) {
-////                // if the player is trying to intersect from the bottom, bounce
-////                player.body.setLinearVelocity(player.body.getLinearVelocity().x, player.body.getLinearVelocity().y * -1);
-////            }
-////        }
-//        // rock transparency and collisions (testing for buildings)
-//        if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), agg)) {
-//            player.body.setLinearVelocity(player.body.getLinearVelocity().x, player.body.getLinearVelocity().y * -1);
-//            if ((player.getSprite().getX() >= (agg.getX() - agg.getWidth()) && player.getSprite().getX() <= agg.getX())) {
-//                player.body.setLinearVelocity(player.body.getLinearVelocity().x * -1, player.body.getLinearVelocity().y);
-//            }
-//            rock.sprite.setAlpha(0.4f);
-//        } else {
-//            rock.sprite.setAlpha(1);
-//        }
 
 
         if (playerAttributes.orderInProgress) {
