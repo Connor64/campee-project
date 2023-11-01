@@ -68,6 +68,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     private TimerTask timerTask;
     private int[] timeCount;
     private int[] orderTimeLeft;
+    float messageTimer = 0.0f;
+    final float MESSAGE_DURATION = 3.0f;
 
     //private TimedPopup incomingOrder;
 
@@ -112,6 +114,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         orderTimeLeft = new int[5];
         Arrays.fill(timeCount, 0);
         Arrays.fill(orderTimeLeft, 6);
+
 
         tileSprites = new ArrayList<>();
         LevelData levelData = loadLevel(fileName);
@@ -265,6 +268,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         font.setColor(0, 0, 0, 1);
         font.getData().setScale(0.5f, 0.5f);
         Label.LabelStyle indicatorStyle = new Label.LabelStyle(font, Color.BLACK);
+        Label.LabelStyle warningStyle = new Label.LabelStyle(font, Color.MAROON);
         warningLabel = new Label("Careful!", indicatorStyle);
         warningLabel.setVisible(false);
         stage.addActor(warningLabel);
@@ -293,8 +297,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         stage.addActor(minOrderLabel);
         //minOrderLabel.setText("Orders Completed: "+playerAttributes.ordersCompleted+"/"+minOrders);
 
-        orderTimeoutLabel = new Label("Time ran out before delivery was complete!", indicatorStyle);
-        orderTimeoutLabel.setPosition(Gdx.graphics.getWidth() - orderTimeoutLabel.getWidth(), 10);
+        orderTimeoutLabel = new Label("Time ran out. Begin next delivery!", warningStyle);
+        orderTimeoutLabel.setPosition(Gdx.graphics.getWidth()/2- 180,Gdx.graphics.getHeight() - minOrderLabel.getHeight()-45);
         orderTimeoutLabel.setVisible(false);
         stage.addActor(orderTimeoutLabel);
         orderTimeoutLabel.setSize(font.getScaleX() * 16, font.getScaleY() * 16);
@@ -417,8 +421,10 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                         }
                     }
                     playerAttributes.array.remove(i);
+                    orderTimeoutLabel.setVisible(true);
+                    messageTimer = 0.0f;
                 } else {
-                    if (timeCount[i - 1] % 40 == 0) {
+                    if (timeCount[i - 1] % 60 == 0) {
                         time -= 1;
                         orderTimeLeft[i - 1] = time;
                     }
@@ -437,6 +443,12 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                     }
                     playerAttributes.array.set(i, sb.toString());
                 }
+            }
+        }
+        if (orderTimeoutLabel.isVisible()) {
+            messageTimer += delta;
+            if (messageTimer >= MESSAGE_DURATION) {
+                orderTimeoutLabel.setVisible(false);
             }
         }
         if (playerAttributes.array.size() > 1) {
@@ -556,26 +568,6 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                                     autoDeclineLabel.setVisible(false); // Remove the label from the display
                                 }
                             }, 4, TimeUnit.SECONDS);
-                        }
-                        if (playerAttributes.orderInProgress) {
-                            for (int i = 1; i < playerAttributes.array.size(); i++) {
-                                String[] s = order.stringToArray(playerAttributes.array.get(i));
-                                int time;
-                                try {
-                                    time = Integer.parseInt(s[4]);
-                                } catch (NumberFormatException num) {
-                                    time = Integer.parseInt(s[5]);
-                                }
-                                if (time <= 0) {
-                                    orderTimeoutLabel.setVisible(true);
-                                    scheduler.schedule(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            orderTimeoutLabel.setVisible(false); // Remove the label from the display
-                                        }
-                                    }, 4, TimeUnit.SECONDS);
-                                }
-                            }
                         }
                     }
                 }, 10, TimeUnit.SECONDS); // Schedule to hide the popup after 10 seconds
