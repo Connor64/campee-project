@@ -76,6 +76,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     public Label autoDeclineLabel;
     public Label orderTimeoutLabel;
     public Label mainTimer;
+    public Label lowTimer;
 
     private Timer timer;
     private TimerTask timerTask;
@@ -85,7 +86,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     final float MESSAGE_DURATION = 3.0f;
 
     // Declare variables for the countdown timer
-    private int countdownMinutes = 3; // 2 minutes
+    private int countdownMinutes = 2; // 2 minutes
     private int countdownSeconds = 0;
     private Timer countdownTimer = new Timer();
 
@@ -441,6 +442,13 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         stage.addActor(mainTimer);
         mainTimer.setSize(font.getScaleX() * 16, font.getScaleY() * 16);
 
+        //String str = "Time remaining:\n" + "     " + String.valueOf(countdownMinutes) + ":" + String.valueOf(countdownSeconds);
+        lowTimer = new Label(str, warningStyle);
+        lowTimer.setPosition(25,Gdx.graphics.getHeight() - 90);
+        lowTimer.setVisible(true);
+        stage.addActor(lowTimer);
+        lowTimer.setSize(font.getScaleX() * 16, font.getScaleY() * 16);
+
 
 
         //auto decline after order timeout label
@@ -504,19 +512,32 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         log.render(batch, 0, 10);
 
             // coin collision
-            for (Coin coin : coins) {
-                if (!coin.collected) {
-                    coin.render(batch, (int) coin.getSprite().getX(), (int) coin.getSprite().getY());
-                    if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), coin.getSprite().getBoundingRectangle())) {
-                        coin.setCollected(true);
-                        coinCounter++;
-                    }
+        for (Coin coin : coins) {
+            if (!coin.collected) {
+                coin.render(batch, (int) coin.getSprite().getX(), (int) coin.getSprite().getY());
+                if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), coin.getSprite().getBoundingRectangle())) {
+                    coin.setCollected(true);
+                    coinCounter++;
                 }
             }
-        // Inside the render method
-        String str = "Time remaining:\n" + "     " + String.valueOf(countdownMinutes) + ":" + String.valueOf(countdownSeconds);
-        mainTimer.setText(str);
-        mainTimer.setVisible(true);
+        }
+        // Inside the render metho
+        String sec;
+        if (countdownSeconds < 10) {
+            sec = "0" + String.valueOf(countdownSeconds);
+        } else {
+            sec = String.valueOf(countdownSeconds);
+        }
+        String str = "Time remaining:\n" + "     " + String.valueOf(countdownMinutes) + ":" + sec;
+        if (countdownMinutes >= 1) {
+            mainTimer.setText(str);
+            mainTimer.setVisible(true);
+            lowTimer.setVisible(false);
+        } else {
+            lowTimer.setText(str);
+            lowTimer.setVisible(true);
+            mainTimer.setVisible(false);
+        }
 
 
         // building collisions and transparency
