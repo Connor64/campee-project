@@ -104,7 +104,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                 } else {
                     // Countdown has reached 0
                     //game over = true !
-                    System.out.println("end of time");
+                    //System.out.println("end of time");
                     this.cancel(); // Stop the timer
                 }
             }
@@ -768,6 +768,10 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             showGameResult();
             //else:
             //show keep playing popup
+        }
+        if (countdownSeconds == 0 && countdownMinutes == 0) {
+            win = false;
+            showGameResult();
         }
     }
 
