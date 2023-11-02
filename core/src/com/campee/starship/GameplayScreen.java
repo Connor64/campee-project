@@ -57,6 +57,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
     private final Popup popup;
     private final GamePopup gamepopup;
+    private final KeepPlayingPopup keepplayingpopup;
     private Coin coin;
     private BuildingObject[] buildings;
     public int coinCounter;
@@ -272,6 +273,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 //        order.setDropoffBounds(22, 102, 16, 16);
 
         gamepopup = new GamePopup(this, "", game, fileName);
+        keepplayingpopup = new KeepPlayingPopup(this, "", game, fileName);
 
         pickupObject = new GameObject(world, order.getPickupBounds().getX(), order.getPickupBounds().getY());
         pickupObject.setSprite("borger.png");
@@ -780,7 +782,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                 showGameResult();
             }
             //else:
-            //show keep playing popup
+           keepPlayingPopup();
         }
     }
 
@@ -816,6 +818,17 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         multiplexer.addProcessor(gamepopup.getStage());
         //System.out.println("Level completed!");
     } //render
+
+    // keep playing pop up
+    public void keepPlayingPopup() {
+        visibleText = false;
+        String message = "Do you want to keep playing or end the game?";
+        keepplayingpopup.setMessageLabel(message);
+        keepplayingpopup.show();
+        keepplayingpopup.render();
+        multiplexer.addProcessor(keepplayingpopup.getStage());
+        //System.out.println("Level completed!");
+    }
 
     // Trigger the timed popup to show
     public void showTimedPopup() {
