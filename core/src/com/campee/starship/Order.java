@@ -27,7 +27,7 @@ import java.util.Scanner;
 public class Order {
     private Stage stage;
     private Game game;
-    private String orderID;
+    public String orderID;
     private String pickupLocation;
     private String dropoffLocation;
     private int timeEstimate;
@@ -37,6 +37,7 @@ public class Order {
     private Rectangle dropoffBounds;
     private boolean pickedUp;
     private boolean droppedOff;
+    String[] words;
 
 
     public Order(Stage stage, Game game, String orderID, String pickupLocation, String dropoffLocation, int timeEstimate, ArrayList<String> array) {
@@ -47,6 +48,7 @@ public class Order {
         this.dropoffLocation = dropoffLocation;
         this.timeEstimate = timeEstimate;
         this.array = array;
+        this.words = words;
         i = 0;
         pickedUp = false;
         droppedOff = false;
@@ -100,7 +102,7 @@ public class Order {
 
 
     public String arrayToString() {
-        String[] words = new String[0];
+        words = new String[0];
         String line = array.get(i);
         words = line.split("\\|");
 
@@ -180,6 +182,10 @@ public class Order {
                         "Pickup Location: " + pickupLocation + '\n' +
                         "Drop-off Location: " + dropoffLocation + '\n' +
                         "Time Estimate: " + timeEstimate ;
+    }
+
+    public String getOrderString(){
+        return words[0];
     }
 
     public Rectangle getPickupBounds() {

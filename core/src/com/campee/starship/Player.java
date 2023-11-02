@@ -31,7 +31,7 @@ public class Player extends GameObject {
         body = world.createBody(bodyDef);
 
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(dimension.x / 2, dimension.y / 2);
+        shape.setAsBox(dimension.x, dimension.y / 2);
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
@@ -107,7 +107,7 @@ public class Player extends GameObject {
 
     private void updateSpritePosition() {
         position = body.getPosition();
-        sprite.setPosition(position.x, position.y);
+        sprite.setBounds(position.x, position.y, sprite.getWidth(), sprite.getHeight());
     }
 
     public Sprite getSprite() {
@@ -115,11 +115,11 @@ public class Player extends GameObject {
     }
 
     public void checkBounds(int width, int height) {
-        if ((body.getPosition().x + sprite.getWidth() > width) || (body.getPosition().x < -width)) {
+        if ((body.getPosition().x + sprite.getWidth() > width) || (body.getPosition().x < 0)) {
             body.setLinearVelocity(body.getLinearVelocity().x * -1, body.getLinearVelocity().y);
         }
 
-        if ((body.getPosition().y + sprite.getHeight() > (height + 16)) || (body.getPosition().y < (-height + 16))) {
+        if ((body.getPosition().y + sprite.getHeight() > height) || (body.getPosition().y < 0)) {
             body.setLinearVelocity(body.getLinearVelocity().x, body.getLinearVelocity().y * -1);
         }
     }
