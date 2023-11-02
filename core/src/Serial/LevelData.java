@@ -4,30 +4,47 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class LevelData implements Serializable {
-    private static final long serialVersionUID = 1L;
-    public Tile[][][] layers;
+    private static final long serialVersionUID = 2L;
+
     public String levelName;
-    //public int minOrders;
-    //public float goalTime;
+    public int difficulty;
+    public int tileSize;
     public int width;
     public int height;
+    public ArrayList<TileData[]> tileData;
+    public ArrayList<ObjectData[]> objectData;
 
-    public LevelData(ArrayList<Tile[][]> layers, String levelName, int minOrders, float goalTime, int width, int height) {
-        this.layers = new Tile[layers.size()][width][height];
+    public class TileData implements Serializable {
+        private static final long serialVersionUID = 2L;
 
-        for (int i = 0; i < layers.size(); i++) {
-            for (int x = 0; x < layers.get(i).length; x++) {
-                for (int y = 0; y < layers.get(i)[x].length; y++) {
-                    this.layers[i][x][y] = new Tile(layers.get(i)[x][y]);
-                }
-            }
+        public String tilesetID;
+        public int spriteIndex;
+        public int layerIndex;
+        public int x, y;
+        public boolean collision;
+
+        public TileData(String tilesetID, int spriteIndex, int layerIndex, int x, int y, boolean collision) {
+            this.tilesetID = tilesetID;
+            this.spriteIndex = spriteIndex;
+            this.layerIndex = layerIndex;
+            this.x = x;
+            this.y = y;
+            this.collision = collision;
         }
+    }
 
-        this.levelName = levelName;
-        //this.minOrders = minOrders;
-        //this.goalTime = goalTime;
-        this.width = width;
-        this.height = height;
+    public class ObjectData implements Serializable {
+        private static final long serialVersionUID = 2L;
+
+        public String objectID;
+        public int layerIndex;
+        public int x, y;
+
+        public ObjectData(String objectID, int layerIndex, int x, int y) {
+            this.objectID = objectID;
+            this.layerIndex = layerIndex;
+            this.x = x;
+            this.y = y;
+        }
     }
 }
-
