@@ -6,22 +6,31 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 
 public class AssetManager {
     private HashMap<String, TextureRegion[]> tilesets;
+    private HashMap<String, GameObject> objects;
 
     private final int TILE_SIZE = 16;
 
     public AssetManager() throws IOException {
         tilesets = new HashMap<>();
+        objects = new HashMap<>();
+        
+        loadTileset("1_terrain.png", "tileset_test_1");
+    }
 
-        Texture source = new Texture(Gdx.files.internal("tilesets/1_terrain.png"));
+    /**
+     * Loads the specified tileset and adds it to the asset manager's list of tilesets
+     *
+     * @param fileName The filename of the tileset image.
+     * @param tilesetID The identifier of the tileset (used to load sprites later).
+     */
+    private void loadTileset(String fileName, String tilesetID) {
+        Texture source = new Texture(Gdx.files.internal("tilesets/" + fileName));
         source.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
 
         if (!source.getTextureData().isPrepared())
@@ -63,12 +72,20 @@ public class AssetManager {
             tiles = Arrays.copyOf(tiles, spriteIndex);
         }
 
-        tilesets.put("test", tiles);
-//        System.out.println("tiles i guess: " + spriteIndex);
-
+        tilesets.put(tilesetID, tiles);
     }
 
-    public TextureRegion getRegion(int index) {
-        return tilesets.get("test")[index];
+    /**
+     * Loads the specified tile sprite from the asset manager's hash map.
+     *
+     * @param tilesetID The source tileset of the sprite.
+     * @param index The index of the sprite within the tileset (top left is index 0).
+     * @return A TextureRegion object from the tileset
+     */
+    public TextureRegion getTileSprite(String tilesetID, int index) {
+        TextureRegion[] textures = tilesets.get(tilesetID);
+        if (textures == null) return null;
+
+        return textures[index];
     }
 }

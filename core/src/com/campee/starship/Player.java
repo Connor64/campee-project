@@ -115,11 +115,11 @@ public class Player extends GameObject {
     }
 
     public void checkBounds(int width, int height) {
-        if ((body.getPosition().x + sprite.getWidth() > width) || (body.getPosition().x < -width)) {
+        if ((body.getPosition().x + sprite.getWidth() > width) || (body.getPosition().x < 0)) {
             body.setLinearVelocity(body.getLinearVelocity().x * -1, body.getLinearVelocity().y);
         }
 
-        if ((body.getPosition().y + sprite.getHeight() > (height + 16)) || (body.getPosition().y < (-height + 16))) {
+        if ((body.getPosition().y + sprite.getHeight() > height) || (body.getPosition().y < 0)) {
             body.setLinearVelocity(body.getLinearVelocity().x, body.getLinearVelocity().y * -1);
         }
     }
