@@ -1,5 +1,6 @@
 package com.campee.starship;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -16,9 +17,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class GamePopup {
+    private final Game game;
     private Stage stage;
     public boolean visible;
     private ShapeRenderer shapeRenderer;
@@ -28,8 +31,6 @@ public class GamePopup {
     private Label levelResultMessage;
     private Label ordersOutOfTimeLabel;
     private BitmapFont font;
-    private boolean exitClicked;
-    private boolean replayClicked;
     private boolean isExitButtonHovered = false;
     private boolean isReplayButtonHovered = false;
 
@@ -38,7 +39,8 @@ public class GamePopup {
     float popupX;
     float popupY;
 
-    public GamePopup(final GameplayScreen screen, final String notificationMessage) {
+    public GamePopup(final GameplayScreen screen, final String notificationMessage, final Game game, final String fileName) {
+        this.game = game;
         stage = new Stage();
         shapeRenderer = new ShapeRenderer();
         visible = false;
@@ -74,14 +76,14 @@ public class GamePopup {
         font.setColor(1, 1, 0, 1);
         font.getData().setScale(1.25f);
 
-        Pixmap exitBackgroundPixmap = createRoundedRectanglePixmap(200, 50, 10, Color.GREEN); // Adjust size and color
+        Pixmap exitBackgroundPixmap = createRoundedRectanglePixmap(200, 50, 10, Color.RED); // Adjust size and color
         TextButton.TextButtonStyle exitButtonStyle = new TextButton.TextButtonStyle();
         exitButtonStyle.font = font;
         exitButtonStyle.fontColor = Color.BLACK;
         exitButtonStyle.up = new TextureRegionDrawable(new TextureRegion(new Texture(exitBackgroundPixmap)));
 
 
-        Pixmap replayBackgroundPixmap = createRoundedRectanglePixmap(200, 50, 10, Color.RED); // Adjust size and color
+        Pixmap replayBackgroundPixmap = createRoundedRectanglePixmap(200, 50, 10, Color.CYAN); // Adjust size and color
         TextButton.TextButtonStyle replayButtonStyle = new TextButton.TextButtonStyle();
         replayButtonStyle.font = font;
         replayButtonStyle.fontColor = Color.BLACK;
@@ -105,11 +107,7 @@ public class GamePopup {
         exitButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                exitClicked = true;
-                screen.playerAttributes.orderInProgress = true;
-                screen.playerAttributes.array.add(screen.order.arrayToString());
-
-                visible = false;
+                game.setScreen(new LevelScreen(game));
             }
             @Override
             public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
@@ -128,13 +126,13 @@ public class GamePopup {
         replayButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                replayClicked = true;
-                if (screen.playerAttributes.array.size() <= 1) {
-                    screen.playerAttributes.orderInProgress = false;
+                try {
+                    game.setScreen(new GameplayScreen((MoonshipGame) game, fileName));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                } catch (ClassNotFoundException e) {
+                    throw new RuntimeException(e);
                 }
-                //use this for the other thing
-                //screen.playerAttributes.array.remove(1);
-                visible = false;
             }
             @Override
             public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
