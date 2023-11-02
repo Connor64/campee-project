@@ -45,6 +45,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
     public boolean win;
     public boolean keepPlaying = true;
+    public boolean popupInAction = false;
 
 
     private Player player;
@@ -94,17 +95,16 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     private TimerTask countdownTask = new TimerTask() {
         @Override
         public void run() {
-            if (countdownSeconds > 0) {
-                countdownSeconds--;
-            } else {
-                if (countdownMinutes > 0) {
-                    countdownMinutes--;
-                    countdownSeconds = 59;
+            if (!popupInAction) {
+                if (countdownSeconds > 0) {
+                    countdownSeconds--;
                 } else {
-                    // Countdown has reached 0
-                    //game over = true !
-                    //System.out.println("end of time");
-                    this.cancel(); // Stop the timer
+                    if (countdownMinutes > 0) {
+                        countdownMinutes--;
+                        countdownSeconds = 59;
+                    } else {
+                        this.cancel(); // Stop the timer
+                    }
                 }
             }
         }
@@ -780,6 +780,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             //else:
             if (playerAttributes.ordersCompleted == minOrders && keepPlaying) {
                 keepPlayingPopup();
+                popupInAction = true;
             }
         }
     }
@@ -854,26 +855,30 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         scheduler.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
-                showTimedPopup(); // Show the popup
-                scheduler.schedule(new Runnable() {
-                    @Override
-                    public void run() {
-                        // Hide the popup
-                        hideTimedPopup();
-                        if (!popup.acceptClicked() && !popup.declineClicked()) {
-                            autoDeclineLabel.setVisible(true);
-                            scheduler.schedule(new Runnable() {
-                                @Override
-                                public void run() {
-                                    autoDeclineLabel.setVisible(false); // Remove the label from the display
-                                }
-                            }, 4, TimeUnit.SECONDS);
+                if (!popupInAction) {
+                    showTimedPopup(); // Show the popup
+                    scheduler.schedule(new Runnable() {
+                        @Override
+                        public void run() {
+                            // Hide the popup
+                            hideTimedPopup();
+                            if (!popup.acceptClicked() && !popup.declineClicked()) {
+                                autoDeclineLabel.setVisible(true);
+                                scheduler.schedule(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        autoDeclineLabel.setVisible(false); // Remove the label from the display
+                                    }
+                                }, 4, TimeUnit.SECONDS);
+                            }
                         }
-                    }
-                }, 10, TimeUnit.SECONDS); // Schedule to hide the popup after 10 seconds
+
+                    }, 10, TimeUnit.SECONDS); // Schedule to hide the popup after 10 seconds
+                }
             }
         }, 0, 15, TimeUnit.SECONDS); // Schedule the next popup 15 seconds after the first one
     }
+
 
 
     @Override
