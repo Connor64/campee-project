@@ -205,11 +205,15 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         coin = new Coin(world, 0, 0);
         coinCounter = 0;
+
         // making a coin array
-        coins = new Coin[5];
+        coins = new Coin[20];
         for (int i = 0; i < coins.length; i++) {
-            int x = (int) ((Math.random() * (levelWidth - (-levelWidth))) + (-levelWidth));
-            int y = (int) ((Math.random() * (levelHeight - (-levelHeight))) + (-levelHeight));
+            Random random = new Random();
+            int x = (random.nextInt((levelWidth - 16)+ 1));
+            int y = (random.nextInt((levelHeight - 16) + 1));
+            x = (x / 16) * 16;
+            y = (y / 16) * 16;
             coins[i] = new Coin(world, x, y);
             coins[i].getSprite().setPosition(x, y);
         }
@@ -225,6 +229,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             Random random = new Random();
             int x = (random.nextInt((levelWidth - 128)+ 1));
             int y = (random.nextInt((levelHeight - 128) + 1));
+            x = (x / 16) * 16;
+            y = (y / 16) * 16;
             buildings[i] = new BuildingObject(world, x, y);
             buildings[i].setSprite(spriteList[i]);
             String sprite = spriteList[i];
