@@ -621,10 +621,10 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                                 totalOrdersCompleted++;
                                 String orderID = order.getOrderString();
                                 System.out.println("order id: " + orderID);
-                                if (!deliveredOrderIDs.contains(orderID)) {
+                                //if (!deliveredOrderIDs.contains(orderID)) {
                                     deliveredOrderIDs.add(orderID);
                                     System.out.println("Order " + orderID + " has been delivered and added to the list.");
-                                }
+                                //}
                                 System.out.println("Order List: " + deliveredOrderIDs);
                                 if (playerAttributes.array.size() <= 1) {
                                     playerAttributes.orderInProgress = false;
@@ -762,17 +762,25 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             //popup.draw();
             batch.end();
         }
-        if (playerAttributes.ordersCompleted == minOrders) {
+        boolean timeLeft = true;
+        if (countdownSeconds == 0 && countdownMinutes == 0) {
+            timeLeft = false;
+            if (playerAttributes.ordersCompleted >= minOrders) {
+                win = true;
+            } else {
+                win = false;
+            }
+            showGameResult();
+        }
+        if (playerAttributes.ordersCompleted >= minOrders) {
             //if time >= 0:
             //show game stats screen, pause game as part of this (if condition in render)
             win = true;
-            showGameResult();
+            if (!timeLeft) {
+                showGameResult();
+            }
             //else:
             //show keep playing popup
-        }
-        if (countdownSeconds == 0 && countdownMinutes == 0) {
-            win = false;
-            showGameResult();
         }
     }
 
