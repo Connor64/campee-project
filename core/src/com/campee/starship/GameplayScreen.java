@@ -271,7 +271,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 //        order.setPickupBounds(10, 55, 16, 16);
 //        order.setDropoffBounds(22, 102, 16, 16);
 
-        gamepopup = new GamePopup(this, "");
+        gamepopup = new GamePopup(this, "", game, fileName);
 
         pickupObject = new GameObject(world, order.getPickupBounds().getX(), order.getPickupBounds().getY());
         pickupObject.setSprite("borger.png");
