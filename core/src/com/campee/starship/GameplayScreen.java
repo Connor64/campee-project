@@ -83,7 +83,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     final float MESSAGE_DURATION = 3.0f;
 
     // Declare variables for the countdown timer
-    private int countdownMinutes = 2; // 2 minutes
+    private int countdownMinutes = 3; // 2 minutes
     private int countdownSeconds = 0;
     private Timer countdownTimer = new Timer();
 
@@ -666,7 +666,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                             order.setPickedUp(false);
                         }
                     }
-                    String orderID = order.getOrderString();
+                    String orderID = s[1];
+                    orderID = orderID.substring(0, str.length() - 3);
                     outOfTimeOrdersIDs.add(orderID);
                     orderTimeoutLabel.setVisible(true);
                     playerAttributes.array.remove(i);
