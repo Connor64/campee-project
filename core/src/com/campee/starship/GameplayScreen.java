@@ -157,7 +157,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         visibleText = true;
 
         // Create a Timer object to schedule the TimerTask
-        countdownTimer.scheduleAtFixedRate(countdownTask, 100, 100);
+        countdownTimer.scheduleAtFixedRate(countdownTask, 500, 500);
 
 
         timeCount = new int[5];
@@ -774,7 +774,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         gamepopup.render();
         multiplexer.addProcessor(gamepopup.getStage());
         //System.out.println("Level completed!");
-    }
+    } //render
 
     // Trigger the timed popup to show
     public void showTimedPopup() {
