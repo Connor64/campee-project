@@ -19,6 +19,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
+import java.util.ArrayList;
+
 public class Popup {
     private Stage stage;
     //private float duration; // Duration of the popup in seconds
@@ -27,10 +29,11 @@ public class Popup {
     private ShapeRenderer shapeRenderer;
     private BitmapFont font;
     private Label messageLabel;
-    public boolean acceptClicked;
-    public boolean declineClicked;
+    private boolean acceptClicked;
+    private boolean declineClicked;
     private boolean isAcceptButtonHovered = false;
     private boolean isDeclineButtonHovered = false;
+
     float popupWidth;
     float popupHeight;
     float popupX;
@@ -144,6 +147,7 @@ public class Popup {
         messageLabel.setText(message);
     }
 
+
     public void show() {
         visible = true;
         //timeElapsed = 0;
@@ -203,6 +207,7 @@ public class Popup {
             stage.draw();
         }
     }
+
 
 //    public void draw() {
 //        if (visible) {

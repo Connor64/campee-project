@@ -39,6 +39,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
     private TextButton backButton;
     private TextButton nextOrderButton;
+    private TextButton gameStatsButton;
 
     private World world;
     private int levelWidth;
@@ -46,15 +47,24 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     public int minOrders;
     public float goalTime;
 
+    public boolean win;
+
     private Player player;
     public PlayerAttributes playerAttributes;
     private ArrayList<String> visibleQ;
+    private ArrayList<String> deliveredOrderIDs;
+    private ArrayList<String> outOfTimeOrdersIDs;
 
     private final Popup popup;
+    private final GamePopup gamepopup;
     private Coin coin;
     private BuildingObject[] buildings;
     public int coinCounter;
     public Coin[] coins;
+    private boolean visibleText;
+
+    private int totalOrdersCompleted;
+
 
     private GameObject log;
     private GameObject rock;
@@ -67,6 +77,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     public Label orderTimeoutLabel;
     public Label mainTimer;
 
+    private Timer timer;
+    private TimerTask timerTask;
     private int[] timeCount;
     private int[] orderTimeLeft;
     float messageTimer = 0.0f;
@@ -126,8 +138,11 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     private float sidePanelHeight;
     private Color sidePanelColor;
     private BitmapFont font;
+    //final String gameStatsMessage;
 
-    /** The width/height of the virtual resolution of the screen. */
+    /**
+     * The width/height of the virtual resolution of the screen.
+     */
     private final int VIRTUAL_WIDTH = 480, VIRTUAL_HEIGHT = 270;
 
     private ArrayList<String> orderArray;
@@ -139,6 +154,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     public GameplayScreen(final MoonshipGame game, String fileName) throws IOException, ClassNotFoundException {
         this.GAME = game;
         batch = game.batch;
+        visibleText = true;
 
         // Create a Timer object to schedule the TimerTask
         countdownTimer.scheduleAtFixedRate(countdownTask, 100, 100);
@@ -148,7 +164,9 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         orderTimeLeft = new int[5];
         Arrays.fill(timeCount, 0);
         Arrays.fill(orderTimeLeft, 6);
+        //gameStatsMessage = "";
 
+        win = false;
 
         tileSprites = new ArrayList<>();
         LevelData levelData = loadLevel(fileName);
@@ -229,7 +247,10 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         visibleQ = new ArrayList<>();
         playerAttributes.setArray(visibleQ);
         playerAttributes.orderInProgress = false;
+        deliveredOrderIDs = new ArrayList<>();
+        outOfTimeOrdersIDs = new ArrayList<>();
 
+        totalOrdersCompleted = 0;
         order = new Order();
         orderArray = new ArrayList<>();
         order.setArray(orderArray);
@@ -249,6 +270,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 //        order.setPickupBounds(10, 55, 16, 16);
 //        order.setDropoffBounds(22, 102, 16, 16);
 
+        gamepopup = new GamePopup(this, "");
+
         pickupObject = new GameObject(world, order.getPickupBounds().getX(), order.getPickupBounds().getY());
         pickupObject.setSprite("borger.png");
         pickupObject.sprite.setPosition(order.getPickupBounds().getX(), order.getPickupBounds().getY());
@@ -258,7 +281,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         dropoffObject.sprite.setPosition(order.getDropoffBounds().getX(), order.getDropoffBounds().getY());
 
         // Make button style
-        Pixmap backgroundPixmap = createRoundedRectanglePixmap(200, 50, 10, new Color (0.9f, 0, 0.9f, 0.6f)); // Adjust size and color
+        Pixmap backgroundPixmap = createRoundedRectanglePixmap(200, 50, 10, new Color(0.9f, 0, 0.9f, 0.6f)); // Adjust size and color
         TextButton.TextButtonStyle buttonStyle = new TextButton.TextButtonStyle();
         buttonStyle.up = new TextureRegionDrawable(new TextureRegion(new Texture(backgroundPixmap)));
         BitmapFont buttonFont = new BitmapFont();
@@ -275,12 +298,14 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                 System.out.println("clicked back");
                 game.setScreen(new LevelScreen(game));
             }
+
             @Override
             public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
                 super.enter(event, x, y, pointer, fromActor);
                 isBackButtonHovered = true;
                 backButton.setColor(Color.LIGHT_GRAY);
             }
+
             @Override
             public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
                 super.exit(event, x, y, pointer, toActor);
@@ -288,6 +313,38 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                 backButton.setColor(Color.WHITE);
             }
         });
+
+        //Make game stats button
+        gameStatsButton = new TextButton("Game Stats", buttonStyle);
+        gameStatsButton.setPosition(Gdx.graphics.getWidth() - 600, 10);
+        gameStatsButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                visibleText = false;
+                StringBuilder orderIDsStringBuilder = new StringBuilder("Successfully Delivered:\n");
+                for (String orderID : deliveredOrderIDs) {
+                    orderIDsStringBuilder.append(orderID).append("\n");
+                }
+                String orderIDsMessage = orderIDsStringBuilder.toString();
+
+                String gameStatsMessage = "GAME STATS! \nTotal Coins Collected: " + coinCounter
+                        + "\nTotal Orders Completed: " + totalOrdersCompleted;
+                StringBuilder timeOrderIDsStringBuilder = new StringBuilder("Out of Time Orders:\n");
+                for (String orderID : outOfTimeOrdersIDs) {
+                    timeOrderIDsStringBuilder.append(orderID).append("\n");
+                }
+                String notInTimeorderIDsMessage = timeOrderIDsStringBuilder.toString();
+
+
+                gamepopup.showGameStatsMessage(gameStatsMessage);
+                gamepopup.showOrderCompletedList(orderIDsMessage);
+                gamepopup.showOutoffTimeList(notInTimeorderIDsMessage);
+                gamepopup.show();
+                gamepopup.render();
+                multiplexer.addProcessor(gamepopup.getStage());
+            }
+        });
+
 
         // Make next order button
         nextOrderButton = new TextButton("Next Order", buttonStyle);
@@ -309,12 +366,14 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                 multiplexer.addProcessor(popup.getStage());
 
             }
+
             @Override
             public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
                 super.enter(event, x, y, pointer, fromActor);
                 isOrderButtonHovered = true;
                 nextOrderButton.setColor(Color.LIGHT_GRAY);
             }
+
             @Override
             public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
                 super.exit(event, x, y, pointer, toActor);
@@ -324,6 +383,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         });
 
         stage.addActor(backButton);
+        //stage.addActor(gameStatsButton);
         //stage.addActor(nextOrderButton);
 
         multiplexer = new InputMultiplexer();
@@ -360,16 +420,16 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         dropoffLabel.setSize(font.getScaleX() * 16, font.getScaleY() * 16);
 
         // min orders label
-        minOrderLabel = new Label("Orders Completed: "+playerAttributes.ordersCompleted+"/"+minOrders, indicatorStyle);
+        minOrderLabel = new Label("Orders Completed: " + playerAttributes.ordersCompleted + "/" + minOrders, indicatorStyle);
         minOrderLabel.setSize(font.getScaleX() * 16, font.getScaleY() * 16);
         //minOrderLabel.setPosition(Gdx.graphics.getWidth() / 2 - minOrderLabel.getWidth() / 2, Gdx.graphics.getHeight() - minOrderLabel.getHeight());
-        minOrderLabel.setPosition(Gdx.graphics.getWidth()/2- 120,Gdx.graphics.getHeight() - minOrderLabel.getHeight()-17);
+        minOrderLabel.setPosition(Gdx.graphics.getWidth() / 2 - 120, Gdx.graphics.getHeight() - minOrderLabel.getHeight() - 17);
         minOrderLabel.setVisible(true);
         stage.addActor(minOrderLabel);
         //minOrderLabel.setText("Orders Completed: "+playerAttributes.ordersCompleted+"/"+minOrders);
 
         orderTimeoutLabel = new Label("Time ran out. Begin next delivery!", warningStyle);
-        orderTimeoutLabel.setPosition(Gdx.graphics.getWidth()/2- 180,Gdx.graphics.getHeight() - minOrderLabel.getHeight()-45);
+        orderTimeoutLabel.setPosition(Gdx.graphics.getWidth() / 2 - 180, Gdx.graphics.getHeight() - minOrderLabel.getHeight() - 52);
         orderTimeoutLabel.setVisible(false);
         stage.addActor(orderTimeoutLabel);
         orderTimeoutLabel.setSize(font.getScaleX() * 16, font.getScaleY() * 16);
@@ -401,7 +461,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     @Override
     public void show() {
         shapeRenderer = new ShapeRenderer();
-        font = new BitmapFont(Gdx.files.internal("moonships_font.fnt"), Gdx.files.internal("moonships_font.png"), false);; // Define your BitmapFont
+        font = new BitmapFont(Gdx.files.internal("moonships_font.fnt"), Gdx.files.internal("moonships_font.png"), false);
+        ; // Define your BitmapFont
         // Set font color and scale
         font.setColor(1, 1, 0, 1);
         font.getData().setScale(0.5f);
@@ -411,13 +472,14 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     public void render(float delta) {
         /* ========================== UPDATE ============================ */
 
-        // If the popup is not visible, update the player and world
-        //if (!popup.isVisible()) {
-        player.update(delta, keyProcessor);
-        player.checkBounds(levelWidth, levelHeight);
-        world.step(1 / 60f, 6, 2); // Physics calculations
+        //If game stats screen is not visible, keep the game going (else pause)
+        //if (!gameStatsScreen.isVisible()) {
+        if (!gamepopup.isVisible()) {
+            player.update(delta, keyProcessor);
+            player.checkBounds(levelWidth, levelHeight);
+            world.step(1 / 60f, 6, 2); // Physics calculations
 
-        camera.follow(player.position, levelWidth, levelHeight);
+            camera.follow(player.position, levelWidth, levelHeight);
 
         batch.setProjectionMatrix(camera.combined);
         //popup.update(delta);
@@ -441,23 +503,17 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         rock.render(batch, 20, -100);
         log.render(batch, 0, 10);
 
-        // Inside the render method
-
-
-
-
-
-
-        // coin collision
-        for (Coin coin : coins) {
-            if (!coin.collected) {
-                coin.render(batch, (int) coin.getSprite().getX(), (int) coin.getSprite().getY());
-                if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), coin.getSprite().getBoundingRectangle())) {
-                    coin.setCollected(true);
-                    coinCounter++;
+            // coin collision
+            for (Coin coin : coins) {
+                if (!coin.collected) {
+                    coin.render(batch, (int) coin.getSprite().getX(), (int) coin.getSprite().getY());
+                    if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), coin.getSprite().getBoundingRectangle())) {
+                        coin.setCollected(true);
+                        coinCounter++;
+                    }
                 }
             }
-        }
+        // Inside the render method
         String str = "Time remaining:\n" + "     " + String.valueOf(countdownMinutes) + ":" + String.valueOf(countdownSeconds);
         mainTimer.setText(str);
         mainTimer.setVisible(true);
@@ -483,64 +539,6 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             }
         }
 
-//        if (playerAttributes.orderInProgress) {
-//            for (int i = 1; i < playerAttributes.array.size(); i++ ) {
-//                // go through all the orders in the current player queue
-//                String[] s = order.stringToArray(playerAttributes.array.get(i));
-//                String str3 = s[3];
-//                String str2 = s[2];
-//                String currDrop = str3.substring(0, str3.length() - 6);
-//                String currPick = str2.substring(0, str2.length() - 3);
-//                int currTime = Integer.parseInt(s[4]);
-//
-//                for (BuildingObject building : buildings) {
-//                    if (currPick.equals(building.getName()) && ) {
-//                        building.setPickupLocation(true);
-//                    } else {
-//                        building.setDropoffLocation(false);
-//                    }
-//                    if (currDrop.equals(building.getName()) && currTime > 0) {
-//                        building.setDropoffLocation(true);
-//                    } else {
-//                        building.setDropoffLocation(false);
-//                    }
-//
-//                    if (!order.isPickedUp() && order.getPickupLocation().equals(building.getName())) {
-//                        // if order is not picked up and the building in the list is the pickuplocation,
-//                        if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), building.getBounds())) {
-//                            // if the player is near the pickup location
-//                            pickupLabel.setVisible(true);
-//                            if (keyProcessor.pPressed) {
-//                                building.setPickupLocation(false);
-//                                order.setPickedUp(true);
-//                                order.setDroppedOff(false);
-//                                pickupLabel.setVisible(false);
-//                            }
-//                        } else {
-//                            pickupLabel.setVisible(false);
-//                        }
-//                    } else if (order.getDropoffBounds().equals(building.getName()) && !order.isDroppedOff()) {
-//                        if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), building.getBounds())) {
-//                            dropoffLabel.setVisible(true);
-//                            if (keyProcessor.oPressed) {
-//                                building.setDropoffLocation(false);
-//                                order.setPickedUp(false);
-//                                order.setDroppedOff(true);
-//                                playerAttributes.array.remove(1);
-//                                if (playerAttributes.array.size() <= 1) {
-//                                    playerAttributes.orderInProgress = false;
-//                                }
-//                                dropoffLabel.setVisible(false);
-//                            }
-//                        } else {
-//                            dropoffLabel.setVisible(false);
-//                        }
-//                    }
-//                }
-//
-//
-//            }
-//        }
 
             // set all buildings to not pickup/dropoff if no queued orders
             if (playerAttributes.array.size() <= 1) {
@@ -599,6 +597,14 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 //                                    playerAttributes.orderInProgress = false;
 //                                }
                                 playerAttributes.array.remove(1);
+                                totalOrdersCompleted++;
+                                String orderID = order.getOrderString();
+                                System.out.println("order id: " + orderID);
+                                if (!deliveredOrderIDs.contains(orderID)) {
+                                    deliveredOrderIDs.add(orderID);
+                                    System.out.println("Order " + orderID + " has been delivered and added to the list.");
+                                }
+                                System.out.println("Order List: " + deliveredOrderIDs);
                                 if (playerAttributes.array.size() <= 1) {
                                     playerAttributes.orderInProgress = false;
                                 }
@@ -650,6 +656,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                             order.setPickedUp(false);
                         }
                     }
+                    outOfTimeOrdersIDs.add(order.getOrderString());
                     playerAttributes.array.remove(i);
                     orderTimeoutLabel.setVisible(true);
                     messageTimer = 0.0f;
@@ -675,87 +682,98 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                 }
             }
         }
-
         if (orderTimeoutLabel.isVisible()) {
             messageTimer += delta;
             if (messageTimer >= MESSAGE_DURATION) {
                 orderTimeoutLabel.setVisible(false);
             }
         }
-//        if (playerAttributes.array.size() > 1) {
-//            if (!order.isPickedUp()) {
-//                pickupObject.sprite.draw(batch);
-//                if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getPickupBounds())) {
-//                    pickupLabel.setVisible(true);
-//                    if (keyProcessor.pPressed) {
-//                        order.setPickedUp(true);
-//                        order.setDroppedOff(false);
-//                        pickupLabel.setVisible(false);
-//                    }
-//                } else {
-//                    pickupLabel.setVisible(false);
-//                }
-//            } else if (!order.isDroppedOff()) {
-//                if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), order.getDropoffBounds())) {
-//                    dropoffLabel.setVisible(true);
-//                    if (keyProcessor.oPressed) {
-//                        order.setPickedUp(false);
-//                        order.setDroppedOff(true);
-//                        playerAttributes.ordersCompleted++;
-//                        minOrderLabel.setText("Orders Completed: "+playerAttributes.ordersCompleted+"/"+minOrders);
-//                        playerAttributes.array.remove(1);
-//                        if (playerAttributes.array.size() <= 1) {
-//                            playerAttributes.orderInProgress = false;
-//                        }
-//                        dropoffLabel.setVisible(false);
-//                    }
-//                } else {
-//                    dropoffLabel.setVisible(false);
-//                }
-//            }
-//        }
+
 
 //        if (playerAttributes.ordersCompleted == minOrders){
 //            //show game stats screen, pause game as part of this (if condition above)
 //            System.out.println("Level completed!");
 //        }
 
-        batch.end();
+            batch.end();
 
-        /* Draw UI elements */
-        batch.begin();
 
-        // Render the side panel
-        Gdx.gl.glEnable(GL20.GL_BLEND);
-        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(sidePanelColor);
-        shapeRenderer.rect(sidePanelX, sidePanelY, sidePanelWidth, sidePanelHeight);
-        shapeRenderer.end();
-        Gdx.gl.glDisable(GL20.GL_BLEND);
+            /* Draw UI elements */
+            batch.begin();
 
-        String[] items = playerAttributes.array.toArray(new String[0]);
+            // Render the side panel
+            Gdx.gl.glEnable(GL20.GL_BLEND);
+            Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+            shapeRenderer.setColor(sidePanelColor);
+            shapeRenderer.rect(sidePanelX, sidePanelY, sidePanelWidth, sidePanelHeight);
+            shapeRenderer.end();
+            Gdx.gl.glDisable(GL20.GL_BLEND);
 
-        font.setColor(Color.WHITE);
-        font.draw(batch, "Order List:", sidePanelX + 10, sidePanelY + sidePanelHeight - 10);
-        //System.out.println("orders completed:"+playerAttributes.getOrdersCompleted());
+            String[] items = playerAttributes.array.toArray(new String[0]);
 
-        for (int i = 1; i < items.length; i++) {
-            if (orderTimeLeft[i - 1] <= 5 && orderTimeLeft[i - 1] > 0) {
-                //if (order.isPickedUp()) {
-                font.setColor(Color.RED);
-                // }
-            } else {
-                font.setColor(Color.WHITE);
+            //if (visibleText) {
+            font.setColor(Color.WHITE);
+            font.draw(batch, "Order List:", sidePanelX + 10, sidePanelY + sidePanelHeight - 10);
+            float coinCountTextX = Gdx.graphics.getWidth() / 2 - 90/*sidePanelX - font.getRegion().getRegionWidth() - 110*/;
+            float coinCountTextY = Gdx.graphics.getHeight() - minOrderLabel.getHeight() - 25/*sidePanelY - 20*/;
+            font.draw(batch, "Coins Collected: " + coinCounter, coinCountTextX, coinCountTextY);
+            //System.out.println("orders completed:"+playerAttributes.getOrdersCompleted());
+
+
+            for (int i = 1; i < items.length; i++) {
+                if (orderTimeLeft[i - 1] <= 5 && orderTimeLeft[i - 1] > 0) {
+                    //if (order.isPickedUp()) {
+                    font.setColor(Color.RED);
+                    // }
+                } else {
+                    font.setColor(Color.WHITE);
+                }
+                font.draw(batch, items[i], sidePanelX + 10, sidePanelY + sidePanelHeight - 70 * i);
+
             }
-            font.draw(batch, items[i], sidePanelX + 10, sidePanelY + sidePanelHeight - 70 * i);
+            //}
 
+            stage.draw();
+            popup.render();
+            gamepopup.render();
+            //popup.draw();
+            batch.end();
         }
-        stage.draw();
-        popup.render();
-        //popup.draw();
+        if (playerAttributes.ordersCompleted == minOrders) {
+            //if time >= 0:
+            //show game stats screen, pause game as part of this (if condition in render)
+            win = true;
+            showGameResult();
+            //else:
+            //show keep playing popup
+        }
+    }
 
-        batch.end();
+    //show game stats screen
+    public void showGameResult() {
+        visibleText = false;
+        StringBuilder orderIDsStringBuilder = new StringBuilder("Successfully Delivered:\n");
+        for (String orderID : deliveredOrderIDs) {
+            orderIDsStringBuilder.append(orderID).append("\n");
+        }
+        String orderIDsMessage = orderIDsStringBuilder.toString();
+        String levelResult;
+        if (win) {
+            levelResult = "Congrats, level completed!";
+        } else {
+            levelResult = "Game Over! :(";
+        }
+
+        String gameStatsMessage = "GAME STATS: \nTotal Coins Collected: " + coinCounter
+                + "\nTotal Orders Completed: " + totalOrdersCompleted;
+        gamepopup.showGameStatsMessage(gameStatsMessage);
+        gamepopup.showOrderCompletedList(orderIDsMessage);
+        gamepopup.showLevelResultMessage(levelResult);
+        gamepopup.show();
+        gamepopup.render();
+        multiplexer.addProcessor(gamepopup.getStage());
+        //System.out.println("Level completed!");
     }
 
     // Trigger the timed popup to show
@@ -770,8 +788,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         order.seti(count);
         count++;
         popup.setMessage(order.arrayToString());
-        popup.acceptClicked = false;
-        popup.declineClicked = false;
+        //popup.acceptClicked = false;
+        //popup.declineClicked = false;
     }
 
     public void hideTimedPopup() {
