@@ -1,5 +1,6 @@
 package com.campee.starship;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -16,9 +17,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class GamePopup {
+    private final Game game;
     private Stage stage;
     public boolean visible;
     private ShapeRenderer shapeRenderer;
@@ -27,8 +30,17 @@ public class GamePopup {
     private Label ordersCompletedLabel;
     private Label levelResultMessage;
     private Label ordersOutOfTimeLabel;
+    private BitmapFont font;
+    private boolean isExitButtonHovered = false;
+    private boolean isReplayButtonHovered = false;
 
-    public GamePopup(final GameplayScreen screen, final String notificationMessage) {
+    float popupWidth;
+    float popupHeight;
+    float popupX;
+    float popupY;
+
+    public GamePopup(final GameplayScreen screen, final String notificationMessage, final Game game, final String fileName) {
+        this.game = game;
         stage = new Stage();
         shapeRenderer = new ShapeRenderer();
         visible = false;
@@ -57,6 +69,88 @@ public class GamePopup {
         stage.addActor(levelResultMessage);
         stage.addActor(ordersOutOfTimeLabel);
         stage.addActor(gameStatsMessage);
+
+        font = new BitmapFont();
+
+        // Set font color and scale
+        font.setColor(1, 1, 0, 1);
+        font.getData().setScale(1.25f);
+
+        Pixmap exitBackgroundPixmap = createRoundedRectanglePixmap(200, 50, 10, Color.RED); // Adjust size and color
+        TextButton.TextButtonStyle exitButtonStyle = new TextButton.TextButtonStyle();
+        exitButtonStyle.font = font;
+        exitButtonStyle.fontColor = Color.BLACK;
+        exitButtonStyle.up = new TextureRegionDrawable(new TextureRegion(new Texture(exitBackgroundPixmap)));
+
+
+        Pixmap replayBackgroundPixmap = createRoundedRectanglePixmap(200, 50, 10, Color.CYAN); // Adjust size and color
+        TextButton.TextButtonStyle replayButtonStyle = new TextButton.TextButtonStyle();
+        replayButtonStyle.font = font;
+        replayButtonStyle.fontColor = Color.BLACK;
+        replayButtonStyle.up = new TextureRegionDrawable(new TextureRegion(new Texture(replayBackgroundPixmap)));
+
+        // Create buttons
+        final TextButton exitButton = new TextButton("Exit", exitButtonStyle);
+        final TextButton replayButton = new TextButton("Replay", replayButtonStyle);
+
+        exitButton.setWidth(75);
+        exitButton.setHeight(25);
+        replayButton.setWidth(75);
+        replayButton.setHeight(25);
+
+
+        // Set button positions
+        exitButton.setPosition(Gdx.graphics.getWidth() - 150, 100);
+        replayButton.setPosition(150, 100);
+
+        // Add click listeners to buttons
+        exitButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                game.setScreen(new LevelScreen(game));
+            }
+            @Override
+            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+                super.enter(event, x, y, pointer, fromActor);
+                isExitButtonHovered = true;
+                exitButton.setColor(Color.LIGHT_GRAY);
+            }
+            @Override
+            public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
+                super.exit(event, x, y, pointer, toActor);
+                isExitButtonHovered = false;
+                exitButton.setColor(Color.WHITE);
+            }
+        });
+
+        replayButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                try {
+                    game.setScreen(new GameplayScreen((MoonshipGame) game, fileName));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                } catch (ClassNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            @Override
+            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+                super.enter(event, x, y, pointer, fromActor);
+                isReplayButtonHovered = true;
+                replayButton.setColor(Color.LIGHT_GRAY);
+            }
+            @Override
+            public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
+                super.exit(event, x, y, pointer, toActor);
+                isReplayButtonHovered = false;
+                replayButton.setColor(Color.WHITE);
+            }
+        });
+
+        // Add buttons to the stage
+        stage.addActor(exitButton);
+        stage.addActor(replayButton);
     }
 
 
@@ -125,5 +219,20 @@ public class GamePopup {
             stage.act();
             stage.draw();
         }
+    }
+
+    public Pixmap createRoundedRectanglePixmap(int width, int height, int cornerRadius, Color color) {
+        Pixmap pixmap = new Pixmap(width, height, Pixmap.Format.RGBA8888);
+        pixmap.setColor(color);
+
+        // Draw rounded rectangle
+        pixmap.fillRectangle(cornerRadius, 0, width - 2 * cornerRadius, height);
+        pixmap.fillRectangle(0, cornerRadius, width, height - 2 * cornerRadius);
+        pixmap.fillCircle(cornerRadius, cornerRadius, cornerRadius);
+        pixmap.fillCircle(cornerRadius, height - cornerRadius - 1, cornerRadius);
+        pixmap.fillCircle(width - cornerRadius - 1, cornerRadius, cornerRadius);
+        pixmap.fillCircle(width - cornerRadius - 1, height - cornerRadius - 1, cornerRadius);
+
+        return pixmap;
     }
 }
