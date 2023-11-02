@@ -88,6 +88,8 @@ public class KeepPlayingPopup {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 keepPlayingClicked = true;
+                screen.keepPlaying = false;
+                visible = false;
                 //add logic
             }
             @Override
@@ -108,6 +110,11 @@ public class KeepPlayingPopup {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 endGameClicked = true;
+                screen.win = true;
+                screen.keepPlaying = false;
+                screen.countdownMinutes = 0;
+                screen.countdownSeconds = 0;
+                screen.showGameResult();
                 //add logic
 
             }
