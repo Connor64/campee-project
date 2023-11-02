@@ -23,14 +23,10 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 
-import java.util.Collections;
+import java.util.*;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -226,19 +222,9 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         spriteList[1] = "HAAS.PNG";
         spriteList[2] = "MSEE.PNG";
         for (int i = 0; i < buildings.length; i++) {
-            int x = (int) ((Math.random() * (levelWidth - (-levelWidth))) + (-levelWidth));
-            int y = (int) ((Math.random() * (levelHeight - (-levelHeight))) + (-levelHeight));
-            // most convoluted thing ever need to change
-            if (x < 0) {
-                x = x + 128;
-            } else {
-                x = x - 128;
-            }
-            if (y < 0) {
-                y = y + 128;
-            } else {
-                y = y - 128;
-            }
+            Random random = new Random();
+            int x = (random.nextInt((levelWidth - 128)+ 1));
+            int y = (random.nextInt((levelHeight - 128) + 1));
             buildings[i] = new BuildingObject(world, x, y);
             buildings[i].setSprite(spriteList[i]);
             String sprite = spriteList[i];
