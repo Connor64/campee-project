@@ -328,14 +328,14 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                 }
                 String orderIDsMessage = orderIDsStringBuilder.toString();
 
-                String gameStatsMessage = "GAME STATS! \nTotal Coins Collected: " + coinCounter
-                        + "\nTotal Orders Completed: " + totalOrdersCompleted;
                 StringBuilder timeOrderIDsStringBuilder = new StringBuilder("Out of Time Orders:\n");
                 for (String orderID : outOfTimeOrdersIDs) {
                     timeOrderIDsStringBuilder.append(orderID).append("\n");
                 }
                 String notInTimeorderIDsMessage = timeOrderIDsStringBuilder.toString();
 
+                String gameStatsMessage = "GAME OVER! \nTotal Coins Collected: " + coinCounter
+                        + "\nTotal Orders Completed: " + totalOrdersCompleted;
 
                 gamepopup.showGameStatsMessage(gameStatsMessage);
                 gamepopup.showOrderCompletedList(orderIDsMessage);
@@ -677,9 +677,10 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                             order.setPickedUp(false);
                         }
                     }
-                    outOfTimeOrdersIDs.add(order.getOrderString());
-                    playerAttributes.array.remove(i);
+                    String orderID = order.getOrderString();
+                    outOfTimeOrdersIDs.add(orderID);
                     orderTimeoutLabel.setVisible(true);
+                    playerAttributes.array.remove(i);
                     messageTimer = 0.0f;
                 } else {
                     if (timeCount[i - 1] % 60 == 0) {
@@ -783,6 +784,12 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             orderIDsStringBuilder.append(orderID).append("\n");
         }
         String orderIDsMessage = orderIDsStringBuilder.toString();
+        StringBuilder timeOrderIDsStringBuilder = new StringBuilder("Out of Time Orders:\n");
+        for (String orderID : outOfTimeOrdersIDs) {
+            timeOrderIDsStringBuilder.append(orderID).append("\n");
+        }
+        String notInTimeorderIDsMessage = timeOrderIDsStringBuilder.toString();
+
         String levelResult;
         if (win) {
             levelResult = "Congrats, level completed!";
@@ -794,6 +801,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                 + "\nTotal Orders Completed: " + totalOrdersCompleted;
         gamepopup.showGameStatsMessage(gameStatsMessage);
         gamepopup.showOrderCompletedList(orderIDsMessage);
+        gamepopup.showOutoffTimeList(notInTimeorderIDsMessage);
         gamepopup.showLevelResultMessage(levelResult);
         gamepopup.show();
         gamepopup.render();
