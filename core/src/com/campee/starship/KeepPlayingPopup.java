@@ -55,7 +55,7 @@ public class KeepPlayingPopup {
 
         messageLabel = new Label(notificationMessage, new Label.LabelStyle(font, Color.WHITE));
         messageLabel.setFontScale(0.5f);
-        messageLabel.setPosition(100, 500);
+        messageLabel.setPosition(100, 300);
 
 
         Pixmap keepPlayingBackgroundPixmap = createRoundedRectanglePixmap(1000, 200, 10, Color.GREEN); // Adjust size and color
