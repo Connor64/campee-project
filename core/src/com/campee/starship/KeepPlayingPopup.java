@@ -75,14 +75,14 @@ public class KeepPlayingPopup {
         final TextButton keepPlayingButton = new TextButton("Keep Playing",  keepPlayingButtonStyle);
         final TextButton endGameButton = new TextButton("End Game",  endGameButtonStyle);
 
-        keepPlayingButton.setWidth(50);
+        keepPlayingButton.setWidth(120);
         keepPlayingButton.setHeight(75);
-        endGameButton.setWidth(50);
+        endGameButton.setWidth(120);
         endGameButton.setHeight(75);
 
         // Set button positions
-        keepPlayingButton.setPosition(100, 400);
-        endGameButton.setPosition(500,400);
+        keepPlayingButton.setPosition(100, 200);
+        endGameButton.setPosition(500,200);
 
         keepPlayingButton.addListener(new ClickListener() {
             @Override
