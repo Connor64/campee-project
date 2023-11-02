@@ -90,6 +90,7 @@ public class KeepPlayingPopup {
                 keepPlayingClicked = true;
                 screen.keepPlaying = false;
                 visible = false;
+                screen.popupInAction = false;
                 //add logic
             }
             @Override
@@ -114,6 +115,7 @@ public class KeepPlayingPopup {
                 screen.keepPlaying = false;
                 screen.countdownMinutes = 0;
                 screen.countdownSeconds = 0;
+                screen.popupInAction = false;
                 screen.showGameResult();
                 //add logic
 
