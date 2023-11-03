@@ -436,6 +436,9 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         if (!gamepopup.isVisible()) {
             player.update(delta, keyProcessor);
             player.checkBounds(levelWidth, levelHeight);
+            for (BuildingObject building : buildings) {
+                player.checkCollision(building, true);
+            }
             world.step(1 / 60f, 6, 2); // Physics calculations
 
             camera.follow(player.getPosition(), levelWidth, levelHeight);
@@ -494,7 +497,6 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             // building collisions and transparency
             for (BuildingObject building : buildings) {
                 building.draw(batch);
-                player.checkCollision(building, true);
             }
 
             // set all buildings to not pickup/dropoff if no queued orders
