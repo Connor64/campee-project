@@ -27,6 +27,7 @@ public class KeepPlayingPopup {
     private ShapeRenderer shapeRenderer;
     private BitmapFont gameStatsfont;
     private Label messageLabel;
+    private Label optionLabel;
     private BitmapFont font;
     private BitmapFont buttonFont;
     private boolean keepPlayingClicked;
@@ -54,8 +55,12 @@ public class KeepPlayingPopup {
         buttonFont.getData().setScale(1.25f);
 
         messageLabel = new Label(notificationMessage, new Label.LabelStyle(font, Color.WHITE));
-        messageLabel.setFontScale(0.5f);
-        messageLabel.setPosition(100, 300);
+        messageLabel.setFontScale(1f);
+        messageLabel.setPosition(200, 350);
+
+        optionLabel = new Label(notificationMessage, new Label.LabelStyle(font, Color.WHITE));
+        optionLabel.setFontScale(0.5f);
+        optionLabel.setPosition(200, 300);
 
 
         Pixmap keepPlayingBackgroundPixmap = createRoundedRectanglePixmap(1000, 200, 10, Color.GREEN); // Adjust size and color
@@ -135,6 +140,7 @@ public class KeepPlayingPopup {
         });
 
         stage.addActor(messageLabel);
+        stage.addActor(optionLabel);
         stage.addActor(keepPlayingButton);
         stage.addActor(endGameButton);
     }
@@ -143,6 +149,11 @@ public class KeepPlayingPopup {
     public void setMessageLabel(String message) {
         messageLabel.setText(message);
         messageLabel.setVisible(true);
+    }
+
+    public void setOptionLabel(String option) {
+        optionLabel.setText(option);
+        optionLabel.setVisible(true);
     }
 
     public void show() {
