@@ -184,9 +184,9 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         minOrders = 2/*levelData.minOrders*/;
         goalTime = 300/*levelData.goalTime*/;
 
-        rock = new GameObject("rock.png", 300, 300);
-
-        log = new GameObject("log.png", VIRTUAL_WIDTH / 2, VIRTUAL_HEIGHT / 2);
+//        rock = new GameObject("rock.png", 300, 300);
+//
+//        log = new GameObject("log.png", VIRTUAL_WIDTH / 2, VIRTUAL_HEIGHT / 2);
 
         // Define side panel properties
         sidePanelWidth = Gdx.graphics.getWidth() / 5; // Width
@@ -458,8 +458,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             }
 
             player.draw(batch);
-            rock.draw(batch);
-            log.draw(batch);
+//            rock.draw(batch);
+//            log.draw(batch);
 
             // coin collision
             for (CoinObject coin : coins) {
@@ -515,13 +515,13 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                         // assign the building to the correct order
                         if (building.getName().equals(currPick) && !order.isPickedUp()) {
                             building.setPickupLocation(true);
-                            order.setPickupBounds(building.getBounds().getX(), building.getBounds().getY(), building.getWidth(), building.getHeight());
+                            order.setPickupBounds(building.bounds.getX(), building.bounds.getY(), building.getWidth(), building.getHeight());
                         } else {
                             building.setPickupLocation(false);
                         }
                         if (building.getName().equals(currDrop) && !order.isDroppedOff() && order.isPickedUp()) {
                             building.setDropoffLocation(true);
-                            order.setDropoffBounds(building.getBounds().getX(), building.getBounds().getY(), building.getWidth(), building.getHeight());
+                            order.setDropoffBounds(building.bounds.getX(), building.bounds.getY(), building.getWidth(), building.getHeight());
                         } else {
                             building.setDropoffLocation(false);
                         }

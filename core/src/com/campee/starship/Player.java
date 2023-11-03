@@ -105,7 +105,6 @@ public class Player extends GameObject {
 
         // Check if within the collision bounds
         if (Intersector.overlaps(getBounds(), object.getBounds())) {
-            System.out.println("yes");
             if (rigid) {
                 if (Math.abs(body.getLinearVelocity().x) > 0) {
                     body.setLinearVelocity(body.getLinearVelocity().x * -2, body.getLinearVelocity().y);
