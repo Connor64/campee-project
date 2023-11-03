@@ -21,6 +21,7 @@ public class AssetManager {
         objects = new HashMap<>();
         
         loadTileset("1_terrain.png", "tileset_test_1");
+        loadTileset("street.png", "modern_tileset");
     }
 
     /**

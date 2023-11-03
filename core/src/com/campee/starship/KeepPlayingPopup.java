@@ -27,6 +27,7 @@ public class KeepPlayingPopup {
     private ShapeRenderer shapeRenderer;
     private BitmapFont gameStatsfont;
     private Label messageLabel;
+    private Label optionLabel;
     private BitmapFont font;
     private BitmapFont buttonFont;
     private boolean keepPlayingClicked;
@@ -54,8 +55,12 @@ public class KeepPlayingPopup {
         buttonFont.getData().setScale(1.25f);
 
         messageLabel = new Label(notificationMessage, new Label.LabelStyle(font, Color.WHITE));
-        messageLabel.setFontScale(0.5f);
-        messageLabel.setPosition(100, 500);
+        messageLabel.setFontScale(1f);
+        messageLabel.setPosition(200, 350);
+
+        optionLabel = new Label(notificationMessage, new Label.LabelStyle(font, Color.WHITE));
+        optionLabel.setFontScale(0.5f);
+        optionLabel.setPosition(200, 300);
 
 
         Pixmap keepPlayingBackgroundPixmap = createRoundedRectanglePixmap(1000, 200, 10, Color.GREEN); // Adjust size and color
@@ -75,19 +80,22 @@ public class KeepPlayingPopup {
         final TextButton keepPlayingButton = new TextButton("Keep Playing",  keepPlayingButtonStyle);
         final TextButton endGameButton = new TextButton("End Game",  endGameButtonStyle);
 
-        keepPlayingButton.setWidth(50);
+        keepPlayingButton.setWidth(120);
         keepPlayingButton.setHeight(75);
-        endGameButton.setWidth(50);
+        endGameButton.setWidth(120);
         endGameButton.setHeight(75);
 
         // Set button positions
-        keepPlayingButton.setPosition(100, 400);
-        endGameButton.setPosition(500,400);
+        keepPlayingButton.setPosition(100, 200);
+        endGameButton.setPosition(500,200);
 
         keepPlayingButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 keepPlayingClicked = true;
+                screen.keepPlaying = false;
+                visible = false;
+                screen.popupInAction = false;
                 //add logic
             }
             @Override
@@ -108,6 +116,12 @@ public class KeepPlayingPopup {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 endGameClicked = true;
+                screen.win = true;
+                screen.keepPlaying = false;
+                screen.countdownMinutes = 0;
+                screen.countdownSeconds = 0;
+                screen.popupInAction = false;
+                screen.showGameResult();
                 //add logic
 
             }
@@ -126,6 +140,7 @@ public class KeepPlayingPopup {
         });
 
         stage.addActor(messageLabel);
+        stage.addActor(optionLabel);
         stage.addActor(keepPlayingButton);
         stage.addActor(endGameButton);
     }
@@ -134,6 +149,11 @@ public class KeepPlayingPopup {
     public void setMessageLabel(String message) {
         messageLabel.setText(message);
         messageLabel.setVisible(true);
+    }
+
+    public void setOptionLabel(String option) {
+        optionLabel.setText(option);
+        optionLabel.setVisible(true);
     }
 
     public void show() {

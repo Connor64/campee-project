@@ -88,7 +88,7 @@ public class GameScreen extends ApplicationAdapter implements Screen {
         stage = new Stage();
         this.game = game;
         batch = new SpriteBatch();
-        keyProcessor = new KeyProcessor();
+        //keyProcessor = new KeyProcessor(this);
         screenWidth = Gdx.graphics.getWidth();
         screenHeight = Gdx.graphics.getHeight();
 

@@ -23,14 +23,10 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 
-import java.util.Collections;
+import java.util.*;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -48,6 +44,9 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     public float goalTime;
 
     public boolean win;
+    public boolean keepPlaying = true;
+    public boolean popupInAction = false;
+
 
     private Player player;
     public PlayerAttributes playerAttributes;
@@ -87,8 +86,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     final float MESSAGE_DURATION = 3.0f;
 
     // Declare variables for the countdown timer
-    private int countdownMinutes = 2; // 2 minutes
-    private int countdownSeconds = 0;
+    int countdownMinutes = 3; // 2 minutes
+    int countdownSeconds = 0;
     private Timer countdownTimer = new Timer();
 
 
@@ -96,17 +95,16 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     private TimerTask countdownTask = new TimerTask() {
         @Override
         public void run() {
-            if (countdownSeconds > 0) {
-                countdownSeconds--;
-            } else {
-                if (countdownMinutes > 0) {
-                    countdownMinutes--;
-                    countdownSeconds = 59;
+            if (!popupInAction) {
+                if (countdownSeconds > 0) {
+                    countdownSeconds--;
                 } else {
-                    // Countdown has reached 0
-                    //game over = true !
-                    //System.out.println("end of time");
-                    this.cancel(); // Stop the timer
+                    if (countdownMinutes > 0) {
+                        countdownMinutes--;
+                        countdownSeconds = 59;
+                    } else {
+                        this.cancel(); // Stop the timer
+                    }
                 }
             }
         }
@@ -170,7 +168,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
 //        stage = new Stage(new ExtendViewport(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, camera));
         stage = new Stage();
-        keyProcessor = new KeyProcessor();
+        keyProcessor = new KeyProcessor(this);
 
 //        Table uiTable = new Table();
 //        uiTable.setFillParent(true);
@@ -209,11 +207,15 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         coin = new Coin(world, 0, 0);
         coinCounter = 0;
+
         // making a coin array
-        coins = new Coin[5];
+        coins = new Coin[20];
         for (int i = 0; i < coins.length; i++) {
-            int x = (int) ((Math.random() * (levelWidth - (-levelWidth))) + (-levelWidth));
-            int y = (int) ((Math.random() * (levelHeight - (-levelHeight))) + (-levelHeight));
+            Random random = new Random();
+            int x = (random.nextInt((levelWidth - 16)+ 1));
+            int y = (random.nextInt((levelHeight - 16) + 1));
+            x = (x / 16) * 16;
+            y = (y / 16) * 16;
             coins[i] = new Coin(world, x, y);
             coins[i].getSprite().setPosition(x, y);
         }
@@ -226,20 +228,15 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         spriteList[1] = "HAAS.PNG";
         spriteList[2] = "MSEE.PNG";
         for (int i = 0; i < buildings.length; i++) {
-            int x = (int) ((Math.random() * (levelWidth - (-levelWidth))) + (-levelWidth));
-            int y = (int) ((Math.random() * (levelHeight - (-levelHeight))) + (-levelHeight));
-            // most convoluted thing ever need to change
-            if (x < 0) {
-                x = x + 128;
-            } else {
-                x = x - 128;
-            }
-            if (y < 0) {
-                y = y + 128;
-            } else {
-                y = y - 128;
-            }
+            Random random = new Random();
+            int x = (random.nextInt((levelWidth - 128)+ 1));
+            int y = (random.nextInt((levelHeight - 128) + 1));
+            x = (x / 16) * 16;
+            y = (y / 16) * 16;
             buildings[i] = new BuildingObject(world, x, y);
+            for (int k = i; k < buildings.length - i; k++) {
+
+            }
             buildings[i].setSprite(spriteList[i]);
             String sprite = spriteList[i];
             buildings[i].setName(sprite.substring(0, (sprite.length() - 4)));
@@ -463,6 +460,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         schedulePopupDisplay();
 
+
+
     }
 
     @Override
@@ -680,17 +679,22 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                             order.setPickedUp(false);
                         }
                     }
-                    String orderID = order.getOrderString();
-                    outOfTimeOrdersIDs.add(orderID);
+                    String orderID = s[1];
+                    orderID = orderID.substring(0, orderID.length() - 3);
+                    if (!(playerAttributes.ordersCompleted >= minOrders)) {
+                        outOfTimeOrdersIDs.add(orderID);
+                    }
                     orderTimeoutLabel.setVisible(true);
                     playerAttributes.array.remove(i);
                     messageTimer = 0.0f;
                 } else {
-                    if (timeCount[i - 1] % 60 == 0) {
-                        time -= 1;
-                        orderTimeLeft[i - 1] = time;
+                    if (!popupInAction) {
+                        if (timeCount[i - 1] % 60 == 0) {
+                            time -= 1;
+                            orderTimeLeft[i - 1] = time;
+                        }
+                        timeCount[i - 1]++;
                     }
-                    timeCount[i - 1]++;
 
                     if (!twoName) {
                         s[4] = String.valueOf(time);
@@ -767,6 +771,17 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         }
         boolean timeLeft = true;
         if (countdownSeconds == 0 && countdownMinutes == 0) {
+            if (playerAttributes.orderInProgress) {
+                // go through all orders and add timed out orders to game stats
+                for (int i = 1; i < playerAttributes.array.size(); i++ ) {
+                    String[] s = order.stringToArray(playerAttributes.array.get(i));
+                    String orderID = s[1];
+                    orderID = orderID.substring(0, orderID.length() - 3);
+                    if (!outOfTimeOrdersIDs.contains(orderID)) {
+                        outOfTimeOrdersIDs.add(orderID);
+                    }
+                }
+            }
             timeLeft = false;
             if (playerAttributes.ordersCompleted >= minOrders) {
                 win = true;
@@ -776,14 +791,14 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             showGameResult();
         }
         if (playerAttributes.ordersCompleted >= minOrders) {
-            //if time >= 0:
-            //show game stats screen, pause game as part of this (if condition in render)
             win = true;
             if (!timeLeft) {
                 showGameResult();
             }
-            //else:
-           keepPlayingPopup();
+            if (playerAttributes.ordersCompleted == minOrders && keepPlaying) {
+                keepPlayingPopup();
+                popupInAction = true;
+            }
         }
     }
 
@@ -823,17 +838,16 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     // keep playing pop up
     public void keepPlayingPopup() {
         visibleText = false;
-        String message = "Do you want to keep playing or end the game?";
+        String message = "Level Complete!\n";
+        String option = "Keep Playing or End Game?";
         keepplayingpopup.setMessageLabel(message);
+        keepplayingpopup.setOptionLabel(option);
         keepplayingpopup.show();
         keepplayingpopup.render();
         multiplexer.addProcessor(keepplayingpopup.getStage());
-        //System.out.println("Level completed!");
     }
-
     // Trigger the timed popup to show
     public void showTimedPopup() {
-        //popup.setPosition(Gdx.graphics.getWidth() - 300, 0);
         popup.show(); // Display the popup
         try {
             order.setArray(orderArray);
@@ -843,8 +857,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         order.seti(count);
         count++;
         popup.setMessage(order.arrayToString());
-        //popup.acceptClicked = false;
-        //popup.declineClicked = false;
+        popup.acceptClicked = false;
+        popup.declineClicked = false;
     }
 
     public void hideTimedPopup() {
@@ -857,26 +871,36 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         scheduler.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
-                showTimedPopup(); // Show the popup
-                scheduler.schedule(new Runnable() {
-                    @Override
-                    public void run() {
-                        // Hide the popup
-                        hideTimedPopup();
-                        if (!popup.acceptClicked() && !popup.declineClicked()) {
-                            autoDeclineLabel.setVisible(true);
-                            scheduler.schedule(new Runnable() {
-                                @Override
-                                public void run() {
-                                    autoDeclineLabel.setVisible(false); // Remove the label from the display
+                if (!popupInAction) {
+                    showTimedPopup(); // Show the popup
+                    scheduler.schedule(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (!popupInAction) {
+                                // Hide the popup
+                                hideTimedPopup();
+                                if (!popup.acceptClicked() && !popup.declineClicked()) {
+                                    autoDeclineLabel.setVisible(true);
+                                    scheduler.schedule(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            if (!popupInAction) {
+                                                autoDeclineLabel.setVisible(false); // Remove the label from the display
+                                            }
+                                        }
+                                    }, 4, TimeUnit.SECONDS);
                                 }
-                            }, 4, TimeUnit.SECONDS);
+                            }
+
                         }
-                    }
-                }, 10, TimeUnit.SECONDS); // Schedule to hide the popup after 10 seconds
+                    }, 5, TimeUnit.SECONDS); // Schedule to hide the popup after 10 seconds
+                }
             }
-        }, 0, 15, TimeUnit.SECONDS); // Schedule the next popup 15 seconds after the first one
+        }, 0, 10, TimeUnit.SECONDS); // Schedule the next popup 15 seconds after the first one
     }
+
+
+
 
 
     @Override
