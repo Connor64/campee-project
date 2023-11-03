@@ -1,6 +1,7 @@
 package com.campee.starship;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -18,10 +19,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 import java.util.ArrayList;
 
-public class Popup {
+public class Popup implements Screen {
     private Stage stage;
     //private float duration; // Duration of the popup in seconds
     //private float timeElapsed; // Time elapsed since the popup was shown
@@ -40,9 +42,12 @@ public class Popup {
     float popupHeight;
     float popupX;
     float popupY;
+    private ExtendViewport viewport;
 
     public Popup(final GameplayScreen screen, final String notificationMessage) {
-        stage = new Stage();
+        viewport = new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        stage = new Stage(viewport);
+        //stage = new Stage();
         //this.duration = duration;
         //timeElapsed = 0;
 
@@ -169,11 +174,30 @@ public class Popup {
         messageLabel.setText(message);
     }
 
-
     public void show() {
         visible = true;
         //timeElapsed = 0;
         //stage.act();
+    }
+
+    @Override
+    public void render(float delta) {
+
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        viewport.update(width, height, true);
+    }
+
+    @Override
+    public void pause() {
+
+    }
+
+    @Override
+    public void resume() {
+
     }
 
 //    public void update(float delta) {
@@ -187,6 +211,11 @@ public class Popup {
 
     public void hide() {
         visible = false;
+    }
+
+    @Override
+    public void dispose() {
+        stage.dispose();
     }
 
     public boolean isVisible() {
@@ -207,8 +236,8 @@ public class Popup {
     public void render() {
         if (visible) {
             // Clear the background
-            Gdx.gl.glEnable(GL20.GL_BLEND);
-            Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+//            Gdx.gl.glEnable(GL20.GL_BLEND);
+//            Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 //            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 //            shapeRenderer.setColor(new Color(0, 0, 0, 0.7f));
 //            shapeRenderer.rect(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
