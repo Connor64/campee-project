@@ -681,7 +681,9 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                     }
                     String orderID = s[1];
                     orderID = orderID.substring(0, orderID.length() - 3);
-                    outOfTimeOrdersIDs.add(orderID);
+                    if (!(playerAttributes.ordersCompleted >= minOrders)) {
+                        outOfTimeOrdersIDs.add(orderID);
+                    }
                     orderTimeoutLabel.setVisible(true);
                     playerAttributes.array.remove(i);
                     messageTimer = 0.0f;
