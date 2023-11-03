@@ -234,6 +234,9 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             x = (x / 16) * 16;
             y = (y / 16) * 16;
             buildings[i] = new BuildingObject(world, x, y);
+            for (int k = i; k < buildings.length - i; k++) {
+
+            }
             buildings[i].setSprite(spriteList[i]);
             String sprite = spriteList[i];
             buildings[i].setName(sprite.substring(0, (sprite.length() - 4)));
