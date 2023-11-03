@@ -33,6 +33,8 @@ public class Popup {
     public boolean declineClicked;
     private boolean isAcceptButtonHovered = false;
     private boolean isDeclineButtonHovered = false;
+    public TextButton acceptButton;
+    public TextButton declineButton;
 
     float popupWidth;
     float popupHeight;
@@ -81,8 +83,10 @@ public class Popup {
         declineButtonStyle.up = new TextureRegionDrawable(new TextureRegion(new Texture(declineBackgroundPixmap)));
 
         // Create buttons
-        final TextButton acceptButton = new TextButton("Accept", acceptButtonStyle);
-        final TextButton declineButton = new TextButton("Decline", declineButtonStyle);
+        //final TextButton acceptButton = new TextButton("Accept", acceptButtonStyle);
+        //final TextButton declineButton = new TextButton("Decline", declineButtonStyle);
+        acceptButton = new TextButton("Accept", acceptButtonStyle);
+        declineButton = new TextButton("Decline", declineButtonStyle);
 
         acceptButton.setWidth(75);
         acceptButton.setHeight(25);
@@ -94,59 +98,71 @@ public class Popup {
         acceptButton.setPosition(620, popupY);
         declineButton.setPosition(720, popupY);
 
-        // Add click listeners to buttons
-        acceptButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                acceptClicked = true;
-                screen.playerAttributes.orderInProgress = true;
-                screen.playerAttributes.array.add(screen.order.arrayToString());
 
-                visible = false;
-            }
-            @Override
-            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
-                super.enter(event, x, y, pointer, fromActor);
-                isAcceptButtonHovered = true;
-                acceptButton.setColor(Color.LIGHT_GRAY);
-            }
-            @Override
-            public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
-                super.exit(event, x, y, pointer, toActor);
-                isAcceptButtonHovered = false;
-                acceptButton.setColor(Color.WHITE);
-            }
-        });
 
-        declineButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                declineClicked = true;
-                if (screen.playerAttributes.array.size() <= 1) {
-                    screen.playerAttributes.orderInProgress = false;
+            // Add click listeners to buttons
+            acceptButton.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    if (visible) {
+                        acceptClicked = true;
+                        screen.playerAttributes.orderInProgress = true;
+                        screen.playerAttributes.array.add(screen.order.arrayToString());
+
+                        visible = false;
+                    }
                 }
-                //use this for the other thing
-                //screen.playerAttributes.array.remove(1);
-                visible = false;
-            }
-            @Override
-            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
-                super.enter(event, x, y, pointer, fromActor);
-                isDeclineButtonHovered = true;
-                declineButton.setColor(Color.LIGHT_GRAY);
-            }
-            @Override
-            public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
-                super.exit(event, x, y, pointer, toActor);
-                isDeclineButtonHovered = false;
-                declineButton.setColor(Color.WHITE);
-            }
-        });
+
+                @Override
+                public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+                    super.enter(event, x, y, pointer, fromActor);
+                    isAcceptButtonHovered = true;
+                    acceptButton.setColor(Color.LIGHT_GRAY);
+                }
+
+                @Override
+                public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
+                    super.exit(event, x, y, pointer, toActor);
+                    isAcceptButtonHovered = false;
+                    acceptButton.setColor(Color.WHITE);
+                }
+            });
+
+            declineButton.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    if (visible) {
+                        declineClicked = true;
+                        if (screen.playerAttributes.array.size() <= 1) {
+                            screen.playerAttributes.orderInProgress = false;
+                        }
+                        //use this for the other thing
+                        //screen.playerAttributes.array.remove(1);
+                        visible = false;
+                    }
+                }
+
+                @Override
+                public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+                    super.enter(event, x, y, pointer, fromActor);
+                    isDeclineButtonHovered = true;
+                    declineButton.setColor(Color.LIGHT_GRAY);
+                }
+
+                @Override
+                public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
+                    super.exit(event, x, y, pointer, toActor);
+                    isDeclineButtonHovered = false;
+                    declineButton.setColor(Color.WHITE);
+                }
+            });
 
         // Add buttons to the stage
-        stage.addActor(acceptButton);
-        stage.addActor(declineButton);
-        stage.addActor(messageLabel);
+        //if (messageLabel == "No more orders!")) {
+            stage.addActor(acceptButton);
+            stage.addActor(declineButton);
+            stage.addActor(messageLabel);
+
     }
 
     public void setMessage(String message) {

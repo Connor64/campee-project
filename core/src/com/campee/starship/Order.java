@@ -72,7 +72,7 @@ public class Order {
         return array;
     }
 
-
+//CHANGE FOR DEMO SO WE DONT WAIT FOR ALL SIX :)
 
     public void setArray(ArrayList<String> array) throws FileNotFoundException {
         Scanner scanner = new Scanner(new File("Level1Orders.txt"));
