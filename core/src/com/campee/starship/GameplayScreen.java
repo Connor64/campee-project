@@ -168,7 +168,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
 //        stage = new Stage(new ExtendViewport(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, camera));
         stage = new Stage();
-        keyProcessor = new KeyProcessor();
+        keyProcessor = new KeyProcessor(this);
 
 //        Table uiTable = new Table();
 //        uiTable.setFillParent(true);
@@ -456,6 +456,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         autoDeclineLabel.setSize(font.getScaleX() * 16, font.getScaleY() * 16);
 
         schedulePopupDisplay();
+
+
 
     }
 
@@ -782,13 +784,10 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             showGameResult();
         }
         if (playerAttributes.ordersCompleted >= minOrders) {
-            //if time >= 0:
-            //show game stats screen, pause game as part of this (if condition in render)
             win = true;
             if (!timeLeft) {
                 showGameResult();
             }
-            //else:
             if (playerAttributes.ordersCompleted == minOrders && keepPlaying) {
                 keepPlayingPopup();
                 popupInAction = true;
@@ -852,8 +851,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         order.seti(count);
         count++;
         popup.setMessage(order.arrayToString());
-        //popup.acceptClicked = false;
-        //popup.declineClicked = false;
+        popup.acceptClicked = false;
+        popup.declineClicked = false;
     }
 
     public void hideTimedPopup() {
@@ -866,29 +865,36 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         scheduler.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
-                if (!popupInAction) {
-                    showTimedPopup(); // Show the popup
-                    scheduler.schedule(new Runnable() {
-                        @Override
-                        public void run() {
-                            // Hide the popup
-                            hideTimedPopup();
-                            if (!popup.acceptClicked() && !popup.declineClicked()) {
-                                autoDeclineLabel.setVisible(true);
-                                scheduler.schedule(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        autoDeclineLabel.setVisible(false); // Remove the label from the display
-                                    }
-                                }, 4, TimeUnit.SECONDS);
-                            }
+                //if (!popupInAction) {
+                showTimedPopup(); // Show the popup
+                scheduler.schedule(new Runnable() {
+                    @Override
+                    public void run() {
+                        //if (!popupInAction) {
+                        // Hide the popup
+                        hideTimedPopup();
+                        if (!popup.acceptClicked() && !popup.declineClicked()) {
+                            autoDeclineLabel.setVisible(true);
+                            scheduler.schedule(new Runnable() {
+                                @Override
+                                public void run() {
+                                    // if (!popupInAction) {
+                                    autoDeclineLabel.setVisible(false); // Remove the label from the display
+                                    //}
+                                }
+                            }, 4, TimeUnit.SECONDS);
                         }
+                        //}
 
-                    }, 10, TimeUnit.SECONDS); // Schedule to hide the popup after 10 seconds
-                }
+                    }
+                }, 10, TimeUnit.SECONDS); // Schedule to hide the popup after 10 seconds
+                //}
             }
-        }, 0, 15, TimeUnit.SECONDS); // Schedule the next popup 15 seconds after the first one
-    }
+           }, 0, 15, TimeUnit.SECONDS); // Schedule the next popup 15 seconds after the first one
+
+       }
+
+
 
 
 
