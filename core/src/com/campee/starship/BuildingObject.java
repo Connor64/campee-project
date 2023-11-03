@@ -128,7 +128,7 @@ public class BuildingObject extends GameObject {
                 pickSprite.draw(batch);
             }
         } else if (dropoffLocation) {
-            pickSprite.draw(batch);
+            dropSprite.draw(batch);
         }
 
 //        pickSpriteYellow.setPosition(getBounds().getX() + (getBounds().getWidth() / 2), getBounds().getY() + ((getBounds().getHeight() * 2)));
