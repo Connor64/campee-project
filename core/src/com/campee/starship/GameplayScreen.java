@@ -807,6 +807,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     //show game stats screen
     public void showGameResult() {
         visibleText = false;
+
         StringBuilder orderIDsStringBuilder = new StringBuilder("Successfully Delivered:\n");
         for (String orderID : deliveredOrderIDs) {
             orderIDsStringBuilder.append(orderID).append("\n");
