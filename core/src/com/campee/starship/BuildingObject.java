@@ -112,6 +112,9 @@ public class BuildingObject extends GameObject {
     public void setPosition(float x, float y) {
         super.setPosition(x, y);
         transparencyBounds.setPosition(x, y);
+        dropSprite.setPosition(x + (getBounds().getWidth() / 2), y + ((getBounds().getHeight() * 2)));
+        pickSprite.setPosition(x + (getBounds().getWidth() / 2), y + ((getBounds().getHeight() * 2)));
+        pickSpriteYellow.setPosition(x + (getBounds().getWidth() / 2), y + ((getBounds().getHeight() * 2)));
     }
 
     @Override
