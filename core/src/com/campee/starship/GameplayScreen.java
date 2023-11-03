@@ -184,9 +184,9 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         minOrders = 2/*levelData.minOrders*/;
         goalTime = 300/*levelData.goalTime*/;
 
-        rock = new GameObject("rock.png", 300, 300);
-
-        log = new GameObject("log.png", VIRTUAL_WIDTH / 2, VIRTUAL_HEIGHT / 2);
+//        rock = new GameObject("rock.png", 300, 300);
+//
+//        log = new GameObject("log.png", VIRTUAL_WIDTH / 2, VIRTUAL_HEIGHT / 2);
 
         // Define side panel properties
         sidePanelWidth = Gdx.graphics.getWidth() / 5; // Width
@@ -942,7 +942,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                     building.setPosition(
                             objectData[i].x * levelData.tileSize,
                             // Setting the y-position is like this bc libgdx is stupid :)
-                            levelHeight - (objectData[i].y - 1) * levelData.tileSize - building.getBounds().height
+                            levelHeight - (objectData[i].y + 1) * levelData.tileSize - building.getBounds().height
                     );
                     System.out.println(objectData[i].objectID);
                     buildings.add(building);
