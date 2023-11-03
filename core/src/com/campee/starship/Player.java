@@ -89,11 +89,11 @@ public class Player extends GameObject {
 
     public void checkBounds(int width, int height) {
         if ((body.getPosition().x + sprite.getWidth() > width) || (body.getPosition().x < 0)) {
-            body.setLinearVelocity(body.getLinearVelocity().x * -1, body.getLinearVelocity().y);
+            body.setLinearVelocity(body.getLinearVelocity().x * -2, body.getLinearVelocity().y);
         }
 
         if ((body.getPosition().y + sprite.getHeight() > height) || (body.getPosition().y < 0)) {
-            body.setLinearVelocity(body.getLinearVelocity().x, body.getLinearVelocity().y * -1);
+            body.setLinearVelocity(body.getLinearVelocity().x, body.getLinearVelocity().y * -2);
         }
     }
 
@@ -107,10 +107,10 @@ public class Player extends GameObject {
         if (Intersector.overlaps(getBounds(), object.getBounds())) {
             if (rigid) {
                 if (Math.abs(body.getLinearVelocity().x) > 0) {
-                    body.setLinearVelocity(body.getLinearVelocity().x * -1, body.getLinearVelocity().y);
+                    body.setLinearVelocity(body.getLinearVelocity().x * -2, body.getLinearVelocity().y);
                 }
                 if (Math.abs(body.getLinearVelocity().y) > 0) {
-                    body.setLinearVelocity(body.getLinearVelocity().x, body.getLinearVelocity().y * -1);
+                    body.setLinearVelocity(body.getLinearVelocity().x, body.getLinearVelocity().y * -2);
                 }
             }
 
