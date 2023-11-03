@@ -839,12 +839,9 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         keepplayingpopup.show();
         keepplayingpopup.render();
         multiplexer.addProcessor(keepplayingpopup.getStage());
-        //System.out.println("Level completed!");
     }
-
     // Trigger the timed popup to show
     public void showTimedPopup() {
-        //popup.setPosition(Gdx.graphics.getWidth() - 300, 0);
         popup.show(); // Display the popup
         try {
             order.setArray(orderArray);

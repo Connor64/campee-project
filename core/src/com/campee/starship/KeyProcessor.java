@@ -51,6 +51,9 @@ public class KeyProcessor implements InputProcessor {
                     upPressed = false;
                     downPressed = false;
                     break;
+            }
+        }
+            switch (keycode) {
                 case Input.Keys.P:
                     pPressed = true;
                     break;
@@ -58,31 +61,34 @@ public class KeyProcessor implements InputProcessor {
                     oPressed = true;
                     break;
             }
-        }
+       // }
             return false;
 
     }
 
     @Override
     public boolean keyUp(int keycode) {
-        if (!screen.popupInAction) {
+         if (!screen.popupInAction) {
+             switch (keycode) {
+                 case Input.Keys.UP:
+                 case Input.Keys.W:
+                     upPressed = false;
+                     break;
+                 case Input.Keys.DOWN:
+                 case Input.Keys.S:
+                     downPressed = false;
+                     break;
+                 case Input.Keys.LEFT:
+                 case Input.Keys.A:
+                     leftPressed = false;
+                     break;
+                 case Input.Keys.RIGHT:
+                 case Input.Keys.D:
+                     rightPressed = false;
+                     break;
+             }
+         }
             switch (keycode) {
-                case Input.Keys.UP:
-                case Input.Keys.W:
-                    upPressed = false;
-                    break;
-                case Input.Keys.DOWN:
-                case Input.Keys.S:
-                    downPressed = false;
-                    break;
-                case Input.Keys.LEFT:
-                case Input.Keys.A:
-                    leftPressed = false;
-                    break;
-                case Input.Keys.RIGHT:
-                case Input.Keys.D:
-                    rightPressed = false;
-                    break;
                 case Input.Keys.P:
                     pPressed = false;
                     break;
@@ -90,7 +96,7 @@ public class KeyProcessor implements InputProcessor {
                     oPressed = false;
                     break;
             }
-        }
+        //}
         return false;
     }
 
