@@ -15,6 +15,7 @@ public class BuildingObject extends GameObject {
     private boolean transparent;
     private Sprite pickSprite;
     private Sprite dropSprite;
+    private Sprite pickSpriteYellow;
     private String name;
 
     public BuildingObject(World world, float x, float y) {
@@ -29,6 +30,13 @@ public class BuildingObject extends GameObject {
         pickSprite = new Sprite(pickUpRegion);
         pickSprite.setOrigin(pickSprite.getX() / 2,pickSprite.getY() / 2);
         pickSprite.setPosition(0, 0);
+
+        Texture pickupTextureYellow = new Texture(Gdx.files.internal("pickup flag yellow.PNG"));
+        pickupTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        TextureRegion pickUpRegionYellow = new TextureRegion(pickupTextureYellow, 0, 0, pickupTextureYellow.getWidth(), pickupTextureYellow.getHeight());
+        pickSpriteYellow = new Sprite(pickUpRegionYellow);
+        pickSpriteYellow.setOrigin(pickSpriteYellow.getX() / 2,pickSpriteYellow.getY() / 2);
+        pickSpriteYellow.setPosition(0, 0);
 
         Texture dropoffTexture = new Texture(Gdx.files.internal("dropoff flag.PNG"));
         dropoffTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
@@ -94,9 +102,13 @@ public class BuildingObject extends GameObject {
         } else {
             sprite.setAlpha(1f);
         }
-        if (pickupLocation) {
+        //  TODO: stupit stuff for flag ac change later
+        if (pickupLocation && !name.equals("HAAS")) {
             pickSprite.setPosition(getBounds().getX() + (getBounds().getWidth() / 2), getBounds().getY() + ((getBounds().getHeight() * 2)));
             pickSprite.draw(batch);
+        } else if (pickupLocation && name.equals("HAAS")) {
+            pickSpriteYellow.setPosition(getBounds().getX() + (getBounds().getWidth() / 2), getBounds().getY() + ((getBounds().getHeight() * 2)));
+            pickSpriteYellow.draw(batch);
         }
         if (dropoffLocation) {
             dropSprite.setPosition(getBounds().getX() + (getBounds().getWidth() / 2), getBounds().getY()  + ((getBounds().getHeight() * 2)));
