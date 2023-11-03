@@ -46,6 +46,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     public boolean win;
     public boolean keepPlaying = true;
     public boolean popupInAction = false;
+    public boolean ordersDone = false;
 
 
     private Player player;
@@ -250,7 +251,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         orderArray = new ArrayList<>();
         order.setArray(orderArray);
         Collections.shuffle(orderArray);
-        //System.out.println(orderArray);
+        System.out.println(orderArray);
         orderA = order.arrayToArray();
         order.seti(order.i++);
         int time = Integer.parseInt(orderA[3]);
@@ -291,7 +292,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         backButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                System.out.println("clicked back");
+                //System.out.println("clicked back");
                 game.setScreen(new LevelScreen(game));
             }
 
@@ -342,41 +343,41 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         });
 
 
-        // Make next order button
-        nextOrderButton = new TextButton("Next Order", buttonStyle);
-        nextOrderButton.setPosition(Gdx.graphics.getWidth() - 220, Gdx.graphics.getHeight() - 60); // Adjust the position as necessary
-        nextOrderButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                try {
-                    order.setArray(orderArray);
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }
-                order.seti(count);
-                count++;
-                popup.setMessage(order.arrayToString());
-
-                popup.show();
-                popup.render();
-                multiplexer.addProcessor(popup.getStage());
-
-            }
-
-            @Override
-            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
-                super.enter(event, x, y, pointer, fromActor);
-                isOrderButtonHovered = true;
-                nextOrderButton.setColor(Color.LIGHT_GRAY);
-            }
-
-            @Override
-            public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
-                super.exit(event, x, y, pointer, toActor);
-                isOrderButtonHovered = false;
-                nextOrderButton.setColor(Color.WHITE);
-            }
-        });
+//        // Make next order button
+//        nextOrderButton = new TextButton("Next Order", buttonStyle);
+//        nextOrderButton.setPosition(Gdx.graphics.getWidth() - 220, Gdx.graphics.getHeight() - 60); // Adjust the position as necessary
+//        nextOrderButton.addListener(new ClickListener() {
+//            @Override
+//            public void clicked(InputEvent event, float x, float y) {
+//                try {
+//                    order.setArray(orderArray);
+//                } catch (FileNotFoundException e) {
+//                    e.printStackTrace();
+//                }
+//                order.seti(count);
+//                count++;
+//                popup.setMessage(order.arrayToString());
+//
+//                popup.show();
+//                popup.render();
+//                multiplexer.addProcessor(popup.getStage());
+//
+//            }
+//
+//            @Override
+//            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+//                super.enter(event, x, y, pointer, fromActor);
+//                isOrderButtonHovered = true;
+//                nextOrderButton.setColor(Color.LIGHT_GRAY);
+//            }
+//
+//            @Override
+//            public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
+//                super.exit(event, x, y, pointer, toActor);
+//                isOrderButtonHovered = false;
+//                nextOrderButton.setColor(Color.WHITE);
+//            }
+//        });
 
         stage.addActor(backButton);
         //stage.addActor(gameStatsButton);
@@ -617,12 +618,10 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                                 playerAttributes.array.remove(1);
                                 totalOrdersCompleted++;
                                 String orderID = order.getOrderString();
-                                System.out.println("order id: " + orderID);
                                 //if (!deliveredOrderIDs.contains(orderID)) {
                                     deliveredOrderIDs.add(orderID);
-                                    System.out.println("Order " + orderID + " has been delivered and added to the list.");
+                                    //System.out.println("Order " + orderID + " has been delivered and added to the list.");
                                 //}
-                                System.out.println("Order List: " + deliveredOrderIDs);
                                 if (playerAttributes.array.size() <= 1) {
                                     playerAttributes.orderInProgress = false;
                                 }
@@ -845,16 +844,28 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     // Trigger the timed popup to show
     public void showTimedPopup() {
         popup.show(); // Display the popup
-        try {
+        /*try {
             order.setArray(orderArray);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-        }
+        }*/
         order.seti(count);
         count++;
-        popup.setMessage(order.arrayToString());
-        popup.acceptClicked = false;
-        popup.declineClicked = false;
+        if (count < 7) {
+            popup.setMessage(order.arrayToString());
+            popup.acceptClicked = false;
+            popup.declineClicked = false;
+        } else {
+            popup.setMessage("No more orders!");
+            popup.declineButton.remove();
+            popup.acceptButton.remove();
+            if (ordersDone) {
+                popup.hide();
+            }
+            ordersDone = true;
+
+
+        }
     }
 
     public void hideTimedPopup() {
@@ -887,7 +898,6 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                                     }, 4, TimeUnit.SECONDS);
                                 }
                             }
-
                         }
                     }, 5, TimeUnit.SECONDS); // Schedule to hide the popup after 10 seconds
                 }
@@ -962,11 +972,11 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         if (levelData == null) return null;
 
-        System.out.println(levelData.levelName);
-        System.out.println(levelData.tileSize);
-        System.out.println(levelData.difficulty);
-        System.out.println(levelData.width);
-        System.out.println(levelData.height);
+//        System.out.println(levelData.levelName);
+//        System.out.println(levelData.tileSize);
+//        System.out.println(levelData.difficulty);
+//        System.out.println(levelData.width);
+//        System.out.println(levelData.height);
 
         levelWidth = levelData.width * levelData.tileSize;
         levelHeight = levelData.height * levelData.tileSize;
@@ -980,7 +990,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             Tile[] tiles = new Tile[tileData.length];
 
             for (int i = 0; i < tileData.length; i++) {
-                System.out.println("tileset: " + tileData[i].tilesetID);
+                //System.out.println("tileset: " + tileData[i].tilesetID);
                 tiles[i] = new Tile(
                         assetManager.getTileSprite(tileData[i].tilesetID, tileData[i].spriteIndex),
                         tileData[i].x * levelData.tileSize,

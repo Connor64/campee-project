@@ -33,6 +33,8 @@ public class Popup {
     public boolean declineClicked;
     private boolean isAcceptButtonHovered = false;
     private boolean isDeclineButtonHovered = false;
+    public TextButton acceptButton;
+    public TextButton declineButton;
 
     float popupWidth;
     float popupHeight;
@@ -75,8 +77,10 @@ public class Popup {
         declineButtonStyle.up = new TextureRegionDrawable(new TextureRegion(new Texture(declineBackgroundPixmap)));
 
         // Create buttons
-        final TextButton acceptButton = new TextButton("Accept", acceptButtonStyle);
-        final TextButton declineButton = new TextButton("Decline", declineButtonStyle);
+        //final TextButton acceptButton = new TextButton("Accept", acceptButtonStyle);
+        //final TextButton declineButton = new TextButton("Decline", declineButtonStyle);
+        acceptButton = new TextButton("Accept", acceptButtonStyle);
+        declineButton = new TextButton("Decline", declineButtonStyle);
 
         acceptButton.setWidth(75);
         acceptButton.setHeight(25);
@@ -148,9 +152,11 @@ public class Popup {
             });
 
         // Add buttons to the stage
-        stage.addActor(acceptButton);
-        stage.addActor(declineButton);
-        stage.addActor(messageLabel);
+        //if (messageLabel == "No more orders!")) {
+            stage.addActor(acceptButton);
+            stage.addActor(declineButton);
+            stage.addActor(messageLabel);
+
     }
 
     public void setMessage(String message) {
