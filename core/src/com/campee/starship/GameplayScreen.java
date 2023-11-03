@@ -4,23 +4,19 @@ import Serial.LevelData;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Intersector;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 import java.util.Collections;
@@ -57,10 +53,9 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
     private final Popup popup;
     private final GamePopup gamepopup;
-    private Coin coin;
-    private BuildingObject[] buildings;
+    private ArrayList<BuildingObject> buildings;
+    public ArrayList<CoinObject> coins;
     public int coinCounter;
-    public Coin[] coins;
     private boolean visibleText;
 
     private int totalOrdersCompleted;
@@ -110,8 +105,6 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             }
         }
     };
-
-
 
 
     //private TimedPopup incomingOrder;
@@ -192,12 +185,9 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         minOrders = 2/*levelData.minOrders*/;
         goalTime = 300/*levelData.goalTime*/;
 
-        rock = new GameObject(world, 300, 300);
-        rock.setSprite("rock.png");
-        rock.sprite.setPosition(300, 300);
+        rock = new GameObject("rock.png", 300, 300);
 
-        log = new GameObject(world, VIRTUAL_WIDTH / 2, VIRTUAL_HEIGHT / 2);
-        log.setSprite("log.png");
+        log = new GameObject("log.png", VIRTUAL_WIDTH / 2, VIRTUAL_HEIGHT / 2);
 
         // Define side panel properties
         sidePanelWidth = Gdx.graphics.getWidth() / 5; // Width
@@ -206,45 +196,45 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         sidePanelHeight = Gdx.graphics.getHeight() - 110; // Height
         sidePanelColor = new Color(0.2f, 0.2f, 0.2f, 0.5f); // Background color (RGBA)
 
-        coin = new Coin(world, 0, 0);
+//        coin = new Coin(0, 0);
         coinCounter = 0;
         // making a coin array
-        coins = new Coin[5];
-        for (int i = 0; i < coins.length; i++) {
-            int x = (int) ((Math.random() * (levelWidth - (-levelWidth))) + (-levelWidth));
-            int y = (int) ((Math.random() * (levelHeight - (-levelHeight))) + (-levelHeight));
-            coins[i] = new Coin(world, x, y);
-            coins[i].getSprite().setPosition(x, y);
-        }
+//        coins = new Coin[5];
+//        for (int i = 0; i < coins.length; i++) {
+//            int x = (int) ((Math.random() * (levelWidth - (-levelWidth))) + (-levelWidth));
+//            int y = (int) ((Math.random() * (levelHeight - (-levelHeight))) + (-levelHeight));
+//            coins[i] = new Coin(x, y);
+//            coins[i].getSprite().setPosition(x, y);
+//        }
 
-        // making multiple buildings
-        // TODO: change so its not a random location
-        buildings = new BuildingObject[3];
-        String[] spriteList = new String[3];
-        spriteList[0] = "PMU.PNG";
-        spriteList[1] = "HAAS.PNG";
-        spriteList[2] = "MSEE.PNG";
-        for (int i = 0; i < buildings.length; i++) {
-            int x = (int) ((Math.random() * (levelWidth - (-levelWidth))) + (-levelWidth));
-            int y = (int) ((Math.random() * (levelHeight - (-levelHeight))) + (-levelHeight));
-            // most convoluted thing ever need to change
-            if (x < 0) {
-                x = x + 128;
-            } else {
-                x = x - 128;
-            }
-            if (y < 0) {
-                y = y + 128;
-            } else {
-                y = y - 128;
-            }
-            buildings[i] = new BuildingObject(world, x, y);
-            buildings[i].setSprite(spriteList[i]);
-            String sprite = spriteList[i];
-            buildings[i].setName(sprite.substring(0, (sprite.length() - 4)));
-            System.out.println(buildings[i].getName());
-            buildings[i].sprite.setPosition(x, y);
-        }
+//        // making multiple buildings
+//        // TODO: change so its not a random location
+//        buildings = new BuildingObject[3];
+//        String[] spriteList = new String[3];
+//        spriteList[0] = "PMU.PNG";
+//        spriteList[1] = "HAAS.PNG";
+//        spriteList[2] = "MSEE.PNG";
+//        for (int i = 0; i < buildings.length; i++) {
+//            int x = (int) ((Math.random() * (levelWidth - (-levelWidth))) + (-levelWidth));
+//            int y = (int) ((Math.random() * (levelHeight - (-levelHeight))) + (-levelHeight));
+//            // most convoluted thing ever need to change
+//            if (x < 0) {
+//                x = x + 128;
+//            } else {
+//                x = x - 128;
+//            }
+//            if (y < 0) {
+//                y = y + 128;
+//            } else {
+//                y = y - 128;
+//            }
+//            buildings[i] = new BuildingObject(world, x, y);
+//            buildings[i].setSprite(spriteList[i]);
+//            String sprite = spriteList[i];
+//            buildings[i].setName(sprite.substring(0, (sprite.length() - 4)));
+//            System.out.println(buildings[i].getName());
+//            buildings[i].sprite.setPosition(x, y);
+//        }
 
         visibleQ = new ArrayList<>();
         playerAttributes.setArray(visibleQ);
@@ -269,17 +259,12 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         order.setPickupBounds(-levelWidth + 50, -levelHeight + 50, 16, 16);
         order.setDropoffBounds(levelWidth - 100, levelHeight - 100, 16, 16);
 
-//        order.setPickupBounds(10, 55, 16, 16);
-//        order.setDropoffBounds(22, 102, 16, 16);
-
         gamepopup = new GamePopup(this, "", game, fileName);
 
-        pickupObject = new GameObject(world, order.getPickupBounds().getX(), order.getPickupBounds().getY());
-        pickupObject.setSprite("borger.png");
+        pickupObject = new GameObject("borger.png", order.getPickupBounds().getX(), order.getPickupBounds().getY());
         pickupObject.sprite.setPosition(order.getPickupBounds().getX(), order.getPickupBounds().getY());
 
-        dropoffObject = new GameObject(world, order.getDropoffBounds().getX(), order.getDropoffBounds().getY());
-        dropoffObject.setSprite("plate.png");
+        dropoffObject = new GameObject("plate.png", order.getDropoffBounds().getX(), order.getDropoffBounds().getY());
         dropoffObject.sprite.setPosition(order.getDropoffBounds().getX(), order.getDropoffBounds().getY());
 
         // Make button style
@@ -335,8 +320,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                 }
                 String notInTimeorderIDsMessage = timeOrderIDsStringBuilder.toString();
 
-                String gameStatsMessage = "GAME OVER! \nTotal Coins Collected: " + coinCounter
-                        + "\nTotal Orders Completed: " + totalOrdersCompleted;
+                String gameStatsMessage = "GAME OVER! \nTotal Coins Collected: " + coinCounter + "\nTotal Orders Completed: " + totalOrdersCompleted;
 
                 gamepopup.showGameStatsMessage(gameStatsMessage);
                 gamepopup.showOrderCompletedList(orderIDsMessage);
@@ -438,18 +422,17 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         String str = "Time remaining:\n" + "     " + String.valueOf(countdownMinutes) + ":" + String.valueOf(countdownSeconds);
         mainTimer = new Label(str, indicatorStyle);
-        mainTimer.setPosition(25,Gdx.graphics.getHeight() - 90);
+        mainTimer.setPosition(25, Gdx.graphics.getHeight() - 90);
         mainTimer.setVisible(true);
         stage.addActor(mainTimer);
         mainTimer.setSize(font.getScaleX() * 16, font.getScaleY() * 16);
 
         //String str = "Time remaining:\n" + "     " + String.valueOf(countdownMinutes) + ":" + String.valueOf(countdownSeconds);
         lowTimer = new Label(str, warningStyle);
-        lowTimer.setPosition(25,Gdx.graphics.getHeight() - 90);
+        lowTimer.setPosition(25, Gdx.graphics.getHeight() - 90);
         lowTimer.setVisible(true);
         stage.addActor(lowTimer);
         lowTimer.setSize(font.getScaleX() * 16, font.getScaleY() * 16);
-
 
 
         //auto decline after order timeout label
@@ -488,79 +471,63 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             player.checkBounds(levelWidth, levelHeight);
             world.step(1 / 60f, 6, 2); // Physics calculations
 
-            camera.follow(player.position, levelWidth, levelHeight);
+            camera.follow(player.getPosition(), levelWidth, levelHeight);
 
-        batch.setProjectionMatrix(camera.combined);
-        //popup.update(delta);
+            batch.setProjectionMatrix(camera.combined);
+            //popup.update(delta);
 
-        stage.act(delta);
+            stage.act(delta);
 
-        /* ========================== DRAW ============================ */
+            /* ========================== DRAW ============================ */
 
-        ScreenUtils.clear(Color.PINK);
+            ScreenUtils.clear(Color.PINK);
 
-        /* ===== Draw game objects ===== */
-        batch.begin();
+            /* ===== Draw game objects ===== */
+            batch.begin();
 
-        for (Tile[] layer : layers) {
-            for (Tile tile : layer) {
-                tile.draw(batch);
+            for (Tile[] layer : layers) {
+                for (Tile tile : layer) {
+                    tile.draw(batch);
+                }
             }
-        }
 
-        player.render(batch);
-        rock.render(batch, 20, -100);
-        log.render(batch, 0, 10);
+            player.draw(batch);
+            rock.draw(batch);
+            log.draw(batch);
 
             // coin collision
-        for (Coin coin : coins) {
-            if (!coin.collected) {
-                coin.render(batch, (int) coin.getSprite().getX(), (int) coin.getSprite().getY());
-                if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), coin.getSprite().getBoundingRectangle())) {
-                    coin.setCollected(true);
-                    coinCounter++;
+            for (CoinObject coin : coins) {
+                if (!coin.isCollected()) {
+                    coin.draw(batch);
+                    if (player.checkCollision(coin, false)) {
+                        coin.setCollected(true);
+                        coinCounter++;
+                    }
                 }
             }
-        }
-        // Inside the render metho
-        String sec;
-        if (countdownSeconds < 10) {
-            sec = "0" + String.valueOf(countdownSeconds);
-        } else {
-            sec = String.valueOf(countdownSeconds);
-        }
-        String str = "Time remaining:\n" + "     " + String.valueOf(countdownMinutes) + ":" + sec;
-        if (countdownMinutes >= 1) {
-            mainTimer.setText(str);
-            mainTimer.setVisible(true);
-            lowTimer.setVisible(false);
-        } else {
-            lowTimer.setText(str);
-            lowTimer.setVisible(true);
-            mainTimer.setVisible(false);
-        }
-
-
-        // building collisions and transparency
-        for (BuildingObject building : buildings) {
-            building.render(batch, (int) building.sprite.getX(), (int) building.sprite.getY());
-            if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), building.getBounds())) {
-                building.setTransparent(true);
-                Rectangle collisionBounds = new Rectangle(building.getBounds());
-                collisionBounds.setHeight(collisionBounds.getHeight() / 2);
-                if (Intersector.overlaps(player.getSprite().getBoundingRectangle(), collisionBounds)) {
-                    if (Math.abs(player.body.getLinearVelocity().x) > 0) {
-                        player.body.setLinearVelocity(player.body.getLinearVelocity().x * -1, player.body.getLinearVelocity().y);
-                    }
-                    if (Math.abs(player.body.getLinearVelocity().y) > 0) {
-                        player.body.setLinearVelocity(player.body.getLinearVelocity().x, player.body.getLinearVelocity().y * -1);
-                    }
-                }
+            // Inside the render metho
+            String sec;
+            if (countdownSeconds < 10) {
+                sec = "0" + String.valueOf(countdownSeconds);
             } else {
-                building.setTransparent(false);
+                sec = String.valueOf(countdownSeconds);
             }
-        }
+            String str = "Time remaining:\n" + "     " + String.valueOf(countdownMinutes) + ":" + sec;
+            if (countdownMinutes >= 1) {
+                mainTimer.setText(str);
+                mainTimer.setVisible(true);
+                lowTimer.setVisible(false);
+            } else {
+                lowTimer.setText(str);
+                lowTimer.setVisible(true);
+                mainTimer.setVisible(false);
+            }
 
+//            // building collisions and transparency
+//            for (BuildingObject building : buildings) {
+//                building.draw(batch);
+//                player.checkCollision(building, true);
+//            }
 
             // set all buildings to not pickup/dropoff if no queued orders
             if (playerAttributes.array.size() <= 1) {
@@ -613,7 +580,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                                 order.setPickedUp(false);
                                 order.setDroppedOff(true);
                                 playerAttributes.ordersCompleted++;
-                                minOrderLabel.setText("Orders Completed: "+playerAttributes.ordersCompleted+"/"+minOrders);
+                                minOrderLabel.setText("Orders Completed: " + playerAttributes.ordersCompleted + "/" + minOrders);
 //                                playerAttributes.array.remove(1);
 //                                if (playerAttributes.array.size() <= 1) {
 //                                    playerAttributes.orderInProgress = false;
@@ -623,8 +590,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                                 String orderID = order.getOrderString();
                                 System.out.println("order id: " + orderID);
                                 //if (!deliveredOrderIDs.contains(orderID)) {
-                                    deliveredOrderIDs.add(orderID);
-                                    System.out.println("Order " + orderID + " has been delivered and added to the list.");
+                                deliveredOrderIDs.add(orderID);
+                                System.out.println("Order " + orderID + " has been delivered and added to the list.");
                                 //}
                                 System.out.println("Order List: " + deliveredOrderIDs);
                                 if (playerAttributes.array.size() <= 1) {
@@ -637,7 +604,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                         }
                     }
                 }
-            }  else {
+            } else {
                 // set everything to false
                 order.setPickedUp(false);
                 order.setDroppedOff(false);
@@ -648,69 +615,68 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             }
 
 
-
-        if (playerAttributes.orderInProgress) {
-            for (int i = 1; i < playerAttributes.array.size(); i++ ) {
-                String[] s = order.stringToArray(playerAttributes.array.get(i));
-                int time;
-                boolean twoName = false;
-                try {
-                    time = Integer.parseInt(s[4]);
-                } catch (NumberFormatException num) {
-                    time = Integer.parseInt(s[5]);
-                    twoName = true;
-                }
-                if (time <= 0) {
-                    if (i == 1) {
-                        if (!order.isDroppedOff()) {
-                            order.setDroppedOff(true);
-                            dropoffLabel.setVisible(false);
-                            pickupLabel.setVisible(false);
-                            order.setPickedUp(false);
-                        }
-                        if (playerAttributes.array.size() <= 1) {
-                            playerAttributes.orderInProgress = false;
-                            order.setPickedUp(false);
-                            dropoffLabel.setVisible(false);
-                            pickupLabel.setVisible(false);
-                        } else {
-                            order.setDroppedOff(false);
-                            order.setPickedUp(false);
-                        }
+            if (playerAttributes.orderInProgress) {
+                for (int i = 1; i < playerAttributes.array.size(); i++) {
+                    String[] s = order.stringToArray(playerAttributes.array.get(i));
+                    int time;
+                    boolean twoName = false;
+                    try {
+                        time = Integer.parseInt(s[4]);
+                    } catch (NumberFormatException num) {
+                        time = Integer.parseInt(s[5]);
+                        twoName = true;
                     }
-                    String orderID = order.getOrderString();
-                    outOfTimeOrdersIDs.add(orderID);
-                    orderTimeoutLabel.setVisible(true);
-                    playerAttributes.array.remove(i);
-                    messageTimer = 0.0f;
-                } else {
-                    if (timeCount[i - 1] % 60 == 0) {
-                        time -= 1;
-                        orderTimeLeft[i - 1] = time;
-                    }
-                    timeCount[i - 1]++;
-
-                    if (!twoName) {
-                        s[4] = String.valueOf(time);
+                    if (time <= 0) {
+                        if (i == 1) {
+                            if (!order.isDroppedOff()) {
+                                order.setDroppedOff(true);
+                                dropoffLabel.setVisible(false);
+                                pickupLabel.setVisible(false);
+                                order.setPickedUp(false);
+                            }
+                            if (playerAttributes.array.size() <= 1) {
+                                playerAttributes.orderInProgress = false;
+                                order.setPickedUp(false);
+                                dropoffLabel.setVisible(false);
+                                pickupLabel.setVisible(false);
+                            } else {
+                                order.setDroppedOff(false);
+                                order.setPickedUp(false);
+                            }
+                        }
+                        String orderID = order.getOrderString();
+                        outOfTimeOrdersIDs.add(orderID);
+                        orderTimeoutLabel.setVisible(true);
+                        playerAttributes.array.remove(i);
+                        messageTimer = 0.0f;
                     } else {
-                        s[5] = String.valueOf(time);
-                    }
+                        if (timeCount[i - 1] % 60 == 0) {
+                            time -= 1;
+                            orderTimeLeft[i - 1] = time;
+                        }
+                        timeCount[i - 1]++;
 
-                    StringBuilder sb = new StringBuilder();
-                    for (String thing : s) {
-                        sb.append(thing);
-                        sb.append(" ");
+                        if (!twoName) {
+                            s[4] = String.valueOf(time);
+                        } else {
+                            s[5] = String.valueOf(time);
+                        }
+
+                        StringBuilder sb = new StringBuilder();
+                        for (String thing : s) {
+                            sb.append(thing);
+                            sb.append(" ");
+                        }
+                        playerAttributes.array.set(i, sb.toString());
                     }
-                    playerAttributes.array.set(i, sb.toString());
                 }
             }
-        }
-        if (orderTimeoutLabel.isVisible()) {
-            messageTimer += delta;
-            if (messageTimer >= MESSAGE_DURATION) {
-                orderTimeoutLabel.setVisible(false);
+            if (orderTimeoutLabel.isVisible()) {
+                messageTimer += delta;
+                if (messageTimer >= MESSAGE_DURATION) {
+                    orderTimeoutLabel.setVisible(false);
+                }
             }
-        }
 
 
 //        if (playerAttributes.ordersCompleted == minOrders){
@@ -806,8 +772,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             levelResult = "Game Over! :(";
         }
 
-        String gameStatsMessage = "GAME STATS: \nTotal Coins Collected: " + coinCounter
-                + "\nTotal Orders Completed: " + totalOrdersCompleted;
+        String gameStatsMessage = "GAME STATS: \nTotal Coins Collected: " + coinCounter + "\nTotal Orders Completed: " + totalOrdersCompleted;
         gamepopup.showGameStatsMessage(gameStatsMessage);
         gamepopup.showOrderCompletedList(orderIDsMessage);
         gamepopup.showOutoffTimeList(notInTimeorderIDsMessage);
@@ -895,10 +860,10 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     /**
      * Creates a rectangular panel with rounded corners.
      *
-     * @param width Width of the panel.
-     * @param height Height of the panel.
+     * @param width        Width of the panel.
+     * @param height       Height of the panel.
      * @param cornerRadius The radius of the corners.
-     * @param color The background color of the panel.
+     * @param color        The background color of the panel.
      * @return A pixmap object of the panel.
      */
     public Pixmap createRoundedRectanglePixmap(int width, int height, int cornerRadius, Color color) {
@@ -948,19 +913,21 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
             for (int i = 0; i < tileData.length; i++) {
                 System.out.println("tileset: " + tileData[i].tilesetID);
-                tiles[i] = new Tile(
-                        assetManager.getTileSprite(tileData[i].tilesetID, tileData[i].spriteIndex),
-                        tileData[i].x * levelData.tileSize,
-                        levelHeight - tileData[i].y * levelData.tileSize
-                );
+                tiles[i] = new Tile(assetManager.getTileSprite(tileData[i].tilesetID, tileData[i].spriteIndex), tileData[i].x * levelData.tileSize, levelHeight - tileData[i].y * levelData.tileSize);
+
+                GameObject object = assetManager.loadGameObject(objectData[i].objectID);
+                object.setPosition(objectData[i].x, objectData[i].y);
+
+                if (object instanceof BuildingObject) {
+                    buildings.add((BuildingObject) object);
+                } else if (object instanceof CoinObject) {
+                    coins.add((CoinObject) object);
+                }
             }
 
             layers.add(tiles);
 
         }
-
-        // tileSprite.setPosition((i - 15) * tileSprite.getWidth(), (15 - j) * tileSprite.getHeight());
-
 
         return levelData;
     }
