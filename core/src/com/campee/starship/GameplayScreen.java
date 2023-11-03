@@ -762,6 +762,17 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         }
         boolean timeLeft = true;
         if (countdownSeconds == 0 && countdownMinutes == 0) {
+            if (playerAttributes.orderInProgress) {
+                // go through all orders and add timed out orders to game stats
+                for (int i = 1; i < playerAttributes.array.size(); i++ ) {
+                    String[] s = order.stringToArray(playerAttributes.array.get(i));
+                    String orderID = s[1];
+                    orderID = orderID.substring(0, orderID.length() - 3);
+                    if (!outOfTimeOrdersIDs.contains(orderID)) {
+                        outOfTimeOrdersIDs.add(orderID);
+                    }
+                }
+            }
             timeLeft = false;
             if (playerAttributes.ordersCompleted >= minOrders) {
                 win = true;
