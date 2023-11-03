@@ -47,6 +47,7 @@ public class Popup implements Screen {
     public Popup(final GameplayScreen screen, final String notificationMessage) {
         viewport = new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         stage = new Stage(viewport);
+        Gdx.input.setInputProcessor(stage);
         //stage = new Stage();
         //this.duration = duration;
         //timeElapsed = 0;
@@ -100,8 +101,16 @@ public class Popup implements Screen {
 
 
         // Set button positions
-        acceptButton.setPosition(620, popupY);
-        declineButton.setPosition(720, popupY);
+        popupWidth = (float)(Gdx.graphics.getWidth() / 4.21);
+        popupHeight = 100; // Set the height of the popup
+        popupX = Gdx.graphics.getWidth() - popupWidth; // Position the popup at the right edge
+        popupY = 0; // Position the popup at the bottom
+        float acceptX = (float)(Gdx.graphics.getWidth() / 1.29);
+        float declineX = (float)(Gdx.graphics.getWidth() / 1.11);
+//        acceptButton.setPosition(620, popupY);
+//        declineButton.setPosition(720, popupY);
+        acceptButton.setPosition(acceptX, popupY);
+        declineButton.setPosition(declineX, popupY);
 
 
 
@@ -188,6 +197,13 @@ public class Popup implements Screen {
     @Override
     public void resize(int width, int height) {
         viewport.update(width, height, true);
+        float acceptX = (float)(Gdx.graphics.getWidth() / 1.29);
+        float declineX = (float)(Gdx.graphics.getWidth() / 1.11);
+//        acceptButton.setPosition(620, popupY);
+//        declineButton.setPosition(720, popupY);
+        acceptButton.setPosition(acceptX, 0);
+        declineButton.setPosition(declineX, 0);
+        stage.getViewport().update(width, height, true);
     }
 
     @Override

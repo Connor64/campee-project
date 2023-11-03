@@ -564,14 +564,17 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 //                                if (playerAttributes.array.size() <= 1) {
 //                                    playerAttributes.orderInProgress = false;
 //                                }
-                                playerAttributes.array.remove(1);
-                                totalOrdersCompleted++;
-                                String orderID = order.getOrderString();
-                                //if (!deliveredOrderIDs.contains(orderID)) {
+                                //System.out.println("array before removing: "+playerAttributes.array);
 
-                                deliveredOrderIDs.add(orderID);
-                                //System.out.println("Order " + orderID + " has been delivered and added to the list.");
+                                totalOrdersCompleted++;
+                                String orderID = playerAttributes.array.get(1).substring(4,9)/*order.getOrderString()*/;
+                                //if (!deliveredOrderIDs.contains(orderID)) {
+                                    deliveredOrderIDs.add(orderID);
+                                    System.out.println("Order " + orderID + " (before removing) has been delivered and added to the list.");
+
                                 //}
+                                playerAttributes.array.remove(1);
+                                //System.out.println("array after removing: "+playerAttributes.array);
                                 if (playerAttributes.array.size() <= 1) {
                                     playerAttributes.orderInProgress = false;
                                 }
