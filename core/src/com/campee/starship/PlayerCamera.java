@@ -39,8 +39,13 @@ public class PlayerCamera extends OrthographicCamera {
         float smoothX = (position.x * (interpolateSpeed - deltaLerp)) + (target.x * deltaLerp);
         float smoothY = (position.y * (interpolateSpeed - deltaLerp)) + (target.y * deltaLerp);
 
-        smoothX = MathUtils.clamp(smoothX, (viewportWidth / 2), xBound - (viewportWidth / 2));
-        smoothY = MathUtils.clamp(smoothY, (viewportHeight / 2) + 16, yBound - 16 - (viewportHeight / 2));
+        if (xBound >= viewportWidth) {
+            smoothX = MathUtils.clamp(smoothX, (viewportWidth / 2), xBound - (viewportWidth / 2));
+        }
+
+        if (yBound >= viewportHeight) {
+            smoothY = MathUtils.clamp(smoothY, (viewportHeight / 2) + 16, yBound - 16 - (viewportHeight / 2));
+        }
 
         position.set(smoothX, smoothY, 0);
         update();

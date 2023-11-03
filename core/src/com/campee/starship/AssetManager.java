@@ -23,10 +23,11 @@ public class AssetManager {
         loadTileset("1_terrain.png", "tileset_test_1");
         loadTileset("street.png", "modern_tileset");
 
-        gameObjects.put("building_haas", new BuildingObject("HAAS.PNG", 0, 0, 40, 10));
-        gameObjects.put("building_pmu", new BuildingObject("PMU.PNG", 0, 0, 40, 10));
-        gameObjects.put("building_msee", new BuildingObject("MSEE.PNG", 0, 0, 40, 10));
-        gameObjects.put("building_fountain", new BuildingObject("fountain.PNG", 0, 0, 0, 0));
+        gameObjects.put("building_haas", new BuildingObject("HAAS.PNG", "HAAS", 0, 0, 0.5f, 0.75f));
+        gameObjects.put("building_pmu", new BuildingObject("PMU.PNG", "PMU", 0, 0, 0.5f, 0.75f));
+        gameObjects.put("building_msee", new BuildingObject("MSEE.PNG", "MSEE", 0, 0, 0.5f, 0.75f));
+        gameObjects.put("building_fountain", new BuildingObject("fountain.PNG", "fountain", 0, 0, 0, 1));
+        gameObjects.put("building_panera", new BuildingObject("Panera.PNG", "Panera", 0, 0, 0.5f, 0.75f));
         gameObjects.put("coin", new CoinObject(0, 0));
     }
 

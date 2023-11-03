@@ -42,6 +42,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     public boolean win;
     public boolean keepPlaying = true;
     public boolean popupInAction = false;
+    public boolean ordersDone = false;
 
 
     private Player player;
@@ -104,7 +105,6 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             }
         }
     };
-
 
     //private TimedPopup incomingOrder;
 
@@ -195,10 +195,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         sidePanelHeight = Gdx.graphics.getHeight() - 110; // Height
         sidePanelColor = new Color(0.2f, 0.2f, 0.2f, 0.5f); // Background color (RGBA)
 
-//        coin = new Coin(0, 0);
         coinCounter = 0;
-
-        // making a coin array
 
         visibleQ = new ArrayList<>();
         playerAttributes.setArray(visibleQ);
@@ -211,7 +208,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         orderArray = new ArrayList<>();
         order.setArray(orderArray);
         Collections.shuffle(orderArray);
-        //System.out.println(orderArray);
+        System.out.println(orderArray);
         orderA = order.arrayToArray();
         order.seti(order.i++);
         int time = Integer.parseInt(orderA[3]);
@@ -247,7 +244,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         backButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                System.out.println("clicked back");
+                //System.out.println("clicked back");
                 game.setScreen(new LevelScreen(game));
             }
 
@@ -297,41 +294,41 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         });
 
 
-        // Make next order button
-        nextOrderButton = new TextButton("Next Order", buttonStyle);
-        nextOrderButton.setPosition(Gdx.graphics.getWidth() - 220, Gdx.graphics.getHeight() - 60); // Adjust the position as necessary
-        nextOrderButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                try {
-                    order.setArray(orderArray);
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }
-                order.seti(count);
-                count++;
-                popup.setMessage(order.arrayToString());
-
-                popup.show();
-                popup.render();
-                multiplexer.addProcessor(popup.getStage());
-
-            }
-
-            @Override
-            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
-                super.enter(event, x, y, pointer, fromActor);
-                isOrderButtonHovered = true;
-                nextOrderButton.setColor(Color.LIGHT_GRAY);
-            }
-
-            @Override
-            public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
-                super.exit(event, x, y, pointer, toActor);
-                isOrderButtonHovered = false;
-                nextOrderButton.setColor(Color.WHITE);
-            }
-        });
+//        // Make next order button
+//        nextOrderButton = new TextButton("Next Order", buttonStyle);
+//        nextOrderButton.setPosition(Gdx.graphics.getWidth() - 220, Gdx.graphics.getHeight() - 60); // Adjust the position as necessary
+//        nextOrderButton.addListener(new ClickListener() {
+//            @Override
+//            public void clicked(InputEvent event, float x, float y) {
+//                try {
+//                    order.setArray(orderArray);
+//                } catch (FileNotFoundException e) {
+//                    e.printStackTrace();
+//                }
+//                order.seti(count);
+//                count++;
+//                popup.setMessage(order.arrayToString());
+//
+//                popup.show();
+//                popup.render();
+//                multiplexer.addProcessor(popup.getStage());
+//
+//            }
+//
+//            @Override
+//            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+//                super.enter(event, x, y, pointer, fromActor);
+//                isOrderButtonHovered = true;
+//                nextOrderButton.setColor(Color.LIGHT_GRAY);
+//            }
+//
+//            @Override
+//            public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
+//                super.exit(event, x, y, pointer, toActor);
+//                isOrderButtonHovered = false;
+//                nextOrderButton.setColor(Color.WHITE);
+//            }
+//        });
 
         stage.addActor(backButton);
         //stage.addActor(gameStatsButton);
@@ -410,7 +407,6 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         schedulePopupDisplay();
 
 
-
     }
 
     @Override
@@ -436,6 +432,9 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         if (!gamepopup.isVisible()) {
             player.update(delta, keyProcessor);
             player.checkBounds(levelWidth, levelHeight);
+            for (BuildingObject buildingObject : buildings) {
+                player.checkCollision(buildingObject, true);
+            }
             world.step(1 / 60f, 6, 2); // Physics calculations
 
             camera.follow(player.getPosition(), levelWidth, levelHeight);
@@ -494,7 +493,6 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             // building collisions and transparency
             for (BuildingObject building : buildings) {
                 building.draw(batch);
-                player.checkCollision(building, true);
             }
 
             // set all buildings to not pickup/dropoff if no queued orders
@@ -556,12 +554,11 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                                 playerAttributes.array.remove(1);
                                 totalOrdersCompleted++;
                                 String orderID = order.getOrderString();
-                                System.out.println("order id: " + orderID);
                                 //if (!deliveredOrderIDs.contains(orderID)) {
+
                                 deliveredOrderIDs.add(orderID);
-                                System.out.println("Order " + orderID + " has been delivered and added to the list.");
+                                //System.out.println("Order " + orderID + " has been delivered and added to the list.");
                                 //}
-                                System.out.println("Order List: " + deliveredOrderIDs);
                                 if (playerAttributes.array.size() <= 1) {
                                     playerAttributes.orderInProgress = false;
                                 }
@@ -584,7 +581,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
 
             if (playerAttributes.orderInProgress) {
-                for (int i = 1; i < playerAttributes.array.size(); i++ ) {
+                for (int i = 1; i < playerAttributes.array.size(); i++) {
                     String[] s = order.stringToArray(playerAttributes.array.get(i));
                     int time;
                     boolean twoName = false;
@@ -706,7 +703,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         if (countdownSeconds == 0 && countdownMinutes == 0) {
             if (playerAttributes.orderInProgress) {
                 // go through all orders and add timed out orders to game stats
-                for (int i = 1; i < playerAttributes.array.size(); i++ ) {
+                for (int i = 1; i < playerAttributes.array.size(); i++) {
                     String[] s = order.stringToArray(playerAttributes.array.get(i));
                     String orderID = s[1];
                     orderID = orderID.substring(0, orderID.length() - 3);
@@ -738,6 +735,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     //show game stats screen
     public void showGameResult() {
         visibleText = false;
+
         StringBuilder orderIDsStringBuilder = new StringBuilder("Successfully Delivered:\n");
         for (String orderID : deliveredOrderIDs) {
             orderIDsStringBuilder.append(orderID).append("\n");
@@ -770,28 +768,40 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     // keep playing pop up
     public void keepPlayingPopup() {
         visibleText = false;
-        String message = "Do you want to keep playing or end the game?";
+        String message = "Level Complete!\n";
+        String option = "Keep Playing or End Game?";
         keepplayingpopup.setMessageLabel(message);
+        keepplayingpopup.setOptionLabel(option);
         keepplayingpopup.show();
         keepplayingpopup.render();
         multiplexer.addProcessor(keepplayingpopup.getStage());
-        //System.out.println("Level completed!");
     }
 
     // Trigger the timed popup to show
     public void showTimedPopup() {
-        //popup.setPosition(Gdx.graphics.getWidth() - 300, 0);
         popup.show(); // Display the popup
-        try {
+        /*try {
             order.setArray(orderArray);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-        }
+        }*/
         order.seti(count);
         count++;
-        popup.setMessage(order.arrayToString());
-        popup.acceptClicked = false;
-        popup.declineClicked = false;
+        if (count < 7) {
+            popup.setMessage(order.arrayToString());
+            popup.acceptClicked = false;
+            popup.declineClicked = false;
+        } else {
+            popup.setMessage("No more orders!");
+            popup.declineButton.remove();
+            popup.acceptButton.remove();
+            if (ordersDone) {
+                popup.hide();
+            }
+            ordersDone = true;
+
+
+        }
     }
 
     public void hideTimedPopup() {
@@ -812,7 +822,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                             if (!popupInAction) {
                                 // Hide the popup
                                 hideTimedPopup();
-                                if (!popup.acceptClicked() && !popup.declineClicked()) {
+                                if (!popup.acceptClicked() && !popup.declineClicked() && !ordersDone) {
                                     autoDeclineLabel.setVisible(true);
                                     scheduler.schedule(new Runnable() {
                                         @Override
@@ -824,7 +834,6 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                                     }, 4, TimeUnit.SECONDS);
                                 }
                             }
-
                         }
                     }, 5, TimeUnit.SECONDS); // Schedule to hide the popup after 10 seconds
                 }
@@ -895,11 +904,11 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         if (levelData == null) return;
 
-        System.out.println(levelData.levelName);
-        System.out.println(levelData.tileSize);
-        System.out.println(levelData.difficulty);
-        System.out.println(levelData.width);
-        System.out.println(levelData.height);
+//        System.out.println(levelData.levelName);
+//        System.out.println(levelData.tileSize);
+//        System.out.println(levelData.difficulty);
+//        System.out.println(levelData.width);
+//        System.out.println(levelData.height);
 
         levelWidth = levelData.width * levelData.tileSize;
         levelHeight = levelData.height * levelData.tileSize;
@@ -918,7 +927,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             for (int i = 0; i < tileData.length; i++) {
                 tiles[i] = new Tile(
                         assetManager.getTileSprite(tileData[i].tilesetID,
-                        tileData[i].spriteIndex),
+                                tileData[i].spriteIndex),
                         tileData[i].x * levelData.tileSize,
                         levelHeight - tileData[i].y * levelData.tileSize
                 );
@@ -935,6 +944,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                             // Setting the y-position is like this bc libgdx is stupid :)
                             levelHeight - (objectData[i].y - 1) * levelData.tileSize - building.getBounds().height
                     );
+                    System.out.println(objectData[i].objectID);
                     buildings.add(building);
                 } else if (object instanceof CoinObject) {
                     CoinObject coin = new CoinObject((CoinObject) object);

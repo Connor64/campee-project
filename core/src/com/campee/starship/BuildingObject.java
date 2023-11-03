@@ -15,24 +15,26 @@ public class BuildingObject extends GameObject {
     private boolean translucent;
     private Sprite pickSprite;
     private Sprite dropSprite;
+    private Sprite pickSpriteYellow;
     private String name;
     private Rectangle transparencyBounds;
-    private float collisionDepth;
-    private float transparencyDepth;
+    private float collisionRatio;
+    private float transparencyRatio;
 
-    public BuildingObject(String spritePath, float x, float y, float collisionDepth, float transparencyDepth) {
+    public BuildingObject(String spritePath, String name, float x, float y, float collisionRatio, float transparencyRatio) {
         super(spritePath, x, y);
         pickupLocation = false;
         dropoffLocation = false;
         translucent = false;
+        this.name = name;
 
-        this.collisionDepth = collisionDepth;
-        this.transparencyDepth = transparencyDepth;
+        this.collisionRatio = collisionRatio;
+        this.transparencyRatio = transparencyRatio;
 
         // Set transparency and collision bounds
         transparencyBounds = new Rectangle(getBounds());
-        transparencyBounds.height -= transparencyDepth;
-        bounds.height -= collisionDepth;
+        transparencyBounds.height *= transparencyRatio;
+        bounds.height *= collisionRatio;
 
         Texture pickupTexture = new Texture(Gdx.files.internal("pickup flag.PNG"));
         pickupTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
@@ -40,11 +42,17 @@ public class BuildingObject extends GameObject {
         pickSprite = new Sprite(pickUpRegion);
         pickSprite.setPosition(getBounds().getX() + (getBounds().getWidth() / 2), getBounds().getY() + ((getBounds().getHeight() * 2)));
 
+        Texture pickupTextureYellow = new Texture(Gdx.files.internal("pickup flag yellow.PNG"));
+        pickupTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        TextureRegion pickUpRegionYellow = new TextureRegion(pickupTextureYellow, 0, 0, pickupTextureYellow.getWidth(), pickupTextureYellow.getHeight());
+        pickSpriteYellow = new Sprite(pickUpRegionYellow);
+        pickSpriteYellow.setPosition(pickSprite.getX(), pickSprite.getY());
+
         Texture dropoffTexture = new Texture(Gdx.files.internal("dropoff flag.PNG"));
         dropoffTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         TextureRegion dropOffRegion = new TextureRegion(dropoffTexture, 0, 0, dropoffTexture.getWidth(), dropoffTexture.getHeight());
         dropSprite = new Sprite(dropOffRegion);
-        dropSprite.setPosition(getBounds().getX() + (getBounds().getWidth() / 2), getBounds().getY()  + ((getBounds().getHeight() * 2)));
+        dropSprite.setPosition(getBounds().getX() + (getBounds().getWidth() / 2), getBounds().getY() + ((getBounds().getHeight() * 2)));
     }
 
     public BuildingObject(BuildingObject buildingObject) {
@@ -55,20 +63,21 @@ public class BuildingObject extends GameObject {
         translucent = false;
         pickSprite = new Sprite(buildingObject.pickSprite);
         dropSprite = new Sprite(buildingObject.dropSprite);
+        pickSpriteYellow = new Sprite(buildingObject.pickSpriteYellow);
         name = buildingObject.name;
         transparencyBounds = new Rectangle(buildingObject.transparencyBounds);
     }
 
     @Override
-    public void setSprite (String spritePath) {
+    public void setSprite(String spritePath) {
         super.setSprite(spritePath);
     }
 
-    public void setPickupLocation (boolean status) {
+    public void setPickupLocation(boolean status) {
         pickupLocation = status;
     }
 
-    public void setDropoffLocation (boolean status) {
+    public void setDropoffLocation(boolean status) {
         dropoffLocation = status;
     }
 
@@ -109,9 +118,15 @@ public class BuildingObject extends GameObject {
         super.draw(batch);
 
         if (pickupLocation) {
-            pickSprite.draw(batch);
+            if (name.equals("HAAS")) {
+                pickSpriteYellow.draw(batch);
+            } else {
+                pickSprite.draw(batch);
+            }
         } else if (dropoffLocation) {
             pickSprite.draw(batch);
         }
+
+//        pickSpriteYellow.setPosition(getBounds().getX() + (getBounds().getWidth() / 2), getBounds().getY() + ((getBounds().getHeight() * 2)));
     }
 }
