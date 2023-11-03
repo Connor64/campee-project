@@ -687,16 +687,20 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                     }
                     String orderID = s[1];
                     orderID = orderID.substring(0, orderID.length() - 3);
-                    outOfTimeOrdersIDs.add(orderID);
+                    if (!(playerAttributes.ordersCompleted >= minOrders)) {
+                        outOfTimeOrdersIDs.add(orderID);
+                    }
                     orderTimeoutLabel.setVisible(true);
                     playerAttributes.array.remove(i);
                     messageTimer = 0.0f;
                 } else {
-                    if (timeCount[i - 1] % 60 == 0) {
-                        time -= 1;
-                        orderTimeLeft[i - 1] = time;
+                    if (!popupInAction) {
+                        if (timeCount[i - 1] % 60 == 0) {
+                            time -= 1;
+                            orderTimeLeft[i - 1] = time;
+                        }
+                        timeCount[i - 1]++;
                     }
-                    timeCount[i - 1]++;
 
                     if (!twoName) {
                         s[4] = String.valueOf(time);
@@ -897,10 +901,10 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                             }
 
                         }
-                    }, 10, TimeUnit.SECONDS); // Schedule to hide the popup after 10 seconds
+                    }, 5, TimeUnit.SECONDS); // Schedule to hide the popup after 10 seconds
                 }
             }
-        }, 0, 15, TimeUnit.SECONDS); // Schedule the next popup 15 seconds after the first one
+        }, 0, 10, TimeUnit.SECONDS); // Schedule the next popup 15 seconds after the first one
     }
 
 
