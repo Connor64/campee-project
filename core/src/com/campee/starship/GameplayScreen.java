@@ -834,8 +834,10 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     // keep playing pop up
     public void keepPlayingPopup() {
         visibleText = false;
-        String message = "Do you want to keep playing or end the game?";
+        String message = "Level Complete!\n";
+        String option = "Keep Playing or End Game?";
         keepplayingpopup.setMessageLabel(message);
+        keepplayingpopup.setOptionLabel(option);
         keepplayingpopup.show();
         keepplayingpopup.render();
         multiplexer.addProcessor(keepplayingpopup.getStage());
