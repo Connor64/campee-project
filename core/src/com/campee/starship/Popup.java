@@ -29,8 +29,8 @@ public class Popup {
     private ShapeRenderer shapeRenderer;
     private BitmapFont font;
     private Label messageLabel;
-    private boolean acceptClicked;
-    private boolean declineClicked;
+    public boolean acceptClicked;
+    public boolean declineClicked;
     private boolean isAcceptButtonHovered = false;
     private boolean isDeclineButtonHovered = false;
 
