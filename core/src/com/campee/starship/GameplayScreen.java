@@ -110,9 +110,6 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         }
     };
 
-
-
-
     //private TimedPopup incomingOrder;
 
     public GameObject pickupObject;
@@ -222,33 +219,25 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         // making multiple buildings
         // TODO: change so its not a random location
-        buildings = new BuildingObject[3];
-        String[] spriteList = new String[3];
+        buildings = new BuildingObject[4];
+        String[] spriteList = new String[4];
         spriteList[0] = "PMU.PNG";
         spriteList[1] = "HAAS.PNG";
         spriteList[2] = "MSEE.PNG";
+        spriteList[3] = "Panera.PNG";
+        Random random = new Random();
         for (int i = 0; i < buildings.length; i++) {
-            Random random = new Random();
             int x = (random.nextInt((levelWidth - 128)+ 1));
             int y = (random.nextInt((levelHeight - 128) + 1));
             x = (x / 16) * 16;
             y = (y / 16) * 16;
             buildings[i] = new BuildingObject(world, x, y);
-//            for (int k = i; k < buildings.length - i; k++) {
-//                while (Intersector.overlaps(buildings[i].getBounds(), buildings[k].getBounds())) {
-//                    x = (random.nextInt((levelWidth - 128)+ 1));
-//                    y = (random.nextInt((levelHeight - 128) + 1));
-//                    x = (x / 16) * 16;
-//                    y = (y / 16) * 16;
-//                    buildings[i] = new BuildingObject(world, x, y);
-//                }
-//            }
             buildings[i].setSprite(spriteList[i]);
             String sprite = spriteList[i];
             buildings[i].setName(sprite.substring(0, (sprite.length() - 4)));
-            System.out.println(buildings[i].getName());
             buildings[i].sprite.setPosition(x, y);
         }
+
 
         visibleQ = new ArrayList<>();
         playerAttributes.setArray(visibleQ);
