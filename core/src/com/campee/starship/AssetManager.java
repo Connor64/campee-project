@@ -12,16 +12,23 @@ import java.util.HashMap;
 
 public class AssetManager {
     private HashMap<String, TextureRegion[]> tilesets;
-    private HashMap<String, GameObject> objects;
+    private HashMap<String, GameObject> gameObjects;
 
     private final int TILE_SIZE = 16;
 
     public AssetManager() throws IOException {
         tilesets = new HashMap<>();
-        objects = new HashMap<>();
+        gameObjects = new HashMap<>();
         
         loadTileset("1_terrain.png", "tileset_test_1");
         loadTileset("street.png", "modern_tileset");
+
+        gameObjects.put("building_haas", new BuildingObject("HAAS.PNG", "HAAS", 0, 0, 0.5f, 0.75f));
+        gameObjects.put("building_pmu", new BuildingObject("PMU.PNG", "PMU", 0, 0, 0.5f, 0.75f));
+        gameObjects.put("building_msee", new BuildingObject("MSEE.PNG", "MSEE", 0, 0, 0.5f, 0.75f));
+        gameObjects.put("building_fountain", new BuildingObject("fountain.PNG", "fountain", 0, 0, 0, 1));
+        gameObjects.put("building_panera", new BuildingObject("Panera.PNG", "Panera", 0, 0, 0.5f, 0.75f));
+        gameObjects.put("coin", new CoinObject(0, 0));
     }
 
     /**
@@ -88,5 +95,9 @@ public class AssetManager {
         if (textures == null) return null;
 
         return textures[index];
+    }
+
+    public GameObject loadGameObject(String objectID) {
+        return gameObjects.get(objectID);
     }
 }
