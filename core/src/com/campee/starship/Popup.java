@@ -55,6 +55,12 @@ public class Popup {
         font.setColor(1, 1, 0, 1);
         font.getData().setScale(1.25f);
 
+        popupWidth = (float)(Gdx.graphics.getWidth() / 4.21);
+        popupHeight = 100; // Set the height of the popup
+        popupX = Gdx.graphics.getWidth() - popupWidth; // Position the popup at the right edge
+        popupY = 0; // Position the popup at the bottom
+
+
         messageLabel = new Label(notificationMessage, new Label.LabelStyle(font, Color.WHITE));
         messageLabel.setFontScale(1f);
         messageLabel.setPosition(670, popupY + 15);
@@ -191,15 +197,26 @@ public class Popup {
 //            shapeRenderer.setColor(new Color(0, 0, 0, 0.7f));
 //            shapeRenderer.rect(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 //            shapeRenderer.end();
-
+            Gdx.gl.glEnable(GL20.GL_BLEND);
+            Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
             shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-            shapeRenderer.setColor(new Color(0, 0, 0, 0.5f)); // Adjust the alpha (transparency) value here
-            popupWidth = 190; // Set the width of the popup
-            popupHeight = 100; // Set the height of the popup
-            popupX = Gdx.graphics.getWidth() - popupWidth; // Position the popup at the right edge
-            popupY = 0; // Position the popup at the bottom
+            shapeRenderer.setColor(new Color(0, 0, 0, 0.5f));
             shapeRenderer.rect(popupX, popupY, popupWidth, popupHeight); // Define the popup area
             shapeRenderer.end();
+            Gdx.gl.glDisable(GL20.GL_BLEND);
+
+
+//            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+//            shapeRenderer.setColor(new Color(0, 0, 0, 0.5f)); // Adjust the alpha (transparency) value here
+//            //popupWidth = 190; // Set the width of the popup
+//            popupWidth = (float)(Gdx.graphics.getWidth() / 4.21);
+//            popupHeight = 100; // Set the height of the popup
+//            System.out.println(popupWidth);
+//            popupX = Gdx.graphics.getWidth() - popupWidth; // Position the popup at the right edge
+//            //popupX = Gdx.graphics.getWidth();
+//            popupY = 0; // Position the popup at the bottom
+//            shapeRenderer.rect(popupX, popupY, popupWidth, popupHeight); // Define the popup area
+//            shapeRenderer.end();
             //Gdx.gl.glDisable(GL20.GL_BLEND);
 
 

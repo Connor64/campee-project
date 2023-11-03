@@ -22,6 +22,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 import java.util.*;
 
@@ -75,6 +76,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     public Label minOrderLabel;
     public Label autoDeclineLabel;
     public Label orderTimeoutLabel;
+    public Label coinCollectLabel;
     public Label mainTimer;
     public Label lowTimer;
 
@@ -166,8 +168,10 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         camera = new PlayerCamera(VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
         camera.update();
 
-//        stage = new Stage(new ExtendViewport(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, camera));
+        //stage = new Stage(new ExtendViewport(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, camera));
+        //ExtendViewport viewport = new ExtendViewport(VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
         stage = new Stage();
+        //Gdx.input.setInputProcessor(multiplexer);
         keyProcessor = new KeyProcessor(this);
 
 //        Table uiTable = new Table();
@@ -427,8 +431,16 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         minOrderLabel.setPosition(Gdx.graphics.getWidth() / 2 - 120, Gdx.graphics.getHeight() - minOrderLabel.getHeight() - 17);
         minOrderLabel.setVisible(true);
         stage.addActor(minOrderLabel);
+
+        indicatorStyle = new Label.LabelStyle(font, Color.YELLOW);
+        coinCollectLabel = new Label("Coins Collected: " + coinCounter, indicatorStyle);
+        coinCollectLabel.setSize(font.getScaleX() * 16, font.getScaleY() * 16);
+        coinCollectLabel.setPosition(Gdx.graphics.getWidth() / 2 - 90, Gdx.graphics.getHeight() - coinCollectLabel.getHeight() - 36);
+        coinCollectLabel.setVisible(true);
+        stage.addActor(coinCollectLabel);
         //minOrderLabel.setText("Orders Completed: "+playerAttributes.ordersCompleted+"/"+minOrders);
 
+        indicatorStyle = new Label.LabelStyle(font, Color.BLACK);
         orderTimeoutLabel = new Label("Time ran out. Begin next delivery!", warningStyle);
         orderTimeoutLabel.setPosition(Gdx.graphics.getWidth() / 2 - 180, Gdx.graphics.getHeight() - minOrderLabel.getHeight() - 52);
         orderTimeoutLabel.setVisible(false);
@@ -744,10 +756,21 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             //if (visibleText) {
             font.setColor(Color.WHITE);
             font.draw(batch, "Order List:", sidePanelX + 10, sidePanelY + sidePanelHeight - 10);
-            float coinCountTextX = Gdx.graphics.getWidth() / 2 - 90/*sidePanelX - font.getRegion().getRegionWidth() - 110*/;
-            float coinCountTextY = Gdx.graphics.getHeight() - minOrderLabel.getHeight() - 25/*sidePanelY - 20*/;
-            font.draw(batch, "Coins Collected: " + coinCounter, coinCountTextX, coinCountTextY);
+            //float coinCountTextX = Gdx.graphics.getWidth() / 2 - 90/*sidePanelX - font.getRegion().getRegionWidth() - 110*/;
+            //float coinCountTextY = Gdx.graphics.getHeight() - minOrderLabel.getHeight() - 25/*sidePanelY - 20*/;
+
+            float coinCountTextX = Gdx.graphics.getWidth() / 2 - 90; // X position within the side panel
+            float coinCountTextY = Gdx.graphics.getHeight() - minOrderLabel.getHeight() - 25;
+            //font.draw(batch, "Coins Collected: " + coinCounter, coinCountTextX, coinCountTextY);
             //System.out.println("orders completed:"+playerAttributes.getOrdersCompleted());
+
+//            Label.LabelStyle indicatorStyle = new Label.LabelStyle(font, Color.YELLOW);
+//            coinCollectLabel = new Label("Coins Collected: " + coinCounter, indicatorStyle);
+//            coinCollectLabel.setSize(font.getScaleX() * 16, font.getScaleY() * 16);
+//            coinCollectLabel.setPosition(Gdx.graphics.getWidth() / 2 - 90, Gdx.graphics.getHeight() - coinCollectLabel.getHeight() - 25);
+//            coinCollectLabel.setVisible(true);
+//            stage.addActor(coinCollectLabel);
+
 
 
             for (int i = 1; i < items.length; i++) {
