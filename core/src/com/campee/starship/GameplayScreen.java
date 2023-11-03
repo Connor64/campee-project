@@ -865,34 +865,33 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         scheduler.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
-                //if (!popupInAction) {
-                showTimedPopup(); // Show the popup
-                scheduler.schedule(new Runnable() {
-                    @Override
-                    public void run() {
-                        //if (!popupInAction) {
-                        // Hide the popup
-                        hideTimedPopup();
-                        if (!popup.acceptClicked() && !popup.declineClicked()) {
-                            autoDeclineLabel.setVisible(true);
-                            scheduler.schedule(new Runnable() {
-                                @Override
-                                public void run() {
-                                    // if (!popupInAction) {
-                                    autoDeclineLabel.setVisible(false); // Remove the label from the display
-                                    //}
+                if (!popupInAction) {
+                    showTimedPopup(); // Show the popup
+                    scheduler.schedule(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (!popupInAction) {
+                                // Hide the popup
+                                hideTimedPopup();
+                                if (!popup.acceptClicked() && !popup.declineClicked()) {
+                                    autoDeclineLabel.setVisible(true);
+                                    scheduler.schedule(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            if (!popupInAction) {
+                                                autoDeclineLabel.setVisible(false); // Remove the label from the display
+                                            }
+                                        }
+                                    }, 4, TimeUnit.SECONDS);
                                 }
-                            }, 4, TimeUnit.SECONDS);
+                            }
+
                         }
-                        //}
-
-                    }
-                }, 10, TimeUnit.SECONDS); // Schedule to hide the popup after 10 seconds
-                //}
+                    }, 10, TimeUnit.SECONDS); // Schedule to hide the popup after 10 seconds
+                }
             }
-           }, 0, 15, TimeUnit.SECONDS); // Schedule the next popup 15 seconds after the first one
-
-       }
+        }, 0, 15, TimeUnit.SECONDS); // Schedule the next popup 15 seconds after the first one
+    }
 
 
 
