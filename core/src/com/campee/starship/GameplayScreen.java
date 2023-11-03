@@ -480,6 +480,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                     if (player.checkCollision(coin, false)) {
                         coin.setCollected(true);
                         coinCounter++;
+                        coinCollectLabel.setText("Coins Collected: " + coinCounter);
                     }
                 }
             }
