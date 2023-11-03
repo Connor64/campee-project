@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 
 public class BuildingObject extends GameObject {
 
@@ -16,6 +17,8 @@ public class BuildingObject extends GameObject {
     private Sprite dropSprite;
     private String name;
     private Rectangle transparencyBounds;
+    private float collisionDepth;
+    private float transparencyDepth;
 
     public BuildingObject(String spritePath, float x, float y, float collisionDepth, float transparencyDepth) {
         super(spritePath, x, y);
@@ -23,10 +26,13 @@ public class BuildingObject extends GameObject {
         dropoffLocation = false;
         translucent = false;
 
+        this.collisionDepth = collisionDepth;
+        this.transparencyDepth = transparencyDepth;
+
         // Set transparency and collision bounds
         transparencyBounds = new Rectangle(getBounds());
         transparencyBounds.height -= transparencyDepth;
-        getBounds().height -= collisionDepth;
+        bounds.height -= collisionDepth;
 
         Texture pickupTexture = new Texture(Gdx.files.internal("pickup flag.PNG"));
         pickupTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
@@ -68,7 +74,7 @@ public class BuildingObject extends GameObject {
 
     public void setTranslucent(boolean status) {
         translucent = status;
-        float opacity = translucent ? 0.2f : 1;
+        float opacity = translucent ? 0.2f : 1f;
 
         setOpacity(opacity);
         pickSprite.setAlpha(opacity);
@@ -85,6 +91,17 @@ public class BuildingObject extends GameObject {
 
     public Rectangle getTransparencyBounds() {
         return transparencyBounds;
+    }
+
+    @Override
+    public void setPosition(Vector2 position) {
+        this.setPosition(position.x, position.y);
+    }
+
+    @Override
+    public void setPosition(float x, float y) {
+        super.setPosition(x, y);
+        transparencyBounds.setPosition(x, y);
     }
 
     @Override

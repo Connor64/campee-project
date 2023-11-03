@@ -9,16 +9,17 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
 public class GameObject {
-    private boolean visible;
     protected Sprite sprite;
+    protected Rectangle bounds;
     private Vector2 position;
-    private Rectangle bounds;
+    private boolean visible;
 
     public GameObject(String spritePath, float x, float y) {
         this(x, y);
 
         setSprite(spritePath);
         sprite.setPosition(x, y);
+        bounds = new Rectangle(x, y, sprite.getWidth(), sprite.getHeight());
     }
 
     public GameObject(float x, float y) {
@@ -42,7 +43,7 @@ public class GameObject {
     }
 
     public Rectangle getBounds() {
-        return sprite.getBoundingRectangle();
+        return bounds;
     }
 
     public Vector2 getPosition() {
@@ -52,11 +53,14 @@ public class GameObject {
     public void setPosition(float x, float y) {
         sprite.setPosition(x, y);
         position.set(x, y);
+
+        if (bounds != null) {
+            bounds.setPosition(x, y);
+        }
     }
 
     public void setPosition(Vector2 position) {
-        sprite.setPosition(position.x, position.y);
-        this.position.set(position);
+        this.setPosition(position.x, position.y);
     }
 
     public void setOpacity(float alpha) {

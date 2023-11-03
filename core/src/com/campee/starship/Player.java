@@ -41,6 +41,8 @@ public class Player extends GameObject {
 
         sprite = new Sprite(directionalSprites[0]); // Set default sprite
 
+        bounds = new Rectangle(x, y, sprite.getWidth(), sprite.getHeight());
+
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         bodyDef.position.set(x, y);
@@ -103,6 +105,7 @@ public class Player extends GameObject {
 
         // Check if within the collision bounds
         if (Intersector.overlaps(getBounds(), object.getBounds())) {
+            System.out.println(object.getBounds());
 
             if (rigid) {
                 if (Math.abs(body.getLinearVelocity().x) > 0) {

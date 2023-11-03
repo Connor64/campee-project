@@ -21,10 +21,12 @@ public class AssetManager {
         gameObjects = new HashMap<>();
         
         loadTileset("1_terrain.png", "tileset_test_1");
+        loadTileset("street.png", "modern_tileset");
 
-        gameObjects.put("building_haas", new BuildingObject("HAAS.PNG", 0, 0, 20, 10));
-        gameObjects.put("building_pmu", new BuildingObject("PMU.PNG", 0, 0, 20, 10));
-        gameObjects.put("building_msee", new BuildingObject("MSEE.PNG", 0, 0, 20, 10));
+        gameObjects.put("building_haas", new BuildingObject("HAAS.PNG", 0, 0, 40, 10));
+        gameObjects.put("building_pmu", new BuildingObject("PMU.PNG", 0, 0, 40, 10));
+        gameObjects.put("building_msee", new BuildingObject("MSEE.PNG", 0, 0, 40, 10));
+        gameObjects.put("building_fountain", new BuildingObject("fountain.PNG", 0, 0, 0, 0));
         gameObjects.put("coin", new CoinObject(0, 0));
     }
 

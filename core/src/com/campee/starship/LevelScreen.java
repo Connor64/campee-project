@@ -160,6 +160,9 @@ public class LevelScreen extends ScreenAdapter {
         Label label = new Label(levelName, createLabelStyle(Color.BLACK));
         label.setFontScale(1.2f);
 
+        Label orderLabel = new Label("2 orders", createLabelStyle(Color.BLACK));
+        orderLabel.setFontScale(1f);
+
         // Create a button
         TextButton.TextButtonStyle levelButtonStyle = new TextButton.TextButtonStyle();
         BitmapFont levelButtonFont = new BitmapFont();
@@ -202,7 +205,7 @@ public class LevelScreen extends ScreenAdapter {
 
         // Add the label to the top center of the table
         levelWidget.add(label).padBottom(30).colspan(3).center().row();
-
+        levelWidget.add(orderLabel).padBottom(10).colspan(3).center().row();
         // Add the button slightly towards the bottom of the rectangle
         levelWidget.add(levelButton).padBottom(30).colspan(3).center().row();
 
