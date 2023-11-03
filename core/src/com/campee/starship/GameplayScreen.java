@@ -886,7 +886,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                             if (!popupInAction) {
                                 // Hide the popup
                                 hideTimedPopup();
-                                if (!popup.acceptClicked() && !popup.declineClicked()) {
+                                if (!popup.acceptClicked() && !popup.declineClicked() && !ordersDone) {
                                     autoDeclineLabel.setVisible(true);
                                     scheduler.schedule(new Runnable() {
                                         @Override
