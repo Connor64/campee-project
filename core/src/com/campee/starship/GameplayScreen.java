@@ -458,8 +458,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             }
 
             player.draw(batch);
-            rock.draw(batch);
-            log.draw(batch);
+//            rock.draw(batch);
+//            log.draw(batch);
 
             // coin collision
             for (CoinObject coin : coins) {
@@ -515,13 +515,13 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                         // assign the building to the correct order
                         if (building.getName().equals(currPick) && !order.isPickedUp()) {
                             building.setPickupLocation(true);
-                            order.setPickupBounds(building.getBounds().getX(), building.getBounds().getY(), building.getWidth(), building.getHeight());
+                            order.setPickupBounds(building.bounds.getX(), building.bounds.getY(), building.getWidth(), building.getHeight());
                         } else {
                             building.setPickupLocation(false);
                         }
                         if (building.getName().equals(currDrop) && !order.isDroppedOff() && order.isPickedUp()) {
                             building.setDropoffLocation(true);
-                            order.setDropoffBounds(building.getBounds().getX(), building.getBounds().getY(), building.getWidth(), building.getHeight());
+                            order.setDropoffBounds(building.bounds.getX(), building.bounds.getY(), building.getWidth(), building.getHeight());
                         } else {
                             building.setDropoffLocation(false);
                         }
@@ -942,7 +942,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                     building.setPosition(
                             objectData[i].x * levelData.tileSize,
                             // Setting the y-position is like this bc libgdx is stupid :)
-                            levelHeight - (objectData[i].y + 1) * levelData.tileSize - building.getBounds().height
+                            levelHeight - (objectData[i].y + 1) * levelData.tileSize - building.bounds.height
                     );
                     System.out.println(objectData[i].objectID);
                     buildings.add(building);

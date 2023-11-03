@@ -21,6 +21,7 @@ public class BuildingObject extends GameObject {
     private float collisionRatio;
     private float transparencyRatio;
 
+
     public BuildingObject(String spritePath, String name, float x, float y, float collisionRatio, float transparencyRatio) {
         super(spritePath, x, y);
         pickupLocation = false;
