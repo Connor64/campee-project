@@ -161,15 +161,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         camera = new PlayerCamera(VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
         camera.update();
 
-        //stage = new Stage(new ExtendViewport(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, camera));
-        //ExtendViewport viewport = new ExtendViewport(VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
         stage = new Stage();
-        //Gdx.input.setInputProcessor(multiplexer);
         keyProcessor = new KeyProcessor(this);
-
-//        Table uiTable = new Table();
-//        uiTable.setFillParent(true);
-//        stage.addActor(uiTable);
 
         // Create a Timer object to schedule the TimerTask
         countdownTimer.scheduleAtFixedRate(countdownTask, 500, 500);
@@ -187,10 +180,6 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         minOrders = 2/*levelData.minOrders*/;
         goalTime = 300/*levelData.goalTime*/;
-
-//        rock = new GameObject("rock.png", 300, 300);
-//
-//        log = new GameObject("log.png", VIRTUAL_WIDTH / 2, VIRTUAL_HEIGHT / 2);
 
         // Define side panel properties
         sidePanelWidth = Gdx.graphics.getWidth() / 5; // Width
@@ -226,12 +215,6 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         gamepopup = new GamePopup(this, "", game, fileName);
         keepplayingpopup = new KeepPlayingPopup(this, "", game, fileName);
-
-        pickupObject = new GameObject("borger.png", order.getPickupBounds().getX(), order.getPickupBounds().getY());
-        pickupObject.sprite.setPosition(order.getPickupBounds().getX(), order.getPickupBounds().getY());
-
-        dropoffObject = new GameObject("plate.png", order.getDropoffBounds().getX(), order.getDropoffBounds().getY());
-        dropoffObject.sprite.setPosition(order.getDropoffBounds().getX(), order.getDropoffBounds().getY());
 
         // Make button style
         Pixmap backgroundPixmap = createRoundedRectanglePixmap(200, 50, 10, new Color(0.9f, 0, 0.9f, 0.6f)); // Adjust size and color
@@ -297,46 +280,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             }
         });
 
-
-//        // Make next order button
-//        nextOrderButton = new TextButton("Next Order", buttonStyle);
-//        nextOrderButton.setPosition(Gdx.graphics.getWidth() - 220, Gdx.graphics.getHeight() - 60); // Adjust the position as necessary
-//        nextOrderButton.addListener(new ClickListener() {
-//            @Override
-//            public void clicked(InputEvent event, float x, float y) {
-//                try {
-//                    order.setArray(orderArray);
-//                } catch (FileNotFoundException e) {
-//                    e.printStackTrace();
-//                }
-//                order.seti(count);
-//                count++;
-//                popup.setMessage(order.arrayToString());
-//
-//                popup.show();
-//                popup.render();
-//                multiplexer.addProcessor(popup.getStage());
-//
-//            }
-//
-//            @Override
-//            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
-//                super.enter(event, x, y, pointer, fromActor);
-//                isOrderButtonHovered = true;
-//                nextOrderButton.setColor(Color.LIGHT_GRAY);
-//            }
-//
-//            @Override
-//            public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
-//                super.exit(event, x, y, pointer, toActor);
-//                isOrderButtonHovered = false;
-//                nextOrderButton.setColor(Color.WHITE);
-//            }
-//        });
-
         stage.addActor(backButton);
-        //stage.addActor(gameStatsButton);
-        //stage.addActor(nextOrderButton);
 
         multiplexer = new InputMultiplexer();
         multiplexer.addProcessor(stage);
@@ -346,27 +290,21 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         Gdx.input.setInputProcessor(multiplexer);
 
-        // visual indicator boundary
+        // visual indicators stuff
         BitmapFont font = new BitmapFont(Gdx.files.internal("moonships_font.fnt"), Gdx.files.internal("moonships_font.png"), false);
         font.setColor(0, 0, 0, 1);
         font.getData().setScale(0.5f, 0.5f);
         Label.LabelStyle indicatorStyle = new Label.LabelStyle(font, Color.BLACK);
         Label.LabelStyle warningStyle = new Label.LabelStyle(font, Color.MAROON);
-        warningLabel = new Label("Careful!", indicatorStyle);
-        warningLabel.setVisible(false);
-        stage.addActor(warningLabel);
-        warningLabel.setSize(font.getScaleX() * 100, font.getScaleY() * 100);
 
         // pickup label
         pickupLabel = new Label("Press P to pickup!", indicatorStyle);
-        //pickupLabel.setPosition(Gdx.graphics.getWidth() - pickupLabel.getWidth() - 550, 10);
         pickupLabel.setVisible(false);
         stage.addActor(pickupLabel);
         pickupLabel.setSize(font.getScaleX() * 16, font.getScaleY() * 16);
 
         // dropoff label
         dropoffLabel = new Label("Press O to dropoff!", indicatorStyle);
-        //dropoffLabel.setPosition(Gdx.graphics.getWidth() - dropoffLabel.getWidth() - 550, 10);
         dropoffLabel.setVisible(false);
         stage.addActor(dropoffLabel);
         dropoffLabel.setSize(font.getScaleX() * 16, font.getScaleY() * 16);
@@ -560,12 +498,6 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                                 order.setDroppedOff(true);
                                 playerAttributes.ordersCompleted++;
                                 minOrderLabel.setText("Orders Completed: " + playerAttributes.ordersCompleted + "/" + minOrders);
-//                                playerAttributes.array.remove(1);
-//                                if (playerAttributes.array.size() <= 1) {
-//                                    playerAttributes.orderInProgress = false;
-//                                }
-                                //System.out.println("array before removing: "+playerAttributes.array);
-
                                 totalOrdersCompleted++;
                                 String orderID = playerAttributes.array.get(1).substring(4,9)/*order.getOrderString()*/;
                                 //if (!deliveredOrderIDs.contains(orderID)) {
@@ -665,11 +597,6 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             }
 
 
-//        if (playerAttributes.ordersCompleted == minOrders){
-//            //show game stats screen, pause game as part of this (if condition above)
-//            System.out.println("Level completed!");
-//        }
-
             batch.end();
 
 
@@ -690,22 +617,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             //if (visibleText) {
             font.setColor(Color.WHITE);
             font.draw(batch, "Order List:", sidePanelX + 10, sidePanelY + sidePanelHeight - 10);
-            //float coinCountTextX = Gdx.graphics.getWidth() / 2 - 90/*sidePanelX - font.getRegion().getRegionWidth() - 110*/;
-            //float coinCountTextY = Gdx.graphics.getHeight() - minOrderLabel.getHeight() - 25/*sidePanelY - 20*/;
-
             float coinCountTextX = Gdx.graphics.getWidth() / 2 - 90; // X position within the side panel
             float coinCountTextY = Gdx.graphics.getHeight() - minOrderLabel.getHeight() - 25;
-            //font.draw(batch, "Coins Collected: " + coinCounter, coinCountTextX, coinCountTextY);
-            //System.out.println("orders completed:"+playerAttributes.getOrdersCompleted());
-
-//            Label.LabelStyle indicatorStyle = new Label.LabelStyle(font, Color.YELLOW);
-//            coinCollectLabel = new Label("Coins Collected: " + coinCounter, indicatorStyle);
-//            coinCollectLabel.setSize(font.getScaleX() * 16, font.getScaleY() * 16);
-//            coinCollectLabel.setPosition(Gdx.graphics.getWidth() / 2 - 90, Gdx.graphics.getHeight() - coinCollectLabel.getHeight() - 25);
-//            coinCollectLabel.setVisible(true);
-//            stage.addActor(coinCollectLabel);
-
-
 
             for (int i = 1; i < items.length; i++) {
                 if (orderTimeLeft[i - 1] <= 5 && orderTimeLeft[i - 1] > 0) {
@@ -723,7 +636,6 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             stage.draw();
             popup.render();
             gamepopup.render();
-            //popup.draw();
             batch.end();
         }
         boolean timeLeft = true;
@@ -969,7 +881,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                     building.setPosition(
                             objectData[i].x * levelData.tileSize,
                             // Setting the y-position is like this bc libgdx is stupid :)
-                            levelHeight - (objectData[i].y + 2) * levelData.tileSize - building.getBounds().height
+                            levelHeight - (objectData[i].y + 1) * levelData.tileSize - building.getBounds().height
                     );
                     System.out.println(objectData[i].objectID);
                     buildings.add(building);
