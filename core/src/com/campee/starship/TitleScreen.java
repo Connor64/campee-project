@@ -46,7 +46,7 @@ public class TitleScreen implements Screen {
         font.setColor(1, 1, 0, 1);
         font.getData().setScale(3);
 
-        img = new Texture(Gdx.files.internal("IMG_0339.PNG"));
+        img = new Texture(Gdx.files.internal("title_moonship.PNG"));
 
         glyphLayout = new GlyphLayout();
         viewport = new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
