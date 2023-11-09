@@ -54,6 +54,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
     private final Popup popup;
     private final GamePopup gamepopup;
+    private TutorialPopups tutorialPopups;
     private ArrayList<BuildingObject> buildings;
     public ArrayList<CoinObject> coins;
     private final KeepPlayingPopup keepplayingpopup;
@@ -215,6 +216,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         gamepopup = new GamePopup(this, "", game, fileName);
         keepplayingpopup = new KeepPlayingPopup(this, "", game, fileName);
+        tutorialPopups = new TutorialPopups(this);
 
         // Make button style
         Pixmap backgroundPixmap = createRoundedRectanglePixmap(200, 50, 10, new Color(0.9f, 0, 0.9f, 0.6f)); // Adjust size and color
@@ -247,36 +249,6 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                 super.exit(event, x, y, pointer, toActor);
                 isBackButtonHovered = false;
                 backButton.setColor(Color.WHITE);
-            }
-        });
-
-        //Make game stats button
-        gameStatsButton = new TextButton("Game Stats", buttonStyle);
-        gameStatsButton.setPosition(Gdx.graphics.getWidth() - 600, 10);
-        gameStatsButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                visibleText = false;
-                StringBuilder orderIDsStringBuilder = new StringBuilder("Successfully Delivered:\n");
-                for (String orderID : deliveredOrderIDs) {
-                    orderIDsStringBuilder.append(orderID).append("\n");
-                }
-                String orderIDsMessage = orderIDsStringBuilder.toString();
-
-                StringBuilder timeOrderIDsStringBuilder = new StringBuilder("Out of Time Orders:\n");
-                for (String orderID : outOfTimeOrdersIDs) {
-                    timeOrderIDsStringBuilder.append(orderID).append("\n");
-                }
-                String notInTimeorderIDsMessage = timeOrderIDsStringBuilder.toString();
-
-                String gameStatsMessage = "GAME OVER! \nTotal Coins Collected: " + coinCounter + "\nTotal Orders Completed: " + totalOrdersCompleted;
-
-                gamepopup.showGameStatsMessage(gameStatsMessage);
-                gamepopup.showOrderCompletedList(orderIDsMessage);
-                gamepopup.showOutoffTimeList(notInTimeorderIDsMessage);
-                gamepopup.show();
-                gamepopup.render();
-                multiplexer.addProcessor(gamepopup.getStage());
             }
         });
 
@@ -371,7 +343,10 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         // Set font color and scale
         font.setColor(1, 1, 0, 1);
         font.getData().setScale(0.5f);
+
     }
+
+
 
     @Override
     public void render(float delta) {
@@ -385,6 +360,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             for (BuildingObject buildingObject : buildings) {
                 player.checkCollision(buildingObject, true);
             }
+
             world.step(1 / 60f, 6, 2); // Physics calculations
 
             camera.follow(player.getPosition(), levelWidth, levelHeight);
@@ -423,7 +399,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                 }
             }
 
-            // Inside the render metho
+            // Inside the render method
             String sec;
             if (countdownSeconds < 10) {
                 sec = "0" + String.valueOf(countdownSeconds);
@@ -636,6 +612,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             stage.draw();
             popup.render();
             gamepopup.render();
+            tutorialPopups.render();
             batch.end();
         }
         boolean timeLeft = true;
@@ -715,6 +692,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         keepplayingpopup.render();
         multiplexer.addProcessor(keepplayingpopup.getStage());
     }
+
+
 
     // Trigger the timed popup to show
     public void showTimedPopup() {
