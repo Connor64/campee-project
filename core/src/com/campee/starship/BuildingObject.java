@@ -6,103 +6,130 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.math.Vector2;
 
 public class BuildingObject extends GameObject {
 
     private boolean pickupLocation;
     private boolean dropoffLocation;
-    private boolean transparent;
+    private boolean translucent;
     private Sprite pickSprite;
     private Sprite dropSprite;
+    private Sprite pickSpriteYellow;
     private String name;
+    private Rectangle transparencyBounds;
+    private float collisionRatio;
+    private float transparencyRatio;
 
-    public BuildingObject(World world, float x, float y) {
-        super(world, x, y);
+
+    public BuildingObject(String spritePath, String name, float x, float y, float collisionRatio, float transparencyRatio) {
+        super(spritePath, x, y);
         pickupLocation = false;
         dropoffLocation = false;
-        transparent = false;
+        translucent = false;
+        this.name = name;
 
+        this.collisionRatio = collisionRatio;
+        this.transparencyRatio = transparencyRatio;
+
+        // Set transparency and collision bounds
+        transparencyBounds = new Rectangle(getBounds());
+        transparencyBounds.height *= transparencyRatio;
+        bounds.height *= collisionRatio;
+
+        // flag sprites and textures
         Texture pickupTexture = new Texture(Gdx.files.internal("pickup flag.PNG"));
         pickupTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         TextureRegion pickUpRegion = new TextureRegion(pickupTexture, 0, 0, pickupTexture.getWidth(), pickupTexture.getHeight());
         pickSprite = new Sprite(pickUpRegion);
-        pickSprite.setOrigin(pickSprite.getX() / 2,pickSprite.getY() / 2);
-        pickSprite.setPosition(0, 0);
+        pickSprite.setPosition(getBounds().getX() + (getBounds().getWidth() / 2), getBounds().getY() + ((getBounds().getHeight() * 2)));
+
+        Texture pickupTextureYellow = new Texture(Gdx.files.internal("pickup flag yellow.PNG"));
+        pickupTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        TextureRegion pickUpRegionYellow = new TextureRegion(pickupTextureYellow, 0, 0, pickupTextureYellow.getWidth(), pickupTextureYellow.getHeight());
+        pickSpriteYellow = new Sprite(pickUpRegionYellow);
+        pickSpriteYellow.setPosition(pickSprite.getX(), pickSprite.getY());
 
         Texture dropoffTexture = new Texture(Gdx.files.internal("dropoff flag.PNG"));
         dropoffTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         TextureRegion dropOffRegion = new TextureRegion(dropoffTexture, 0, 0, dropoffTexture.getWidth(), dropoffTexture.getHeight());
         dropSprite = new Sprite(dropOffRegion);
-        dropSprite.setOrigin(dropSprite.getX() / 2,dropSprite.getY() / 2);
-        dropSprite.setPosition(0, 0);
+        dropSprite.setPosition(getBounds().getX() + (getBounds().getWidth() / 2), getBounds().getY() + ((getBounds().getHeight() * 2)));
+    }
 
-//        // Set bounds for collision detection
-//        dimension.set(0.5f, 0.5f);
-//        setBounds(0, 0, dimension.x, dimension.y);
-//
-//        BodyDef bodyDef = new BodyDef();
-//        bodyDef.type = BodyDef.BodyType.DynamicBody;
-//        bodyDef.position.set(x, y);
-//        body = world.createBody(bodyDef);
-//
-//        PolygonShape shape = new PolygonShape();
-//        shape.setAsBox(dimension.x / 2, dimension.y / 2);
-//
-//        FixtureDef fixtureDef = new FixtureDef();
-//        fixtureDef.shape = shape;
-//
-//        body.createFixture(fixtureDef);
-//
-//        body.setUserData(this);
-//        body.setGravityScale(0);
-//
-//        shape.dispose();
+    public BuildingObject(BuildingObject buildingObject) {
+        super(buildingObject);
+
+        pickupLocation = false;
+        dropoffLocation = false;
+        translucent = false;
+        pickSprite = new Sprite(buildingObject.pickSprite);
+        dropSprite = new Sprite(buildingObject.dropSprite);
+        pickSpriteYellow = new Sprite(buildingObject.pickSpriteYellow);
+        name = buildingObject.name;
+        transparencyBounds = new Rectangle(buildingObject.transparencyBounds);
     }
 
     @Override
-    public void setSprite (String spritePath) {
+    public void setSprite(String spritePath) {
         super.setSprite(spritePath);
-        setHeight(sprite.getHeight() / 2);
-        setBounds(body.getPosition().x, body.getPosition().y, sprite.getWidth(), sprite.getHeight());
     }
 
-    public void setPickupLocation (boolean status) {
-        this.pickupLocation = status;
+    public void setPickupLocation(boolean status) {
+        pickupLocation = status;
     }
 
-    public void setDropoffLocation (boolean status) {
-        this.dropoffLocation = status;
+    public void setDropoffLocation(boolean status) {
+        dropoffLocation = status;
     }
 
-    public void setTransparent (boolean status) {
-        this.transparent = status;
+    public void setTranslucent(boolean status) {
+        translucent = status;
+        float opacity = translucent ? 0.2f : 1f;
+
+        setOpacity(opacity);
+        pickSprite.setAlpha(opacity);
+        dropSprite.setAlpha(opacity);
     }
 
     public String getName() {
-        return this.name;
+        return name;
     }
 
     public void setName(String n) {
         name = n;
     }
 
+    public Rectangle getTransparencyBounds() {
+        return transparencyBounds;
+    }
+
     @Override
-    public void render(SpriteBatch batch, int x, int y) {
-        if (transparent) {
-            sprite.setAlpha(0.2f);
-        } else {
-            sprite.setAlpha(1f);
-        }
+    public void setPosition(Vector2 position) {
+        this.setPosition(position.x, position.y);
+    }
+
+    @Override
+    public void setPosition(float x, float y) {
+        super.setPosition(x, y);
+        transparencyBounds.setPosition(x, y);
+        dropSprite.setPosition(x + (getBounds().getWidth() / 2), y + ((getBounds().getHeight() * 2)) - 10);
+        pickSprite.setPosition(x + (getBounds().getWidth() / 2), y + ((getBounds().getHeight() * 2)) - 10);
+        pickSpriteYellow.setPosition(x + (getBounds().getWidth() / 2), y + ((getBounds().getHeight() * 2)) - 10);
+    }
+
+    @Override
+    public void draw(SpriteBatch batch) {
+        super.draw(batch);
+
         if (pickupLocation) {
-            pickSprite.setPosition(getBounds().getX() + (getBounds().getWidth() / 2), getBounds().getY() + ((getBounds().getHeight() * 2)));
-            pickSprite.draw(batch);
-        }
-        if (dropoffLocation) {
-            dropSprite.setPosition(getBounds().getX() + (getBounds().getWidth() / 2), getBounds().getY()  + ((getBounds().getHeight() * 2)));
+            if (name.equals("HAAS")) {
+                pickSpriteYellow.draw(batch);
+            } else {
+                pickSprite.draw(batch);
+            }
+        } else if (dropoffLocation) {
             dropSprite.draw(batch);
         }
-        sprite.setBounds(body.getPosition().x, body.getPosition().y, sprite.getWidth(), sprite.getHeight());
-        super.render(batch, x, y);
     }
 }

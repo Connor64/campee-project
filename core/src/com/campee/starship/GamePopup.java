@@ -13,9 +13,11 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Align;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -57,13 +59,14 @@ public class GamePopup {
         ordersCompletedLabel.setFontScale(0.5f);
         ordersCompletedLabel.setPosition(50, 400);
 
+
         levelResultMessage = new Label("", new Label.LabelStyle(gameStatsfont, Color.YELLOW));
         levelResultMessage.setFontScale(1f);
         levelResultMessage.setPosition(Gdx.graphics.getWidth()/2 - levelResultMessage.getWidth() - 300, 550);
 
         ordersOutOfTimeLabel = new Label("", new Label.LabelStyle(gameStatsfont, Color.YELLOW));
-        ordersOutOfTimeLabel .setFontScale(0.5f);
-        ordersOutOfTimeLabel .setPosition(500, 400);
+        ordersOutOfTimeLabel.setFontScale(0.5f);
+        ordersOutOfTimeLabel.setPosition(500, 400);
 
         stage.addActor(ordersCompletedLabel);
         stage.addActor(levelResultMessage);
@@ -149,6 +152,7 @@ public class GamePopup {
         });
 
         // Add buttons to the stage
+
         stage.addActor(exitButton);
         stage.addActor(replayButton);
     }
@@ -162,14 +166,22 @@ public class GamePopup {
     }
 
     public void showOrderCompletedList(String message) {
+        String[] lines = message.split("\n");
+        int numberOfLines = lines.length;
+        int yPos = numberOfLines * 6;
         ordersCompletedLabel.setText(message);
+        ordersCompletedLabel.setPosition(50, 400 - yPos);
         gameStatsMessage.setVisible(true);
         ordersOutOfTimeLabel.setVisible(true);
         ordersCompletedLabel.setVisible(true);
     }
 
     public void showOutoffTimeList(String message) {
+        String[] lines = message.split("\n");
+        int numberOfLines = lines.length;
+        int yPos = numberOfLines * 6;
         ordersOutOfTimeLabel.setText(message);
+        ordersOutOfTimeLabel.setPosition(500, 400 - yPos);
         gameStatsMessage.setVisible(true);
         ordersOutOfTimeLabel.setVisible(true);
         ordersCompletedLabel.setVisible(true);
