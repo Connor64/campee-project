@@ -55,6 +55,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     private final Popup popup;
     private final GamePopup gamepopup;
     private TutorialPopups tutorialPopups;
+    private boolean isTutorialPopupsVisible;
     private ArrayList<BuildingObject> buildings;
     public ArrayList<CoinObject> coins;
     private final KeepPlayingPopup keepplayingpopup;
@@ -216,7 +217,13 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         gamepopup = new GamePopup(this, "", game, fileName);
         keepplayingpopup = new KeepPlayingPopup(this, "", game, fileName);
-        tutorialPopups = new TutorialPopups(this);
+        if ("Level 5".equals(fileName)) {
+            tutorialPopups = new TutorialPopups(this);
+            isTutorialPopupsVisible = true;
+        } else {
+            tutorialPopups = null; // If fileName is not "Level 5", set tutorialPopups to null
+            isTutorialPopupsVisible = false;
+        }
 
         // Make button style
         Pixmap backgroundPixmap = createRoundedRectanglePixmap(200, 50, 10, new Color(0.9f, 0, 0.9f, 0.6f)); // Adjust size and color
@@ -347,6 +354,13 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     }
 
 
+    public boolean isTutorialPopupsVisible() {
+        return isTutorialPopupsVisible;
+    }
+
+    public void setTutorialPopupsVisible(boolean visible) {
+        isTutorialPopupsVisible = visible;
+    }
 
     @Override
     public void render(float delta) {
@@ -612,7 +626,9 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             stage.draw();
             popup.render();
             gamepopup.render();
-            tutorialPopups.render();
+            if (this.tutorialPopups != null) {
+                tutorialPopups.render();
+            }
             batch.end();
         }
         boolean timeLeft = true;
@@ -692,8 +708,6 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         keepplayingpopup.render();
         multiplexer.addProcessor(keepplayingpopup.getStage());
     }
-
-
 
     // Trigger the timed popup to show
     public void showTimedPopup() {

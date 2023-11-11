@@ -24,7 +24,6 @@ public class TutorialPopups implements Screen {
     private ShapeRenderer shapeRenderer;
     private BitmapFont font;
     private boolean OKClicked;
-    public boolean visible;
     private Label messageLabel;
     private TextButton OKButton;
     private int currentStep;
@@ -78,7 +77,7 @@ public class TutorialPopups implements Screen {
         OKButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                if(visible) {
+                if(screen.isTutorialPopupsVisible()) {
                     System.out.println("OK Button Clicked!");
                     OKClicked = true;
                     if (currentStep < tutorialMessages.length - 1) {
@@ -87,7 +86,7 @@ public class TutorialPopups implements Screen {
                         messageLabel.setText(tutorialMessages[currentStep]);
                     } else {
                         // If no more steps, close the pop-up
-                       visible = false;
+                        screen.setTutorialPopupsVisible(false);
                     }
                 }
             }
@@ -99,12 +98,12 @@ public class TutorialPopups implements Screen {
 
     @Override
     public void show() {
-    }
 
-    public boolean isVisible() {
-        return visible;
-    }
 
+    }
+    public Stage getStage() {
+        return stage;
+    }
 
     @Override
     public void render(float delta) {
@@ -112,7 +111,7 @@ public class TutorialPopups implements Screen {
     }
 
     public void render() {
-        if (visible) {
+        if (screen.isTutorialPopupsVisible()) {
             Gdx.gl.glEnable(GL20.GL_BLEND);
             Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
             shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
