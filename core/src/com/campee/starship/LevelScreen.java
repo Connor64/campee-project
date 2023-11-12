@@ -160,6 +160,7 @@ public class LevelScreen extends ScreenAdapter {
         Label label = new Label(levelName, createLabelStyle(Color.BLACK));
         label.setFontScale(1.2f);
 
+
         Label orderLabel = new Label("2 orders", createLabelStyle(Color.BLACK));
         orderLabel.setFontScale(1f);
 

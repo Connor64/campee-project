@@ -18,7 +18,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.utils.viewport.ExtendViewport;
+
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 
 import java.util.*;
 
@@ -87,6 +89,10 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     int countdownMinutes = 3; // 2 minutes
     int countdownSeconds = 0;
     private Timer countdownTimer = new Timer();
+
+    // music and sound
+    Music gameplayMusic;
+    Sound coinCollect;
 
 
     // Create a TimerTask to decrement the countdown timer
@@ -212,6 +218,11 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         popup = new Popup(this, order.arrayToString());
         order.setPickupBounds(-levelWidth + 50, -levelHeight + 50, 16, 16);
         order.setDropoffBounds(levelWidth - 100, levelHeight - 100, 16, 16);
+
+        gameplayMusic = Gdx.audio.newMusic(Gdx.files.internal("music_demo.mp3"));
+        gameplayMusic.setLooping(true);
+        gameplayMusic.setVolume(0.5f);
+        coinCollect = Gdx.audio.newSound(Gdx.files.internal("Coin Collect.mp3"));
 
         gamepopup = new GamePopup(this, "", game, fileName);
         keepplayingpopup = new KeepPlayingPopup(this, "", game, fileName);
@@ -411,11 +422,15 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 //            rock.draw(batch);
 //            log.draw(batch);
 
+            // start music
+            gameplayMusic.play();
+
             // coin collision
             for (CoinObject coin : coins) {
                 if (!coin.isCollected()) {
                     coin.draw(batch);
                     if (player.checkCollision(coin, false)) {
+                        coinCollect.play();
                         coin.setCollected(true);
                         coinCounter++;
                         coinCollectLabel.setText("Coins Collected: " + coinCounter);
@@ -637,6 +652,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             popup.render();
             gamepopup.render();
             batch.end();
+        } else {
+            gameplayMusic.pause();
         }
         boolean timeLeft = true;
         if (countdownSeconds == 0 && countdownMinutes == 0) {
@@ -797,11 +814,13 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
     @Override
     public void hide() {
+        gameplayMusic.dispose();
     }
 
     @Override
     public void dispose() {
         batch.dispose();
+        gameplayMusic.dispose();
         //incomingOrder.dispose();
         multiplexer.removeProcessor(stage);
     }
