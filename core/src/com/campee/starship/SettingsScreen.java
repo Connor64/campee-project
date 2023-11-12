@@ -75,6 +75,7 @@ public class SettingsScreen implements Screen {
         // Draw the text "SETTINGS" at the top of the screen
         GlyphLayout layout = new GlyphLayout();
         layout.setText(font, "SETTINGS");
+        //add camera stuff so that the extending works
         float textX = (camera.viewportWidth - layout.width) / 2;
         float textY = camera.viewportHeight - 50;
         font.draw(batch, "SETTINGS", textX, textY);
