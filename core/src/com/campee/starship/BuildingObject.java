@@ -37,6 +37,7 @@ public class BuildingObject extends GameObject {
         transparencyBounds.height *= transparencyRatio;
         bounds.height *= collisionRatio;
 
+        // flag sprites and textures
         Texture pickupTexture = new Texture(Gdx.files.internal("pickup flag.PNG"));
         pickupTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         TextureRegion pickUpRegion = new TextureRegion(pickupTexture, 0, 0, pickupTexture.getWidth(), pickupTexture.getHeight());
@@ -130,7 +131,5 @@ public class BuildingObject extends GameObject {
         } else if (dropoffLocation) {
             dropSprite.draw(batch);
         }
-
-//        pickSpriteYellow.setPosition(getBounds().getX() + (getBounds().getWidth() / 2), getBounds().getY() + ((getBounds().getHeight() * 2)));
     }
 }
