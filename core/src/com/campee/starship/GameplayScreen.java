@@ -45,6 +45,11 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     public boolean popupInAction = false;
     public boolean ordersDone = false;
 
+    //pause screen
+    private TextButton pauseButton;
+    //public boolean resume = true;
+    private boolean isPauseButtonHovered = false;
+    public boolean gamePaused = false;
 
     private Player player;
     public PlayerAttributes playerAttributes;
@@ -57,6 +62,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     private ArrayList<BuildingObject> buildings;
     public ArrayList<CoinObject> coins;
     private final KeepPlayingPopup keepplayingpopup;
+    private final PauseScreen pauseScreen;
     public int coinCounter;
     private boolean visibleText;
 
@@ -93,7 +99,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     private TimerTask countdownTask = new TimerTask() {
         @Override
         public void run() {
-            if (!popupInAction) {
+            if (!popupInAction && !gamePaused) {
                 if (countdownSeconds > 0) {
                     countdownSeconds--;
                 } else {
@@ -215,9 +221,10 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         gamepopup = new GamePopup(this, "", game, fileName);
         keepplayingpopup = new KeepPlayingPopup(this, "", game, fileName);
+        pauseScreen = new PauseScreen(this,"", game);
 
         // Make button style
-        Pixmap backgroundPixmap = createRoundedRectanglePixmap(200, 50, 10, new Color(0.9f, 0, 0.9f, 0.6f)); // Adjust size and color
+        Pixmap backgroundPixmap = createRoundedRectanglePixmap(100, 50, 10, new Color(0.9f, 0, 0.9f, 0.6f)); // Adjust size and color
         TextButton.TextButtonStyle buttonStyle = new TextButton.TextButtonStyle();
         buttonStyle.up = new TextureRegionDrawable(new TextureRegion(new Texture(backgroundPixmap)));
         BitmapFont buttonFont = new BitmapFont();
@@ -247,6 +254,32 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                 super.exit(event, x, y, pointer, toActor);
                 isBackButtonHovered = false;
                 backButton.setColor(Color.WHITE);
+            }
+        });
+
+        // Make pause button
+        pauseButton = new TextButton("| |", buttonStyle);
+        pauseButton.setPosition(120, Gdx.graphics.getHeight() - 60); // Adjust the position as necessary
+        pauseButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                //System.out.println("clicked back");
+                pauseScreen();
+                gamePaused = true;
+            }
+
+            @Override
+            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+                super.enter(event, x, y, pointer, fromActor);
+                isPauseButtonHovered = true;
+                pauseButton.setColor(Color.LIGHT_GRAY);
+            }
+
+            @Override
+            public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
+                super.exit(event, x, y, pointer, toActor);
+                isPauseButtonHovered = false;
+                pauseButton.setColor(Color.WHITE);
             }
         });
 
@@ -281,6 +314,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         });
 
         stage.addActor(backButton);
+        stage.addActor(pauseButton);
 
         multiplexer = new InputMultiplexer();
         multiplexer.addProcessor(stage);
@@ -566,7 +600,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                         playerAttributes.array.remove(i);
                         messageTimer = 0.0f;
                     } else {
-                        if (!popupInAction) {
+                        if (!popupInAction && !gamePaused) {
                             if (timeCount[i - 1] % 60 == 0) {
                                 time -= 1;
                                 orderTimeLeft[i - 1] = time;
@@ -716,6 +750,18 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         multiplexer.addProcessor(keepplayingpopup.getStage());
     }
 
+    // pause screen pop up
+    public void pauseScreen() {
+        visibleText = false;
+        String message = "Game Paused!\nSettings:\n";
+        //String option = "Keep Playing or End Game?";
+        pauseScreen.setMessageLabel(message);
+        //keepplayingpopup.setOptionLabel(option);
+        pauseScreen.show();
+        pauseScreen.render();
+        multiplexer.addProcessor(pauseScreen.getStage());
+    }
+
     // Trigger the timed popup to show
     public void showTimedPopup() {
         popup.show(); // Display the popup
@@ -753,12 +799,12 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         scheduler.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
-                if (!popupInAction) {
+                if (!popupInAction && !gamePaused) {
                     showTimedPopup(); // Show the popup
                     scheduler.schedule(new Runnable() {
                         @Override
                         public void run() {
-                            if (!popupInAction) {
+                            if (!popupInAction && !gamePaused) {
                                 // Hide the popup
                                 hideTimedPopup();
                                 if (!popup.acceptClicked() && !popup.declineClicked() && !ordersDone) {
@@ -766,7 +812,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                                     scheduler.schedule(new Runnable() {
                                         @Override
                                         public void run() {
-                                            if (!popupInAction) {
+                                            if (!popupInAction && !gamePaused) {
                                                 autoDeclineLabel.setVisible(false); // Remove the label from the display
                                             }
                                         }
