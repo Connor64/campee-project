@@ -28,11 +28,9 @@ public class LevelScreen extends ScreenAdapter {
     private BitmapFont font;
     private TextButton backButton; // Add a TextButton for the "BACK" button
     private TextButton settingsButton;
+    private TextButton storeButton;
     private TextButton levelButton;
     private ExtendViewport viewport;
-    private boolean isBackButtonHovered = false;
-    private boolean isSettingButtonHovered = false;
-    private boolean isButtonHovered = false;
     private Stage stage2;
 
     public LevelScreen(final Game game) {
@@ -100,13 +98,11 @@ public class LevelScreen extends ScreenAdapter {
             @Override
             public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
                 super.enter(event, x, y, pointer, fromActor);
-                isBackButtonHovered = true;
                 backButton.setColor(Color.LIGHT_GRAY);
             }
             @Override
             public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
                 super.exit(event, x, y, pointer, toActor);
-                isBackButtonHovered = false;
                 backButton.setColor(Color.WHITE);
             }
         });
@@ -127,17 +123,42 @@ public class LevelScreen extends ScreenAdapter {
             @Override
             public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
                 super.enter(event, x, y, pointer, fromActor);
-                isSettingButtonHovered = true;
                 settingsButton.setColor(Color.LIGHT_GRAY);
             }
             @Override
             public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
                 super.exit(event, x, y, pointer, toActor);
-                isSettingButtonHovered = false;
                 settingsButton.setColor(Color.WHITE);
             }
         });
 
+        TextButton.TextButtonStyle storeButtonStyle = new TextButton.TextButtonStyle();
+        storeButtonStyle.font = buttonFont;
+        storeButtonStyle.fontColor = Color.BLACK;
+        Pixmap storeButtonPixmap = createRoundedRectanglePixmap(150, 60, 15, Color.valueOf("98FF98"));
+        storeButtonStyle.up = new TextureRegionDrawable(new TextureRegion(new Texture(storeButtonPixmap)));
+        storeButton = new TextButton("STORE", storeButtonStyle);
+        storeButton.setPosition(30, Gdx.graphics.getHeight() - 150); // Adjust Y-coordinate as needed
+        storeButton.setSize(150, 60);
+        storeButton.addListener(new InputListener() {
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                game.setScreen(new StoreScreen(game));
+                return true;
+            }
+            @Override
+            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+                super.enter(event, x, y, pointer, fromActor);
+                storeButton.setColor(Color.LIGHT_GRAY);
+            }
+            @Override
+            public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
+                super.exit(event, x, y, pointer, toActor);
+                storeButton.setColor(Color.WHITE);
+            }
+        });
+
+
+        stage.addActor(storeButton);
         stage.addActor(settingsButton);
         stage.addActor(backButton);
 
@@ -192,13 +213,11 @@ public class LevelScreen extends ScreenAdapter {
             @Override
             public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
                 super.enter(event, x, y, pointer, fromActor);
-                isButtonHovered = true;
                 levelButton.setColor(Color.LIGHT_GRAY);
             }
             @Override
             public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
                 super.exit(event, x, y, pointer, toActor);
-                isButtonHovered = false;
                 levelButton.setColor(Color.WHITE);
             }
         });
@@ -261,6 +280,7 @@ public class LevelScreen extends ScreenAdapter {
         viewport.update(width, height, true);
         backButton.setPosition(30, viewport.getWorldHeight() - 80); // Update button position on resize
         settingsButton.setPosition(viewport.getWorldWidth() - 180, viewport.getWorldHeight() - 80);
+        storeButton.setPosition(viewport.getWorldWidth() - 340, viewport.getWorldHeight() - 80);
         stage.getViewport().update(width, height, true);
     }
 
