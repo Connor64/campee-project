@@ -78,7 +78,7 @@ public class TutorialPopups implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 if(screen.isTutorialPopupsVisible()) {
-                    System.out.println("OK Button Clicked!");
+                    //System.out.println("OK Button Clicked!");
                     OKClicked = true;
                     if (currentStep < tutorialMessages.length - 1) {
                         // If there are more steps, increment the step and update the label
@@ -123,13 +123,14 @@ public class TutorialPopups implements Screen {
             stage.act();
             stage.draw();
 
-            System.out.println("TutorialPopups.render() - OKClicked: " + OKClicked);
+            //System.out.println("TutorialPopups.render() - OKClicked: " + OKClicked);
 
-            if (Gdx.input.isTouched()) {
+            /* if (Gdx.input.isTouched()) {
                 float touchX = Gdx.input.getX();
                 float touchY = Gdx.input.getY();
                 System.out.println("Touch coordinates: " + touchX + ", " + touchY);
             }
+             */
         }
     }
 

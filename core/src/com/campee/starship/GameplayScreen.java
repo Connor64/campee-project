@@ -265,7 +265,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         multiplexer.addProcessor(stage);
         multiplexer.addProcessor(keyProcessor);
         multiplexer.addProcessor(popup.getStage());
-
+        multiplexer.addProcessor(tutorialPopups.getStage());
 
         Gdx.input.setInputProcessor(multiplexer);
 
