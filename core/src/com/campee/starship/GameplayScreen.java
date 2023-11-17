@@ -472,12 +472,29 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             //  building dropoff and pickup pin stuff
             if (playerAttributes.orderInProgress) {
                 for (int i = 1; i < playerAttributes.array.size(); i++) {
-                    String[] s = order.stringToArray(playerAttributes.array.get(1));
-                    String str3 = s[3];
-                    String str2 = s[2];
-                    String currDrop = str3.substring(0, str3.length() - 6);
-                    String currPick = str2.substring(0, str2.length() - 3);
+                    StringBuilder sb = new StringBuilder();
+                    String[] currentOrder = playerAttributes.array.get(i).split("\\\n");
+                    for (String s : currentOrder)
+                    {
+                        sb.append(s);
+                        sb.append("\t");
+                    }
+//                    System.out.println("sb: " + sb.toString());
+                    String orderString = sb.toString();
+                    String[] splitArray = orderString.split("\\\t");
+                    String orderID = splitArray[0].substring(4);
+//                    System.out.println(orderID);
+                    String currPick = splitArray[1].substring(3);
+                    String currDrop = splitArray[2].substring(3);
+
+//                    String[] s = order.stringToArray(playerAttributes.array.get(1));
+//                    String str3 = s[3];
+//                    String str2 = s[2];
+//                    String currDrop = str3.substring(0, str3.length() - 6);
+//                    String currPick = str2.substring(0, str2.length() - 3);
+//                    System.out.println("pick:" + currPick);
                     for (BuildingObject building : buildings) {
+//                        System.out.println("name: " + building.getName());
                         // assign the building to the correct order
                         if (building.getName().equals(currPick) && !order.isPickedUp()) {
                             building.setPickupLocation(true);
@@ -514,7 +531,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                                 playerAttributes.ordersCompleted++;
                                 minOrderLabel.setText("Orders Completed: " + playerAttributes.ordersCompleted + "/" + minOrders);
                                 totalOrdersCompleted++;
-                                String orderID = playerAttributes.array.get(1).substring(4,9)/*order.getOrderString()*/;
+//                                String orderID = playerAttributes.array.get(1).substring(4,9)/*order.getOrderString()*/;
                                 //if (!deliveredOrderIDs.contains(orderID)) {
                                     deliveredOrderIDs.add(orderID);
                                     System.out.println("Order " + orderID + " (before removing) has been delivered and added to the list.");
@@ -743,7 +760,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         }*/
         order.seti(count);
         count++;
-        if (count < 7) {
+        if (count < orderArray.size() + 1) {
             popup.setMessage(order.arrayToString());
             popup.acceptClicked = false;
             popup.declineClicked = false;

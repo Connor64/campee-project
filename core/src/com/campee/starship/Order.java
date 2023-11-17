@@ -75,7 +75,7 @@ public class Order {
 //CHANGE FOR DEMO SO WE DONT WAIT FOR ALL SIX :)
 
     public void setArray(ArrayList<String> array) throws FileNotFoundException {
-        Scanner scanner = new Scanner(new File("Level1Orders.txt"));
+        Scanner scanner = new Scanner(new File("Level6Orders.txt"));
         while (scanner.hasNext()) {
             String line = scanner.nextLine();
             array.add(line);
