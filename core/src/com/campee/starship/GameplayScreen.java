@@ -205,7 +205,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         totalOrdersCompleted = 0;
         order = new Order();
         orderArray = new ArrayList<>();
-        order.setArray(orderArray);
+        order.setArray(orderArray, fileName + " Orders");
         Collections.shuffle(orderArray);
         System.out.println(orderArray);
         orderA = order.arrayToArray();
@@ -473,7 +473,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             if (playerAttributes.orderInProgress) {
                 for (int i = 1; i < playerAttributes.array.size(); i++) {
                     StringBuilder sb = new StringBuilder();
-                    String[] currentOrder = playerAttributes.array.get(i).split("\\\n");
+                    String[] currentOrder = playerAttributes.array.get(1).split("\\\n");
                     for (String s : currentOrder)
                     {
                         sb.append(s);
@@ -492,9 +492,9 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 //                    String str2 = s[2];
 //                    String currDrop = str3.substring(0, str3.length() - 6);
 //                    String currPick = str2.substring(0, str2.length() - 3);
-//                    System.out.println("pick:" + currPick);
+                    System.out.println("pick:" + currPick);
                     for (BuildingObject building : buildings) {
-//                        System.out.println("name: " + building.getName());
+                        System.out.println("name: " + building.getName());
                         // assign the building to the correct order
                         if (building.getName().equals(currPick) && !order.isPickedUp()) {
                             building.setPickupLocation(true);
