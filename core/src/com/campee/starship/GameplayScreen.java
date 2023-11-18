@@ -95,7 +95,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     private TimerTask countdownTask = new TimerTask() {
         @Override
         public void run() {
-            if (!popupInAction) {
+            if (!popupInAction && !keyProcessor.isPlayerMoving()) {
                 if (countdownSeconds > 0) {
                     countdownSeconds--;
                 } else {
@@ -121,6 +121,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     private SpriteBatch batch;
     private Stage stage;
     private KeyProcessor keyProcessor;
+    private float timeSinceLastMove;
 
     private PlayerCamera camera;
 
@@ -165,6 +166,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         stage = new Stage();
         keyProcessor = new KeyProcessor(this);
+        timeSinceLastMove = 0;
 
         // Create a Timer object to schedule the TimerTask
         countdownTimer.scheduleAtFixedRate(countdownTask, 500, 500);
@@ -369,6 +371,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         //If game stats screen is not visible, keep the game going (else pause)
         //if (!gameStatsScreen.isVisible()) {
         if (!gamepopup.isVisible()) {
+
             player.update(delta, keyProcessor);
             player.checkBounds(levelWidth, levelHeight);
             for (BuildingObject buildingObject : buildings) {
@@ -631,6 +634,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             }
             batch.end();
         }
+
         boolean timeLeft = true;
         if (countdownSeconds == 0 && countdownMinutes == 0) {
             if (playerAttributes.orderInProgress) {

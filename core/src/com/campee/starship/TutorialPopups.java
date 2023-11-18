@@ -28,11 +28,11 @@ public class TutorialPopups implements Screen {
     private TextButton OKButton;
     private int currentStep;
     private String[] tutorialMessages = {
-            "Step 1: Move the WASD or \narrow keys to move!",
-            "Step 2: Press P to \npick up an order now!",
-            "Step 3: Deliver orders \nto marked locations.",
-            "Step 4: Avoid obstacles \nto keep your health up.",
-            "Step 5: Collect coins \nfor extra points!"
+            "Step 1: Move the WASD or \narrow keys to move around the map!",
+            "Step 2: Click the accept button\nto accept an order!",
+            "Step 3: Travel to the pickup building and \n press P to pick up the order!",
+            "Step 4: Make sure to collect coins \n on the way!",
+            "Step 5: Travel to the destination building and \n press d to drop off the order!"
     };
 
     private float popupWidth;
@@ -122,15 +122,6 @@ public class TutorialPopups implements Screen {
 
             stage.act();
             stage.draw();
-
-            //System.out.println("TutorialPopups.render() - OKClicked: " + OKClicked);
-
-            /* if (Gdx.input.isTouched()) {
-                float touchX = Gdx.input.getX();
-                float touchY = Gdx.input.getY();
-                System.out.println("Touch coordinates: " + touchX + ", " + touchY);
-            }
-             */
         }
     }
 

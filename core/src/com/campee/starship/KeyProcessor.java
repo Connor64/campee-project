@@ -17,6 +17,10 @@ public class KeyProcessor implements InputProcessor {
         this.screen = screen;
     }
 
+    public boolean isPlayerMoving() {
+        return upPressed || downPressed || leftPressed || rightPressed;
+    }
+
 
     @Override
     public boolean keyDown(int keycode) {
