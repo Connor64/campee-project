@@ -166,12 +166,12 @@ public class LevelScreen extends ScreenAdapter {
         orderLabel.setFontScale(1f);
 
         // Create a button
-        TextButton.TextButtonStyle levelButtonStyle = new TextButton.TextButtonStyle();
+        final TextButton.TextButtonStyle levelButtonStyle = new TextButton.TextButtonStyle();
         BitmapFont levelButtonFont = new BitmapFont();
         levelButtonFont.getData().setScale(1f);
         levelButtonStyle.font = levelButtonFont;
         levelButtonStyle.fontColor = Color.BLACK;
-        levelButtonStyle.up = new TextureRegionDrawable(new TextureRegion(new Texture(createRoundedRectanglePixmap(100, 45, 15, Color.YELLOW))));
+        levelButtonStyle.up = new TextureRegionDrawable(new TextureRegion(new Texture(createRoundedRectanglePixmap(100, 45, 15, Color.DARK_GRAY))));
         //levelButtonStyle.down = new TextureRegionDrawable(new TextureRegion(new Texture(createRoundedRectanglePixmap(150, 60, 15, Color.YELLOW))));
 
         final TextButton levelButton = new TextButton("LOCKED", levelButtonStyle);
@@ -186,7 +186,7 @@ public class LevelScreen extends ScreenAdapter {
                     break; // Stop checking once the level is unlocked
                 } else {
                     levelButtonStyle.up = new TextureRegionDrawable(
-                            new TextureRegion(new Texture(createRoundedRectanglePixmap(100, 45, 15, Color.YELLOW))));
+                            new TextureRegion(new Texture(createRoundedRectanglePixmap(100, 45, 15, Color.DARK_GRAY))));
                     levelButton.setText("LOCKED");
                 }
             }
@@ -205,9 +205,11 @@ public class LevelScreen extends ScreenAdapter {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 try {
-                    nameOfFile = levelName;
-                    game.setScreen(new GameplayScreen((MoonshipGame) game, levelName));
-                    //System.out.println("hereeee");
+                    if (levelButton.getText().toString().equals("UNLOCKED")) {
+                        nameOfFile = levelName;
+                        game.setScreen(new GameplayScreen((MoonshipGame) game, levelName));
+                        //System.out.println("hereeee");
+                    }
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
@@ -221,13 +223,19 @@ public class LevelScreen extends ScreenAdapter {
             public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
                 super.enter(event, x, y, pointer, fromActor);
                 isButtonHovered = true;
-                levelButton.setColor(Color.LIGHT_GRAY);
+                //levelButton.setColor(Color.LIGHT_GRAY);
+                if (levelButton.getText().toString().equals("UNLOCKED")) {
+                    levelButton.setColor(Color.LIGHT_GRAY);
+                }
             }
             @Override
             public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
                 super.exit(event, x, y, pointer, toActor);
                 isButtonHovered = false;
-                levelButton.setColor(Color.WHITE);
+                //levelButton.setColor(Color.WHITE);
+                if (levelButton.getText().toString().equals("UNLOCKED")) {
+                    levelButton.setColor(Color.WHITE);
+                }
             }
         });
 
