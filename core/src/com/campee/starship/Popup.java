@@ -183,6 +183,7 @@ public class Popup implements Screen {
         messageLabel.setText(message);
     }
 
+
     public void show() {
         visible = true;
         //timeElapsed = 0;
