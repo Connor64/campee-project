@@ -174,7 +174,32 @@ public class LevelScreen extends ScreenAdapter {
         levelButtonStyle.up = new TextureRegionDrawable(new TextureRegion(new Texture(createRoundedRectanglePixmap(100, 45, 15, Color.YELLOW))));
         //levelButtonStyle.down = new TextureRegionDrawable(new TextureRegion(new Texture(createRoundedRectanglePixmap(150, 60, 15, Color.YELLOW))));
 
-        final TextButton levelButton = new TextButton("UNLOCKED", levelButtonStyle);
+        final TextButton levelButton = new TextButton("LOCKED", levelButtonStyle);
+        try {
+            FileHandle playerDataFile = Gdx.files.internal("playerdata.txt");
+            String[] lines = playerDataFile.readString().split("\n");
+            for (String line : lines) {
+                if (line.trim().equals(levelName + ":passed")) {
+                    levelButtonStyle.up = new TextureRegionDrawable(
+                            new TextureRegion(new Texture(createRoundedRectanglePixmap(100, 45, 15, Color.GREEN))));
+                    levelButton.setText("UNLOCKED");
+                    break; // Stop checking once the level is unlocked
+                } else {
+                    levelButtonStyle.up = new TextureRegionDrawable(
+                            new TextureRegion(new Texture(createRoundedRectanglePixmap(100, 45, 15, Color.YELLOW))));
+                    levelButton.setText("LOCKED");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        //final TextButton levelButton = new TextButton("LOCKED", levelButtonStyle);
+
+
+
+
+
         levelButton.setSize(10, 20);
         levelButton.addListener(new ClickListener() {
             @Override
