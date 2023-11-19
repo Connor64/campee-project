@@ -425,6 +425,9 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             // start music
             gameplayMusic.play();
 
+            if (keepplayingpopup.isVisible()) {
+                gameplayMusic.pause();
+            }
             // coin collision
             for (CoinObject coin : coins) {
                 if (!coin.isCollected()) {
