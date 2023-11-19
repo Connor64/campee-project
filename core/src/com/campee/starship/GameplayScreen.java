@@ -54,8 +54,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
     private final Popup popup;
     private final GamePopup gamepopup;
-    private TutorialPopups tutorialPopups;
-    private boolean isTutorialPopupsVisible;
+    public TutorialPopups tutorialPopups;
+    public boolean isTutorialPopupsVisible;
     private ArrayList<BuildingObject> buildings;
     public ArrayList<CoinObject> coins;
     private final KeepPlayingPopup keepplayingpopup;
@@ -222,9 +222,10 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         if ("Level 5".equals(fileName)) {
             tutorialPopups = new TutorialPopups(this);
             isTutorialPopupsVisible = true;
+            GameDifficulty.tutorial = true;
         } else {
             tutorialPopups = null; // If fileName is not "Level 5", set tutorialPopups to null
-            isTutorialPopupsVisible = false;
+            //isTutorialPopupsVisible = false;
         }
 
         // Make button style
@@ -750,7 +751,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         scheduler.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
-                if (!popupInAction) {
+                if (!popupInAction ) {
                     showTimedPopup(); // Show the popup
                     scheduler.schedule(new Runnable() {
                         @Override

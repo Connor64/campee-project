@@ -18,12 +18,18 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 public class TutorialPopups implements Screen {
     private GameplayScreen screen;
     private Stage stage;
     private ShapeRenderer shapeRenderer;
+    ScheduledExecutorService scheduler;
     private BitmapFont font;
     private boolean OKClicked;
+    private boolean countDone;
     private Label messageLabel;
     private TextButton OKButton;
     private int currentStep;
@@ -47,8 +53,11 @@ public class TutorialPopups implements Screen {
         stage = new Stage(viewport);
         Gdx.input.setInputProcessor(stage);
 
+        scheduler = Executors.newSingleThreadScheduledExecutor();
+
         shapeRenderer = new ShapeRenderer();
         OKClicked = false;
+        countDone = false;
         currentStep = 0;
 
         font = new BitmapFont();
@@ -83,7 +92,11 @@ public class TutorialPopups implements Screen {
                     if (currentStep < tutorialMessages.length - 1) {
                         // If there are more steps, increment the step and update the label
                         currentStep++;
+                        //count 15 seconds and let them play, then display next step
+                        hideStepPopup();
                         messageLabel.setText(tutorialMessages[currentStep]);
+                        scheduleStep();
+
                     } else {
                         // If no more steps, close the pop-up
                         screen.setTutorialPopupsVisible(false);
@@ -98,8 +111,7 @@ public class TutorialPopups implements Screen {
 
     @Override
     public void show() {
-
-
+        screen.isTutorialPopupsVisible = true;
     }
     public Stage getStage() {
         return stage;
@@ -130,6 +142,34 @@ public class TutorialPopups implements Screen {
 
     }
 
+    private void scheduleStep() {
+        scheduler = Executors.newSingleThreadScheduledExecutor();
+        scheduler.schedule(new Runnable() {
+            @Override
+            public void run() {
+                //if (!popupInAction) {
+                showStepPopup();
+                stopScheduler();
+                //}
+            }
+        }, 15, TimeUnit.SECONDS); // Schedule the next popup 15 seconds after the first one
+    }
+
+    public void stopScheduler() {
+        if (scheduler != null) {
+            scheduler.shutdown();
+        }
+    }
+
+    public void hideStepPopup() {
+        screen.tutorialPopups.hide(); // Hide the popup
+    }
+
+    public void showStepPopup() {
+        screen.tutorialPopups.show(); // Display the popup
+    }
+
+
     @Override
     public void pause() {
 
@@ -142,7 +182,7 @@ public class TutorialPopups implements Screen {
 
     @Override
     public void hide() {
-
+        screen.isTutorialPopupsVisible = false;
     }
 
     @Override
