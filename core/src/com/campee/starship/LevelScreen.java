@@ -21,6 +21,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class LevelScreen extends ScreenAdapter {
+    public static String nameOfFile;
     private final Game game;
     private Stage stage;
     private ScrollPane scrollPane;
@@ -94,6 +95,7 @@ public class LevelScreen extends ScreenAdapter {
         backButton.addListener(new InputListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 // Switch back to the title screen when the BACK button is clicked
+
                 game.setScreen(new TitleScreen((MoonshipGame) game)); // Change to the screen you want
                 return true;
             }
@@ -178,6 +180,7 @@ public class LevelScreen extends ScreenAdapter {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 try {
+                    nameOfFile = levelName;
                     game.setScreen(new GameplayScreen((MoonshipGame) game, levelName));
                     //System.out.println("hereeee");
                 } catch (FileNotFoundException e) {

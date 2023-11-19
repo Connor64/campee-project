@@ -86,6 +86,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     // Declare variables for the countdown timer
     int countdownMinutes = 3; // 2 minutes
     int countdownSeconds = 0;
+    int printcounter = 0;
     private Timer countdownTimer = new Timer();
 
 
@@ -714,6 +715,16 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         keepplayingpopup.show();
         keepplayingpopup.render();
         multiplexer.addProcessor(keepplayingpopup.getStage());
+
+        if (printcounter == 0) {
+            String fileName = "playerdata.txt";
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, true))) {
+                writer.write(LevelScreen.nameOfFile + ":passed\n");
+            } catch (IOException e) {
+                e.printStackTrace(); // Handle the exception appropriately
+            }
+            printcounter = 1;
+        }
     }
 
     // Trigger the timed popup to show

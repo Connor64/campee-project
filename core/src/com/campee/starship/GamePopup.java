@@ -19,6 +19,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -161,6 +163,7 @@ public class GamePopup {
     public void showGameStatsMessage(String message) {
         gameStatsMessage.setText(message);
         gameStatsMessage.setVisible(true);
+        System.out.println(message);
         ordersCompletedLabel.setVisible(true);
         ordersOutOfTimeLabel.setVisible(true);
     }
