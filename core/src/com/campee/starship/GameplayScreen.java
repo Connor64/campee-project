@@ -18,7 +18,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.utils.viewport.ExtendViewport;
+
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 
 import java.util.*;
 
@@ -88,6 +90,10 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     int countdownSeconds = 0;
     int printcounter = 0;
     private Timer countdownTimer = new Timer();
+
+    // music and sound
+    Music gameplayMusic;
+    Sound coinCollect;
 
 
     // Create a TimerTask to decrement the countdown timer
@@ -200,7 +206,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         totalOrdersCompleted = 0;
         order = new Order();
         orderArray = new ArrayList<>();
-        order.setArray(orderArray);
+        order.setArray(orderArray, fileName + " Orders");
         Collections.shuffle(orderArray);
         System.out.println(orderArray);
         orderA = order.arrayToArray();
@@ -213,6 +219,11 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         popup = new Popup(this, order.arrayToString());
         order.setPickupBounds(-levelWidth + 50, -levelHeight + 50, 16, 16);
         order.setDropoffBounds(levelWidth - 100, levelHeight - 100, 16, 16);
+
+        gameplayMusic = Gdx.audio.newMusic(Gdx.files.internal("music_demo.mp3"));
+        gameplayMusic.setLooping(true);
+        gameplayMusic.setVolume(0.5f);
+        coinCollect = Gdx.audio.newSound(Gdx.files.internal("Coin Collect.mp3"));
 
         gamepopup = new GamePopup(this, "", game, fileName);
         keepplayingpopup = new KeepPlayingPopup(this, "", game, fileName);
@@ -412,11 +423,15 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 //            rock.draw(batch);
 //            log.draw(batch);
 
+            // start music
+            gameplayMusic.play();
+
             // coin collision
             for (CoinObject coin : coins) {
                 if (!coin.isCollected()) {
                     coin.draw(batch);
                     if (player.checkCollision(coin, false)) {
+                        coinCollect.play();
                         coin.setCollected(true);
                         coinCounter++;
                         coinCollectLabel.setText("Coins Collected: " + coinCounter);
@@ -458,12 +473,29 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             //  building dropoff and pickup pin stuff
             if (playerAttributes.orderInProgress) {
                 for (int i = 1; i < playerAttributes.array.size(); i++) {
-                    String[] s = order.stringToArray(playerAttributes.array.get(1));
-                    String str3 = s[3];
-                    String str2 = s[2];
-                    String currDrop = str3.substring(0, str3.length() - 6);
-                    String currPick = str2.substring(0, str2.length() - 3);
+                    StringBuilder sb = new StringBuilder();
+                    String[] currentOrder = playerAttributes.array.get(1).split("\\\n");
+                    for (String s : currentOrder)
+                    {
+                        sb.append(s);
+                        sb.append("\t");
+                    }
+//                    System.out.println("sb: " + sb.toString());
+                    String orderString = sb.toString();
+                    String[] splitArray = orderString.split("\\\t");
+                    String orderID = splitArray[0].substring(4);
+//                    System.out.println(orderID);
+                    String currPick = splitArray[1].substring(3);
+                    String currDrop = splitArray[2].substring(3);
+
+//                    String[] s = order.stringToArray(playerAttributes.array.get(1));
+//                    String str3 = s[3];
+//                    String str2 = s[2];
+//                    String currDrop = str3.substring(0, str3.length() - 6);
+//                    String currPick = str2.substring(0, str2.length() - 3);
+                    System.out.println("pick:" + currPick);
                     for (BuildingObject building : buildings) {
+                        System.out.println("name: " + building.getName());
                         // assign the building to the correct order
                         if (building.getName().equals(currPick) && !order.isPickedUp()) {
                             building.setPickupLocation(true);
@@ -500,7 +532,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                                 playerAttributes.ordersCompleted++;
                                 minOrderLabel.setText("Orders Completed: " + playerAttributes.ordersCompleted + "/" + minOrders);
                                 totalOrdersCompleted++;
-                                String orderID = playerAttributes.array.get(1).substring(4,9)/*order.getOrderString()*/;
+//                                String orderID = playerAttributes.array.get(1).substring(4,9)/*order.getOrderString()*/;
                                 //if (!deliveredOrderIDs.contains(orderID)) {
                                     deliveredOrderIDs.add(orderID);
                                     System.out.println("Order " + orderID + " (before removing) has been delivered and added to the list.");
@@ -638,6 +670,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             popup.render();
             gamepopup.render();
             batch.end();
+        } else {
+            gameplayMusic.pause();
         }
         boolean timeLeft = true;
         if (countdownSeconds == 0 && countdownMinutes == 0) {
@@ -737,7 +771,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         }*/
         order.seti(count);
         count++;
-        if (count < 7) {
+        if (count < orderArray.size() + 1) {
             popup.setMessage(order.arrayToString());
             popup.acceptClicked = false;
             popup.declineClicked = false;
@@ -808,11 +842,13 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
     @Override
     public void hide() {
+        gameplayMusic.dispose();
     }
 
     @Override
     public void dispose() {
         batch.dispose();
+        gameplayMusic.dispose();
         //incomingOrder.dispose();
         multiplexer.removeProcessor(stage);
     }
