@@ -52,8 +52,8 @@ public class AssetManager {
         BUTTON_FONT = new BitmapFont();
         BUTTON_FONT.getData().scale(3);
 
-        TITLE_FONT = new BitmapFont(Gdx.files.internal("moonships_font.fnt"),
-                                    Gdx.files.internal("moonships_font.png"), false);
+        TITLE_FONT = new BitmapFont(Gdx.files.internal("fonts/moonships_font.fnt"),
+                                    Gdx.files.internal("fonts/moonships_font.png"), false);
         TITLE_FONT.setColor(1, 1, 0, 1);
         TITLE_FONT.getData().scale(3);
 
