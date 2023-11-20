@@ -35,12 +35,17 @@ public class AssetManager {
         
         loadTileset("1_terrain.png", "tileset_test_1");
         loadTileset("street.png", "modern_tileset");
+        loadTileset("caves.png", "caves_tileset");
 
         gameObjects.put("building_haas", new BuildingObject("HAAS.PNG", "HAAS", 0, 0, 0.5f, 0.75f));
         gameObjects.put("building_pmu", new BuildingObject("PMU.PNG", "PMU", 0, 0, 0.5f, 0.75f));
         gameObjects.put("building_msee", new BuildingObject("MSEE.PNG", "MSEE", 0, 0, 0.5f, 0.75f));
         gameObjects.put("building_fountain", new BuildingObject("fountain.PNG", "fountain", 0, 0, 0, 1));
         gameObjects.put("building_panera", new BuildingObject("Panera.PNG", "Panera", 0, 0, 0.5f, 0.75f));
+        gameObjects.put("building_bepsi", new BuildingObject("Bepsi Machine.PNG", "Bepsi Machine", 0, 0, 0.5f, 0.75f));
+        gameObjects.put("building_kola", new BuildingObject("Koca Kola Machine.PNG", "Kola Machine", 0, 0, 0.5f, 0.75f));
+        gameObjects.put("building_turkstra", new BuildingObject("Prof. Turkstra.PNG", "Turkstra", 0, 0, 0.5f, 0.75f));
+        gameObjects.put("building_police", new BuildingObject("Police Officer.PNG", "Officer", 0, 0, 0.5f, 0.75f));
         gameObjects.put("coin", new CoinObject(0, 0));
 
         BUTTON_FONT = new BitmapFont();
