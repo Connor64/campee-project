@@ -1,4 +1,4 @@
-package com.campee.starship;
+package com.campee.starship.screens;
 
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.Gdx;

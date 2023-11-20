@@ -1,4 +1,4 @@
-package com.campee.starship;
+package com.campee.starship.managers;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.campee.starship.objects.*;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -37,15 +38,15 @@ public class AssetManager {
         loadTileset("street.png", "modern_tileset");
         loadTileset("caves.png", "caves_tileset");
 
-        gameObjects.put("building_haas", new BuildingObject("HAAS.PNG", "HAAS", 0, 0, 0.5f, 0.75f));
-        gameObjects.put("building_pmu", new BuildingObject("PMU.PNG", "PMU", 0, 0, 0.5f, 0.75f));
-        gameObjects.put("building_msee", new BuildingObject("MSEE.PNG", "MSEE", 0, 0, 0.5f, 0.75f));
-        gameObjects.put("building_fountain", new BuildingObject("fountain.PNG", "fountain", 0, 0, 0, 1));
-        gameObjects.put("building_panera", new BuildingObject("Panera.PNG", "Panera", 0, 0, 0.5f, 0.75f));
-        gameObjects.put("building_bepsi", new BuildingObject("Bepsi Machine.PNG", "Bepsi Machine", 0, 0, 0.5f, 0.75f));
-        gameObjects.put("building_kola", new BuildingObject("Koca Kola Machine.PNG", "Kola Machine", 0, 0, 0.5f, 0.75f));
-        gameObjects.put("building_turkstra", new BuildingObject("Prof. Turkstra.PNG", "Turkstra", 0, 0, 0.5f, 0.75f));
-        gameObjects.put("building_police", new BuildingObject("Police Officer.PNG", "Officer", 0, 0, 0.5f, 0.75f));
+        gameObjects.put("building_haas", new BuildingObject("sprites/buildings/haas.png", "HAAS", 0, 0, 0.5f, 0.75f));
+        gameObjects.put("building_pmu", new BuildingObject("sprites/buildings/pmu.png", "PMU", 0, 0, 0.5f, 0.75f));
+        gameObjects.put("building_msee", new BuildingObject("sprites/buildings/msee.png", "MSEE", 0, 0, 0.5f, 0.75f));
+        gameObjects.put("building_fountain", new BuildingObject("sprites/buildings/fountain.png", "fountain", 0, 0, 0, 1));
+        gameObjects.put("building_panera", new BuildingObject("sprites/buildings/panera.png", "Panera", 0, 0, 0.5f, 0.75f));
+        gameObjects.put("building_bepsi", new BuildingObject("sprites/buildings/bepsi_machine.png", "Bepsi Machine", 0, 0, 0.5f, 0.75f));
+        gameObjects.put("building_kola", new BuildingObject("sprites/buildings/koca_kola_machine.png", "Kola Machine", 0, 0, 0.5f, 0.75f));
+        gameObjects.put("building_turkstra", new BuildingObject("sprites/buildings/prof_turkstra.png", "Turkstra", 0, 0, 0.5f, 0.75f));
+        gameObjects.put("building_police", new BuildingObject("sprites/buildings/police_officer.png", "Officer", 0, 0, 0.5f, 0.75f));
         gameObjects.put("coin", new CoinObject(0, 0));
 
         BUTTON_FONT = new BitmapFont();

@@ -1,4 +1,4 @@
-package com.campee.starship;
+package com.campee.starship.objects;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
@@ -10,6 +10,8 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 
+import com.campee.starship.managers.*;
+
 public class Player extends GameObject {
     private Body body;
     private final TextureRegion[] directionalSprites;
@@ -19,16 +21,16 @@ public class Player extends GameObject {
         super(x, y);
 
         // Set up directional sprites
-        Texture upTexture = new Texture(Gdx.files.internal("moonship_up.PNG"));
+        Texture upTexture = new Texture(Gdx.files.internal("sprites/moonship_up.png"));
         upTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
 
-        Texture downTexture = new Texture(Gdx.files.internal("moonship_down.PNG"));
+        Texture downTexture = new Texture(Gdx.files.internal("sprites/moonship_down.png"));
         downTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
 
-        Texture leftTexture = new Texture(Gdx.files.internal("moonship_left.PNG"));
+        Texture leftTexture = new Texture(Gdx.files.internal("sprites/moonship_left.png"));
         leftTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
 
-        Texture rightTexture = new Texture(Gdx.files.internal("moonship_right.PNG"));
+        Texture rightTexture = new Texture(Gdx.files.internal("sprites/moonship_right.png"));
         rightTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
 
         // Get regions and put them into the array
