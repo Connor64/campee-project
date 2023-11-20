@@ -13,6 +13,8 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
@@ -34,9 +36,11 @@ public class PauseScreen {
     private boolean exitClicked;
     private boolean isResumeButtonHovered = false;
     private boolean isExitButtonHovered = false;
+    private Slider musicSlider;
+    private Slider soundSlider;
 
 
-    public PauseScreen(final GameplayScreen screen, final String notificationMessage, final Game game) {
+    public PauseScreen(final GameplayScreen screen, final String notificationMessage, final Game game, Skin skin) {
         this.game = game;
         stage = new Stage();
         shapeRenderer = new ShapeRenderer();
@@ -61,6 +65,20 @@ public class PauseScreen {
         soundEffectsLabel = new Label("Sound Effects volume:", new Label.LabelStyle(font, Color.WHITE));
         soundEffectsLabel.setFontScale(0.75f);
         soundEffectsLabel.setPosition(200, 250);
+
+        // Create music volume slider
+        musicSlider = new Slider(0f, 1f, 0.1f, false, skin);
+        musicSlider.setValue(1f);
+        musicSlider.setSize(200f, 20f);
+        musicSlider.setPosition(200f, Gdx.graphics.getHeight() - 300f);
+        stage.addActor(musicSlider);
+
+        // Create sound volume slider
+        soundSlider = new Slider(0f, 1f, 0.1f, false, skin);
+        soundSlider.setValue(1f);
+        soundSlider.setSize(200f, 20f);
+        soundSlider.setPosition(200f, Gdx.graphics.getHeight() - 400f);
+        stage.addActor(soundSlider);
 
         Pixmap resumeBackgroundPixmap = createRoundedRectanglePixmap(1000, 200, 10, Color.GREEN); // Adjust size and color
         TextButton.TextButtonStyle resumeButtonStyle = new TextButton.TextButtonStyle();
@@ -158,6 +176,14 @@ public class PauseScreen {
 //        optionLabel.setVisible(true);
 //    }
 
+    public Slider getMusicSlider() {
+        return musicSlider;
+    }
+
+    public Slider getSoundSlider() {
+        return soundSlider;
+    }
+
     public void show() {
         visible = true;
     }
@@ -191,6 +217,8 @@ public class PauseScreen {
             shapeRenderer.setColor(new Color(0, 0, 0, 0.7f));
             shapeRenderer.rect(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
             shapeRenderer.end();
+
+
 
             stage.act();
             stage.draw();

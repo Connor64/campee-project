@@ -98,9 +98,11 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     // music and sound
     Music gameplayMusic;
     Sound coinCollect;
-    private Slider musicSlider;
-    private Slider soundSlider;
-    private Skin skin;
+    Skin skin;
+    Slider musicSlider;
+    Slider soundSlider;
+    private boolean coinCollectPlayed;
+    boolean coinCollected;
 
     // Create a TimerTask to decrement the countdown timer
     private TimerTask countdownTask = new TimerTask() {
@@ -230,12 +232,16 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         gameplayMusic.setLooping(true);
         gameplayMusic.setVolume(0.5f);
         coinCollect = Gdx.audio.newSound(Gdx.files.internal("Coin Collect.mp3"));
-        skin = new Skin(Gdx.files.internal("uiskin.json"));
-
 
         gamepopup = new GamePopup(this, "", game, fileName);
         keepplayingpopup = new KeepPlayingPopup(this, "", game, fileName);
-        pauseScreen = new PauseScreen(this, "", game);
+        skin = new Skin(Gdx.files.internal("uiskin.json"));
+        pauseScreen = new PauseScreen(this, "", game, skin);
+
+        musicSlider = pauseScreen.getMusicSlider();
+        soundSlider = pauseScreen.getSoundSlider();
+        coinCollectPlayed = false;
+        coinCollected = false;
 
         // Make button style
         Pixmap backgroundPixmap = createRoundedRectanglePixmap(100, 50, 10, new Color(0.9f, 0, 0.9f, 0.6f)); // Adjust size and color
@@ -427,8 +433,14 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         //If game stats screen is not visible, keep the game going (else pause)
         //if (!gameStatsScreen.isVisible()) {
+        if (coinCollected && !coinCollectPlayed) {
+            long soundId = coinCollect.play();
+            coinCollect.setVolume(soundId, soundSlider.getValue());
+            coinCollectPlayed = true; // Mark that the sound has been played
+        }
+        //long soundId = coinCollect.play();
         gameplayMusic.setVolume(musicSlider.getValue());
-        coinCollect.setVolume(coinCollect.play(), soundSlider.getValue());
+        //coinCollect.setVolume(soundId, soundSlider.getValue());
 
         if (!gamepopup.isVisible()) {
             if (!gamePaused) {
@@ -474,6 +486,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                     if (player.checkCollision(coin, false)) {
                         coinCollect.play();
                         coin.setCollected(true);
+                        coinCollected = true;
                         coinCounter++;
                         coinCollectLabel.setText("Coins Collected: " + coinCounter);
                     }
@@ -802,20 +815,10 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         //String option = "Keep Playing or End Game?";
         pauseScreen.setMessageLabel(message);
 
-        // Create music volume slider
-        musicSlider = new Slider(0f, 1f, 0.1f, false, skin);
-        musicSlider.setValue(1f);
-        musicSlider.setSize(200f, 20f);
-        musicSlider.setPosition(50f, Gdx.graphics.getHeight() - 50f);
 
-        // Create sound volume slider
-        soundSlider = new Slider(0f, 1f, 0.1f, false, skin);
-        soundSlider.setValue(1f);
-        soundSlider.setSize(200f, 20f);
-        soundSlider.setPosition(50f, Gdx.graphics.getHeight() - 100f);
 
-        stage.addActor(musicSlider);
-        stage.addActor(soundSlider);
+        //stage.addActor(musicSlider);
+        //stage.addActor(soundSlider);
         pauseScreen.show();
         pauseScreen.render();
         multiplexer.addProcessor(pauseScreen.getStage());
