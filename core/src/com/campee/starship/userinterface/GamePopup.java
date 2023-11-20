@@ -1,4 +1,4 @@
-package com.campee.starship;
+package com.campee.starship.userinterface;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
@@ -13,14 +13,13 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.utils.Align;
+
+import com.campee.starship.screens.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 public class GamePopup {
     private final Game game;
@@ -47,7 +46,7 @@ public class GamePopup {
         shapeRenderer = new ShapeRenderer();
         visible = false;
 
-        gameStatsfont = new BitmapFont(Gdx.files.internal("moonships_font.fnt"), Gdx.files.internal("moonships_font.png"), false);
+        gameStatsfont = new BitmapFont(Gdx.files.internal("fonts/moonships_font.fnt"), Gdx.files.internal("fonts/moonships_font.png"), false);
 
         gameStatsfont.setColor(1, 1, 0, 1);
         gameStatsfont.getData().setScale(1f);

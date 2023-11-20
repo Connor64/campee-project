@@ -1,4 +1,4 @@
-package com.campee.starship;
+package com.campee.starship.userinterface;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
@@ -17,8 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
-import java.io.IOException;
-import java.util.ArrayList;
+import com.campee.starship.screens.*;
 
 public class KeepPlayingPopup {
     private final Game game;
@@ -46,7 +45,7 @@ public class KeepPlayingPopup {
         shapeRenderer = new ShapeRenderer();
         visible = false;
 
-        font = new BitmapFont(Gdx.files.internal("moonships_font.fnt"), Gdx.files.internal("moonships_font.png"), false);
+        font = new BitmapFont(Gdx.files.internal("fonts/moonships_font.fnt"), Gdx.files.internal("fonts/moonships_font.png"), false);
 
         buttonFont = new BitmapFont();
 

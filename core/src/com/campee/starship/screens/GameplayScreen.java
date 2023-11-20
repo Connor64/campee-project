@@ -1,4 +1,4 @@
-package com.campee.starship;
+package com.campee.starship.screens;
 
 import Serial.LevelData;
 import com.badlogic.gdx.*;
@@ -21,6 +21,9 @@ import com.badlogic.gdx.utils.ScreenUtils;
 
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
+import com.campee.starship.objects.*;
+import com.campee.starship.managers.*;
+import com.campee.starship.userinterface.*;
 
 import java.util.*;
 
@@ -86,8 +89,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     final float MESSAGE_DURATION = 3.0f;
 
     // Declare variables for the countdown timer
-    int countdownMinutes = 3; // 2 minutes
-    int countdownSeconds = 0;
+    public int countdownMinutes = 3; // 2 minutes
+    public int countdownSeconds = 0;
     private Timer countdownTimer = new Timer();
 
     // music and sound
@@ -205,7 +208,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         totalOrdersCompleted = 0;
         order = new Order();
         orderArray = new ArrayList<>();
-        order.setArray(orderArray, fileName + " Orders");
+        order.setArray(orderArray, fileName + "_orders");
         Collections.shuffle(orderArray);
         System.out.println(orderArray);
         orderA = order.arrayToArray();
@@ -219,10 +222,10 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         order.setPickupBounds(-levelWidth + 50, -levelHeight + 50, 16, 16);
         order.setDropoffBounds(levelWidth - 100, levelHeight - 100, 16, 16);
 
-        gameplayMusic = Gdx.audio.newMusic(Gdx.files.internal("music_demo.mp3"));
+        gameplayMusic = Gdx.audio.newMusic(Gdx.files.internal("audio/music_demo.mp3"));
         gameplayMusic.setLooping(true);
         gameplayMusic.setVolume(0.5f);
-        coinCollect = Gdx.audio.newSound(Gdx.files.internal("Coin Collect.mp3"));
+        coinCollect = Gdx.audio.newSound(Gdx.files.internal("audio/coin_collect.mp3"));
 
         gamepopup = new GamePopup(this, "", game, fileName);
         keepplayingpopup = new KeepPlayingPopup(this, "", game, fileName);
@@ -302,7 +305,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         Gdx.input.setInputProcessor(multiplexer);
 
         // visual indicators stuff
-        BitmapFont font = new BitmapFont(Gdx.files.internal("moonships_font.fnt"), Gdx.files.internal("moonships_font.png"), false);
+        BitmapFont font = new BitmapFont(Gdx.files.internal("fonts/moonships_font.fnt"), Gdx.files.internal("fonts/moonships_font.png"), false);
         font.setColor(0, 0, 0, 1);
         font.getData().setScale(0.5f, 0.5f);
         Label.LabelStyle indicatorStyle = new Label.LabelStyle(font, Color.BLACK);
@@ -377,7 +380,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     @Override
     public void show() {
         shapeRenderer = new ShapeRenderer();
-        font = new BitmapFont(Gdx.files.internal("moonships_font.fnt"), Gdx.files.internal("moonships_font.png"), false);
+        font = new BitmapFont(Gdx.files.internal("fonts/moonships_font.fnt"), Gdx.files.internal("fonts/moonships_font.png"), false);
         ; // Define your BitmapFont
         // Set font color and scale
         font.setColor(1, 1, 0, 1);
@@ -498,13 +501,13 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                         // assign the building to the correct order
                         if (building.getName().equals(currPick) && !order.isPickedUp()) {
                             building.setPickupLocation(true);
-                            order.setPickupBounds(building.bounds.getX(), building.bounds.getY(), building.getWidth(), building.getHeight());
+                            order.setPickupBounds(building.getBounds().getX(), building.getBounds().getY(), building.getWidth(), building.getHeight());
                         } else {
                             building.setPickupLocation(false);
                         }
                         if (building.getName().equals(currDrop) && !order.isDroppedOff() && order.isPickedUp()) {
                             building.setDropoffLocation(true);
-                            order.setDropoffBounds(building.bounds.getX(), building.bounds.getY(), building.getWidth(), building.getHeight());
+                            order.setDropoffBounds(building.getBounds().getX(), building.getBounds().getY(), building.getWidth(), building.getHeight());
                         } else {
                             building.setDropoffLocation(false);
                         }
