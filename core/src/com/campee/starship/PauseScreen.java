@@ -26,7 +26,8 @@ public class PauseScreen {
     public boolean visible;
     private ShapeRenderer shapeRenderer;
     private Label messageLabel;
-    //private Label optionLabel;
+    private Label musicLabel;
+    private Label soundEffectsLabel;
     private BitmapFont font;
     private BitmapFont buttonFont;
     private boolean resumeClicked;
@@ -51,12 +52,15 @@ public class PauseScreen {
 
         messageLabel = new Label(notificationMessage, new Label.LabelStyle(font, Color.WHITE));
         messageLabel.setFontScale(1f);
-        messageLabel.setPosition(200, 350);
+        messageLabel.setPosition(200, 450);
 
-        //optionLabel = new Label(notificationMessage, new Label.LabelStyle(font, Color.WHITE));
-        //optionLabel.setFontScale(0.5f);
-        //optionLabel.setPosition(200, 300);
+        musicLabel = new Label("Music volume:", new Label.LabelStyle(font, Color.WHITE));
+        musicLabel.setFontScale(0.75f);
+        musicLabel.setPosition(200, 350);
 
+        soundEffectsLabel = new Label("Sound Effects volume:", new Label.LabelStyle(font, Color.WHITE));
+        soundEffectsLabel.setFontScale(0.75f);
+        soundEffectsLabel.setPosition(200, 250);
 
         Pixmap resumeBackgroundPixmap = createRoundedRectanglePixmap(1000, 200, 10, Color.GREEN); // Adjust size and color
         TextButton.TextButtonStyle resumeButtonStyle = new TextButton.TextButtonStyle();
@@ -75,14 +79,14 @@ public class PauseScreen {
         final TextButton resumeButton = new TextButton("Resume Game",  resumeButtonStyle);
         final TextButton exitButton = new TextButton("Exit Game",  exitButtonStyle);
 
-        resumeButton.setWidth(120);
+        resumeButton.setWidth(130);
         resumeButton.setHeight(75);
-        exitButton.setWidth(120);
+        exitButton.setWidth(130);
         exitButton.setHeight(75);
 
         // Set button positions
-        resumeButton.setPosition(100, 200);
-        exitButton.setPosition(500,200);
+        resumeButton.setPosition(100, 75);
+        exitButton.setPosition(500,75);
 
         resumeButton.addListener(new ClickListener() {
             @Override
@@ -137,7 +141,8 @@ public class PauseScreen {
         });
 
         stage.addActor(messageLabel);
-        //stage.addActor(optionLabel);
+        stage.addActor(musicLabel);
+        stage.addActor(soundEffectsLabel);
         stage.addActor(resumeButton);
         stage.addActor(exitButton);
     }
