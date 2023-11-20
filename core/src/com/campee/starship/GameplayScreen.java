@@ -13,8 +13,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -99,7 +98,9 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     // music and sound
     Music gameplayMusic;
     Sound coinCollect;
-
+    private Slider musicSlider;
+    private Slider soundSlider;
+    private Skin skin;
 
     // Create a TimerTask to decrement the countdown timer
     private TimerTask countdownTask = new TimerTask() {
@@ -229,6 +230,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         gameplayMusic.setLooping(true);
         gameplayMusic.setVolume(0.5f);
         coinCollect = Gdx.audio.newSound(Gdx.files.internal("Coin Collect.mp3"));
+        skin = new Skin(Gdx.files.internal("uiskin.json"));
+
 
         gamepopup = new GamePopup(this, "", game, fileName);
         keepplayingpopup = new KeepPlayingPopup(this, "", game, fileName);
@@ -424,6 +427,9 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         //If game stats screen is not visible, keep the game going (else pause)
         //if (!gameStatsScreen.isVisible()) {
+        gameplayMusic.setVolume(musicSlider.getValue());
+        coinCollect.setVolume(coinCollect.play(), soundSlider.getValue());
+
         if (!gamepopup.isVisible()) {
             if (!gamePaused) {
                 player.update(delta, keyProcessor);
@@ -795,7 +801,21 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         String message = "Game Paused!\nSettings:\n";
         //String option = "Keep Playing or End Game?";
         pauseScreen.setMessageLabel(message);
-        //keepplayingpopup.setOptionLabel(option);
+
+        // Create music volume slider
+        musicSlider = new Slider(0f, 1f, 0.1f, false, skin);
+        musicSlider.setValue(1f);
+        musicSlider.setSize(200f, 20f);
+        musicSlider.setPosition(50f, Gdx.graphics.getHeight() - 50f);
+
+        // Create sound volume slider
+        soundSlider = new Slider(0f, 1f, 0.1f, false, skin);
+        soundSlider.setValue(1f);
+        soundSlider.setSize(200f, 20f);
+        soundSlider.setPosition(50f, Gdx.graphics.getHeight() - 100f);
+
+        stage.addActor(musicSlider);
+        stage.addActor(soundSlider);
         pauseScreen.show();
         pauseScreen.render();
         multiplexer.addProcessor(pauseScreen.getStage());
