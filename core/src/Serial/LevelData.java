@@ -1,4 +1,4 @@
-package com.campee.starship.serial;
+package Serial;
 
 import java.io.Serializable;
 import java.util.ArrayList;
