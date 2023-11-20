@@ -1,4 +1,4 @@
-package com.campee.starship;
+package com.campee.starship.objects;
 
 import java.io.File;
 import java.io.FileNotFoundException;

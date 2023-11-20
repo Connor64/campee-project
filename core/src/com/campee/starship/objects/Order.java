@@ -1,4 +1,4 @@
-package com.campee.starship;
+package com.campee.starship.objects;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -75,7 +75,7 @@ public class Order {
 //CHANGE FOR DEMO SO WE DONT WAIT FOR ALL SIX :)
 
     public void setArray(ArrayList<String> array, String pathname) throws FileNotFoundException {
-        Scanner scanner = new Scanner(new File(pathname + ".txt"));
+        Scanner scanner = new Scanner(new File("orders/" + pathname + ".txt"));
         while (scanner.hasNext()) {
             String line = scanner.nextLine();
             array.add(line);

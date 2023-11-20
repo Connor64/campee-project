@@ -1,4 +1,4 @@
-package com.campee.starship;
+package com.campee.starship.objects;
 
 import com.badlogic.gdx.graphics.g2d.Sprite;
 
@@ -6,7 +6,7 @@ public class CoinObject extends GameObject {
     private boolean collected;
 
     public CoinObject(float x, float y) {
-        super("coin.PNG", x, y);
+        super("sprites/coin.png", x, y);
 
         collected = false;
     }

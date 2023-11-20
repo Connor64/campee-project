@@ -1,4 +1,4 @@
-package com.campee.starship;
+package com.campee.starship.screens;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
@@ -14,8 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
-import com.badlogic.gdx.utils.viewport.ScalingViewport;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.campee.starship.userinterface.CustomScrollPane;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -63,7 +62,8 @@ public class LevelScreen extends ScreenAdapter {
 
             // Add up to three level widgets in this row
             for (int j = i; j < Math.min(i + 3, levelFiles.length); j++) {
-                Table levelWidget = createLevelWidget(levelFiles[j].nameWithoutExtension());
+                String[] level_name = levelFiles[j].nameWithoutExtension().split("_");
+                Table levelWidget = createLevelWidget(level_name[1]);
                 rowTable.add(levelWidget).pad(40).center();
             }
 
@@ -152,12 +152,12 @@ public class LevelScreen extends ScreenAdapter {
         style.fontColor = color;
         return style;
     }
-    private Table createLevelWidget(final String levelName) {
+    private Table createLevelWidget(final String levelNumber) {
         Table levelWidget = new Table();
 //        levelWidget.setBackground(new TextureRegionDrawable(new TextureRegion(new Texture(createPixmap(new Color(0.8f, 0.6f, 1f, 1f))))));
 
         // Create a label
-        Label label = new Label(levelName, createLabelStyle(Color.BLACK));
+        Label label = new Label("Level " + levelNumber, createLabelStyle(Color.BLACK));
         label.setFontScale(1.2f);
 
 
@@ -179,7 +179,7 @@ public class LevelScreen extends ScreenAdapter {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 try {
-                    game.setScreen(new GameplayScreen((MoonshipGame) game, levelName));
+                    game.setScreen(new GameplayScreen((MoonshipGame) game, "level_" + levelNumber));
                     //System.out.println("hereeee");
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();

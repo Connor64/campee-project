@@ -1,4 +1,4 @@
-package com.campee.starship;
+package com.campee.starship.userinterface;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
