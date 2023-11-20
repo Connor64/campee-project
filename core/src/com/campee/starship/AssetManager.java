@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 import java.io.IOException;
@@ -11,12 +12,24 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 public class AssetManager {
+    public static final AssetManager INSTANCE;
+
+    static {
+        try {
+            INSTANCE = new AssetManager();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private HashMap<String, TextureRegion[]> tilesets;
     private HashMap<String, GameObject> gameObjects;
 
-    private final int TILE_SIZE = 16;
+    public final BitmapFont BUTTON_FONT, TITLE_FONT, GAMEPLAY_FONT;
 
-    public AssetManager() throws IOException {
+    public final int TILE_SIZE = 16;
+
+    private AssetManager() throws IOException {
         tilesets = new HashMap<>();
         gameObjects = new HashMap<>();
         
@@ -29,6 +42,18 @@ public class AssetManager {
         gameObjects.put("building_fountain", new BuildingObject("fountain.PNG", "fountain", 0, 0, 0, 1));
         gameObjects.put("building_panera", new BuildingObject("Panera.PNG", "Panera", 0, 0, 0.5f, 0.75f));
         gameObjects.put("coin", new CoinObject(0, 0));
+
+        BUTTON_FONT = new BitmapFont();
+        BUTTON_FONT.getData().scale(3);
+
+        TITLE_FONT = new BitmapFont(Gdx.files.internal("moonships_font.fnt"),
+                                    Gdx.files.internal("moonships_font.png"), false);
+        TITLE_FONT.setColor(1, 1, 0, 1);
+        TITLE_FONT.getData().scale(3);
+
+        GAMEPLAY_FONT = new BitmapFont();
+        GAMEPLAY_FONT.getData().scale(1.5f);
+        GAMEPLAY_FONT.setColor(Color.BLACK);
     }
 
     /**

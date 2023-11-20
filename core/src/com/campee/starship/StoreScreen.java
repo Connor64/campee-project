@@ -12,8 +12,10 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 public class StoreScreen implements Screen {
@@ -29,7 +31,6 @@ public class StoreScreen implements Screen {
         stage = new Stage(viewport);
         Gdx.input.setInputProcessor(stage);
 
-
         BitmapFont buttonFont = new BitmapFont();
         TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
         buttonFont.getData().setScale(1.5f);
@@ -37,6 +38,7 @@ public class StoreScreen implements Screen {
         textButtonStyle.fontColor = Color.BLACK;
         Pixmap backgroundPixmap = createRoundedRectanglePixmap(150, 60, 15, Color.valueOf("98FF98"));
         textButtonStyle.up = new TextureRegionDrawable(new TextureRegion(new Texture(backgroundPixmap)));
+
         backButton = new TextButton("BACK", textButtonStyle);
         backButton.setPosition(30, Gdx.graphics.getHeight() - 80);
         backButton.setSize(150, 60);
@@ -57,7 +59,19 @@ public class StoreScreen implements Screen {
             }
         });
 
+        Label.LabelStyle labelStyle = new Label.LabelStyle();
+        BitmapFont labelFont = new BitmapFont();
+        labelFont.getData().scale(5);
+        labelStyle.font = labelFont;
+        labelStyle.fontColor = Color.BLACK;
+
+        Label shopBanner = new Label("The Bits Shop", labelStyle);
+        shopBanner.setAlignment(Align.center);
+        shopBanner.setSize(300, 90);
+        shopBanner.setPosition(0, 0);
+
         stage.addActor(backButton);
+        stage.addActor(shopBanner);
     }
 
     @Override
@@ -72,7 +86,7 @@ public class StoreScreen implements Screen {
         Gdx.gl.glClearColor(0.7f, 0.9f, 1f, 1);
         Gdx.gl.glClear(Gdx.gl20.GL_COLOR_BUFFER_BIT);
 
-        stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 80f));
+//        stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 80f));
         // Update and render game elements
         stage.act(delta);
         stage.draw();
