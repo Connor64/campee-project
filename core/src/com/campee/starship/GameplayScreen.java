@@ -221,7 +221,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         gamepopup = new GamePopup(this, "", game, fileName);
         keepplayingpopup = new KeepPlayingPopup(this, "", game, fileName);
-        pauseScreen = new PauseScreen(this,"", game);
+        pauseScreen = new PauseScreen(this, "", game);
 
         // Make button style
         Pixmap backgroundPixmap = createRoundedRectanglePixmap(100, 50, 10, new Color(0.9f, 0, 0.9f, 0.6f)); // Adjust size and color
@@ -414,7 +414,9 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         //If game stats screen is not visible, keep the game going (else pause)
         //if (!gameStatsScreen.isVisible()) {
         if (!gamepopup.isVisible()) {
-            player.update(delta, keyProcessor);
+            if (!gamePaused) {
+                player.update(delta, keyProcessor);
+            }
             player.checkBounds(levelWidth, levelHeight);
             for (BuildingObject buildingObject : buildings) {
                 player.checkCollision(buildingObject, true);
@@ -533,10 +535,10 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                                 playerAttributes.ordersCompleted++;
                                 minOrderLabel.setText("Orders Completed: " + playerAttributes.ordersCompleted + "/" + minOrders);
                                 totalOrdersCompleted++;
-                                String orderID = playerAttributes.array.get(1).substring(4,9)/*order.getOrderString()*/;
+                                String orderID = playerAttributes.array.get(1).substring(4, 9)/*order.getOrderString()*/;
                                 //if (!deliveredOrderIDs.contains(orderID)) {
-                                    deliveredOrderIDs.add(orderID);
-                                    System.out.println("Order " + orderID + " (before removing) has been delivered and added to the list.");
+                                deliveredOrderIDs.add(orderID);
+                                System.out.println("Order " + orderID + " (before removing) has been delivered and added to the list.");
 
                                 //}
                                 playerAttributes.array.remove(1);
@@ -670,6 +672,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             stage.draw();
             popup.render();
             gamepopup.render();
+            pauseScreen.render();
             batch.end();
         }
         boolean timeLeft = true;
@@ -700,6 +703,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             }
             if (playerAttributes.ordersCompleted == minOrders && keepPlaying) {
                 keepPlayingPopup();
+                //pauseScreen();
                 popupInAction = true;
             }
         }
