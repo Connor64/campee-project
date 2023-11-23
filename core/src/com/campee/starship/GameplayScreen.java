@@ -95,7 +95,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     private TimerTask countdownTask = new TimerTask() {
         @Override
         public void run() {
-            if (!popupInAction && !keyProcessor.isPlayerMoving()) {
+            if (!popupInAction) {
                 if (countdownSeconds > 0) {
                     countdownSeconds--;
                 } else {
@@ -166,7 +166,6 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         stage = new Stage();
         keyProcessor = new KeyProcessor(this);
-        timeSinceLastMove = 0;
 
         // Create a Timer object to schedule the TimerTask
         countdownTimer.scheduleAtFixedRate(countdownTask, 500, 500);
@@ -223,6 +222,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             tutorialPopups = new TutorialPopups(this);
             isTutorialPopupsVisible = true;
             GameDifficulty.tutorial = true;
+            minOrders = 1;
+            countdownMinutes = 15;
         } else {
             tutorialPopups = null; // If fileName is not "Level 5", set tutorialPopups to null
             //isTutorialPopupsVisible = false;

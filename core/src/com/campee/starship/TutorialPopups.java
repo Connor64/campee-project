@@ -34,11 +34,11 @@ public class TutorialPopups implements Screen {
     private TextButton OKButton;
     private int currentStep;
     private String[] tutorialMessages = {
-            "Step 1: Move the WASD or \narrow keys to move around the map!",
-            "Step 2: Click the accept button\nto accept an order!",
-            "Step 3: Travel to the pickup building and \n press P to pick up the order!",
-            "Step 4: Make sure to collect coins \n on the way!",
-            "Step 5: Travel to the destination building and \n press d to drop off the order!"
+            "Use WASD or arrow keys \nto move around the map!",
+            "Click Accept button \n to accept an order!",
+            "Travel to the pickup building and \n press p to pick up the order!",
+            "Make sure to collect coins \n on the way!",
+            "Travel to the destination building and \n press d to drop off the order!"
     };
 
     private float popupWidth;
@@ -63,7 +63,7 @@ public class TutorialPopups implements Screen {
         font = new BitmapFont();
         font.setColor(1, 1, 1, 1); // White color
 
-        popupWidth = (float) (Gdx.graphics.getWidth() / 4.21);
+        popupWidth = (float) (Gdx.graphics.getWidth() / 4);
         popupHeight = 100;
         popupX = 0;
         popupY = 0;
@@ -152,7 +152,7 @@ public class TutorialPopups implements Screen {
                 stopScheduler();
                 //}
             }
-        }, 15, TimeUnit.SECONDS); // Schedule the next popup 15 seconds after the first one
+        }, 5, TimeUnit.SECONDS); // Schedule the next popup 15 seconds after the first one
     }
 
     public void stopScheduler() {
