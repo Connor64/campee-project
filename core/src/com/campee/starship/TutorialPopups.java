@@ -26,9 +26,9 @@ public class TutorialPopups implements Screen {
     private GameplayScreen screen;
     private Stage stage;
     private ShapeRenderer shapeRenderer;
-    ScheduledExecutorService scheduler;
+    ScheduledExecutorService scheduler2;
     private BitmapFont font;
-    private boolean OKClicked;
+    public boolean OKClicked;
     private boolean countDone;
     private Label messageLabel;
     private TextButton OKButton;
@@ -53,7 +53,7 @@ public class TutorialPopups implements Screen {
         stage = new Stage(viewport);
         Gdx.input.setInputProcessor(stage);
 
-        scheduler = Executors.newSingleThreadScheduledExecutor();
+        scheduler2 = Executors.newSingleThreadScheduledExecutor();
 
         shapeRenderer = new ShapeRenderer();
         OKClicked = false;
@@ -95,12 +95,14 @@ public class TutorialPopups implements Screen {
                         //count 15 seconds and let them play, then display next step
                         hideStepPopup();
                         messageLabel.setText(tutorialMessages[currentStep]);
-                        scheduleStep();
-
+                        //scheduleStep();
+                        screen.doneButton.setVisible(true);
                     } else {
                         // If no more steps, close the pop-up
                         screen.setTutorialPopupsVisible(false);
                     }
+                    //doneButton visible true
+
                 }
             }
         });
@@ -142,22 +144,52 @@ public class TutorialPopups implements Screen {
 
     }
 
-    private void scheduleStep() {
-        scheduler = Executors.newSingleThreadScheduledExecutor();
-        scheduler.schedule(new Runnable() {
+    public void scheduleStep() {
+        //scheduler2 = Executors.newSingleThreadScheduledExecutor();
+//        scheduler2.schedule(new Runnable() {
+//            @Override
+//            public void run() {
+//                System.out.println("Task executed after 5 seconds.");
+//                // Your logic here
+//            }
+//        }, 5, TimeUnit.SECONDS);
+        scheduler2 = Executors.newSingleThreadScheduledExecutor();
+        scheduler2.schedule(new Runnable() {
             @Override
             public void run() {
-                //if (!popupInAction) {
-                showStepPopup();
+                show();
+                System.out.println("Shutting down the scheduler.");
                 stopScheduler();
-                //}
             }
-        }, 5, TimeUnit.SECONDS); // Schedule the next popup 15 seconds after the first one
+        }, 15, TimeUnit.SECONDS);
+
+//        scheduler2.scheduleAtFixedRate(new Runnable() {
+//            @Override
+//            public void run() {
+//                //if (!popupInAction) {
+//                show();
+//                //stopScheduler();
+//                //}
+//            }
+//        }, 5,5, TimeUnit.SECONDS); // Schedule the next popup 15 seconds after the first one
     }
 
-    public void stopScheduler() {
-        if (scheduler != null) {
-            scheduler.shutdown();
+    public void scheduleStepDelay() {
+//        scheduler2 = Executors.newSingleThreadScheduledExecutor();
+        scheduler2.schedule(new Runnable() {
+            @Override
+            public void run() {
+                show();
+                System.out.println("Task executed after 5 seconds.");
+                // Your logic here
+            }
+        }, 5, TimeUnit.SECONDS);
+    }
+
+
+        public void stopScheduler() {
+        if (scheduler2 != null) {
+            scheduler2.shutdown();
         }
     }
 
@@ -165,9 +197,10 @@ public class TutorialPopups implements Screen {
         screen.tutorialPopups.hide(); // Hide the popup
     }
 
-    public void showStepPopup() {
-        screen.tutorialPopups.show(); // Display the popup
-    }
+//    public void showStepPopup() {
+//        screen.setTutorialPopupsVisible(true);
+//        screen.tutorialPopups.show(); // Display the popup
+//    }
 
 
     @Override

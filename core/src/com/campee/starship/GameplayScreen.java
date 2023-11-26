@@ -31,6 +31,7 @@ import java.util.concurrent.TimeUnit;
 public class GameplayScreen extends ApplicationAdapter implements Screen {
 
     private TextButton backButton;
+    public TextButton doneButton;
     private TextButton nextOrderButton;
     private TextButton gameStatsButton;
 
@@ -95,7 +96,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     private TimerTask countdownTask = new TimerTask() {
         @Override
         public void run() {
-            if (!popupInAction) {
+            if (!popupInAction && !isTutorialPopupsVisible) {
                 if (countdownSeconds > 0) {
                     countdownSeconds--;
                 } else {
@@ -127,6 +128,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
     private ShapeRenderer shapeRenderer;
     private boolean isBackButtonHovered = false;
+    private boolean isDoneButtonHovered = false;
     private boolean isOrderButtonHovered = false;
     float screenWidth;
     float screenHeight;
@@ -218,16 +220,6 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         gamepopup = new GamePopup(this, "", game, fileName);
         keepplayingpopup = new KeepPlayingPopup(this, "", game, fileName);
-        if ("Level 5".equals(fileName)) {
-            tutorialPopups = new TutorialPopups(this);
-            isTutorialPopupsVisible = true;
-            GameDifficulty.tutorial = true;
-            minOrders = 1;
-            countdownMinutes = 15;
-        } else {
-            tutorialPopups = null; // If fileName is not "Level 5", set tutorialPopups to null
-            //isTutorialPopupsVisible = false;
-        }
 
         // Make button style
         Pixmap backgroundPixmap = createRoundedRectanglePixmap(200, 50, 10, new Color(0.9f, 0, 0.9f, 0.6f)); // Adjust size and color
@@ -237,6 +229,52 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         buttonFont.getData().setScale(1.5f);
         buttonStyle.font = buttonFont;
         buttonStyle.fontColor = Color.BLACK;
+
+        if ("Level 5".equals(fileName)) {
+            tutorialPopups = new TutorialPopups(this);
+            //isTutorialPopupsVisible = true;
+            GameDifficulty.tutorial = true;
+            minOrders = 1;
+            countdownMinutes = 15;
+
+            //make done button
+            doneButton = new TextButton("Done!", buttonStyle);
+            doneButton.setVisible(false);
+            doneButton.setPosition(10, Gdx.graphics.getHeight() - 160); // Adjust the position as necessary
+            doneButton.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    //System.out.println("clicked back");
+                    isTutorialPopupsVisible = true;
+                    doneButton.setVisible(false);
+                }
+
+                @Override
+                public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+                    super.enter(event, x, y, pointer, fromActor);
+                    isDoneButtonHovered = true;
+                    doneButton.setColor(Color.LIGHT_GRAY);
+                }
+
+                @Override
+                public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
+                    super.exit(event, x, y, pointer, toActor);
+                    isDoneButtonHovered = false;
+                    doneButton.setColor(Color.WHITE);
+                }
+            });
+
+            if(tutorialPopups.OKClicked) {
+                doneButton.setVisible(true);
+            }
+            stage.addActor(doneButton);
+
+        } else {
+            tutorialPopups = null; // If fileName is not "Level 5", set tutorialPopups to null
+            //isTutorialPopupsVisible = false;
+        }
+
+
 
         // Make back button
         backButton = new TextButton("Back", buttonStyle);
@@ -338,7 +376,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         autoDeclineLabel.setSize(font.getScaleX() * 16, font.getScaleY() * 16);
 
         schedulePopupDisplay();
-
+        tutorialPopups.scheduleStepDelay();
+        //tutorialPopups.scheduleStep();
 
     }
 
@@ -561,7 +600,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                         playerAttributes.array.remove(i);
                         messageTimer = 0.0f;
                     } else {
-                        if (!popupInAction) {
+                        if (!popupInAction && !isTutorialPopupsVisible) {
                             if (timeCount[i - 1] % 60 == 0) {
                                 time -= 1;
                                 orderTimeLeft[i - 1] = time;
@@ -752,12 +791,12 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         scheduler.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
-                if (!popupInAction ) {
+                if (!popupInAction && !isTutorialPopupsVisible) {
                     showTimedPopup(); // Show the popup
                     scheduler.schedule(new Runnable() {
                         @Override
                         public void run() {
-                            if (!popupInAction) {
+                            if (!popupInAction && !isTutorialPopupsVisible) {
                                 // Hide the popup
                                 hideTimedPopup();
                                 if (!popup.acceptClicked() && !popup.declineClicked() && !ordersDone) {
@@ -765,7 +804,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                                     scheduler.schedule(new Runnable() {
                                         @Override
                                         public void run() {
-                                            if (!popupInAction) {
+                                            if (!popupInAction && !isTutorialPopupsVisible) {
                                                 autoDeclineLabel.setVisible(false); // Remove the label from the display
                                             }
                                         }
