@@ -36,11 +36,11 @@ public class PauseScreen {
     private boolean exitClicked;
     private boolean isResumeButtonHovered = false;
     private boolean isExitButtonHovered = false;
-    private Slider musicSlider;
-    private Slider soundSlider;
+    //private Slider musicSlider;
+    //private Slider soundSlider;
 
 
-    public PauseScreen(final GameplayScreen screen, final String notificationMessage, final Game game, Skin skin) {
+    public PauseScreen(final GameplayScreen screen, final String notificationMessage, final Game game, Skin skin, Slider musicSlider, Slider soundSlider) {
         this.game = game;
         stage = new Stage();
         shapeRenderer = new ShapeRenderer();
@@ -67,17 +67,17 @@ public class PauseScreen {
         soundEffectsLabel.setPosition(200, 250);
 
         // Create music volume slider
-        musicSlider = new Slider(0f, 1f, 0.1f, false, skin);
-        musicSlider.setValue(1f);
-        musicSlider.setSize(200f, 20f);
-        musicSlider.setPosition(200f, Gdx.graphics.getHeight() - 300f);
+        //musicSlider = new Slider(0f, 1f, 0.1f, false, skin);
+        //screen.musicSlider.setValue(1f);
+//        screen.musicSlider.setSize(250f, 25f);
+//        screen.musicSlider.setPosition(200f, Gdx.graphics.getHeight() - 300f);
         stage.addActor(musicSlider);
 
         // Create sound volume slider
-        soundSlider = new Slider(0f, 1f, 0.1f, false, skin);
-        soundSlider.setValue(1f);
-        soundSlider.setSize(200f, 20f);
-        soundSlider.setPosition(200f, Gdx.graphics.getHeight() - 400f);
+//        soundSlider = new Slider(0f, 1f, 0.1f, false, skin);
+//        soundSlider.setValue(1f);
+//        soundSlider.setSize(250f, 25f);
+//        soundSlider.setPosition(200f, Gdx.graphics.getHeight() - 400f);
         stage.addActor(soundSlider);
 
         Pixmap resumeBackgroundPixmap = createRoundedRectanglePixmap(1000, 200, 10, Color.GREEN); // Adjust size and color
@@ -176,13 +176,13 @@ public class PauseScreen {
 //        optionLabel.setVisible(true);
 //    }
 
-    public Slider getMusicSlider() {
-        return musicSlider;
-    }
+//    public Slider getMusicSlider() {
+//        return musicSlider;
+//    }
 
-    public Slider getSoundSlider() {
-        return soundSlider;
-    }
+//    public Slider getSoundSlider() {
+//        return soundSlider;
+//    }
 
     public void show() {
         visible = true;
