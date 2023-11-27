@@ -71,6 +71,9 @@ public class LevelScreen extends ScreenAdapter {
                 if (j - 1 >= 0) {
                     Table levelWidget = createLevelWidget(levelFiles[j].nameWithoutExtension(), levelFiles[j - 1].nameWithoutExtension());
                     rowTable.add(levelWidget).pad(40).center();
+                } else if (j - 1 == -1) {
+                    Table levelWidget = createLevelWidget(levelFiles[j].nameWithoutExtension(), "start");
+                    rowTable.add(levelWidget).pad(40).center();
                 } else {
                     Table levelWidget = createLevelWidget(levelFiles[j].nameWithoutExtension(), "");
                     rowTable.add(levelWidget).pad(40).center();
@@ -184,21 +187,26 @@ public class LevelScreen extends ScreenAdapter {
         levelButtonStyle.up = new TextureRegionDrawable(new TextureRegion(new Texture(createRoundedRectanglePixmap(100, 45, 15, Color.DARK_GRAY))));
         //levelButtonStyle.down = new TextureRegionDrawable(new TextureRegion(new Texture(createRoundedRectanglePixmap(150, 60, 15, Color.YELLOW))))
 
-
+        //System.out.println(prevLevelName);
         final TextButton levelButton = new TextButton("LOCKED", levelButtonStyle);
         try {
             FileHandle playerDataFile = Gdx.files.internal("playerdata.txt");
             String[] lines = playerDataFile.readString().split("\n");
+            if (prevLevelName.equals("start")) {
+                levelButtonStyle.up = new TextureRegionDrawable(
+                        new TextureRegion(new Texture(createRoundedRectanglePixmap(100, 45, 15, Color.GREEN))));
+                levelButton.setText("UNLOCKED");
+            }
             for (String line : lines) {
                 if (line.trim().equals(levelName + ":passed")) {
                     levelButtonStyle.up = new TextureRegionDrawable(
                             new TextureRegion(new Texture(createRoundedRectanglePixmap(100, 45, 15, Color.GREEN))));
-                    levelButton.setText("UNLOCKED" + "\uD83D\uDD12");
+                    levelButton.setText("UNLOCKED");
                     break; // Stop checking once the level is unlocked
                 } else if (line.trim().equals(prevLevelName + ":passed")) {
                     levelButtonStyle.up = new TextureRegionDrawable(
                             new TextureRegion(new Texture(createRoundedRectanglePixmap(100, 45, 15, Color.GREEN))));
-                    levelButton.setText("UNLOCKED" + "\uD83D\uDD12");
+                    levelButton.setText("UNLOCKED");
                     break;
                 } else {
                     levelButtonStyle.up = new TextureRegionDrawable(
