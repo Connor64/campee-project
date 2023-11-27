@@ -1,7 +1,9 @@
-package com.campee.starship;
+package com.campee.starship.managers;
 
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
+
+import com.campee.starship.screens.*;
 
 public class KeyProcessor implements InputProcessor {
     //arrow keys

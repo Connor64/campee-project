@@ -1,4 +1,4 @@
-package com.campee.starship;
+package com.campee.starship.screens;
 
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.Game;
@@ -40,7 +40,7 @@ public class SplashScreen implements Screen {
 //        font.setColor(1, 1, 0, 1);
 //        font.getData().setScale(3);
 
-        img = new Texture(Gdx.files.internal("campee_logo.png"));
+        img = new Texture(Gdx.files.internal("sprites/campee_logo.png"));
 
         glyphLayout = new GlyphLayout();
         viewport = new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());

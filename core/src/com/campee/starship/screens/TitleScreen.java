@@ -1,4 +1,4 @@
-package com.campee.starship;
+package com.campee.starship.screens;
 
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.Game;
@@ -39,14 +39,14 @@ public class TitleScreen implements Screen {
     public TitleScreen(final MoonshipGame game) {
         this.game = game;
         batch = new SpriteBatch();
-        font = new BitmapFont(Gdx.files.internal("moonships_font.fnt"), Gdx.files.internal("moonships_font.png"), false);
+        font = new BitmapFont(Gdx.files.internal("fonts/moonships_font.fnt"), Gdx.files.internal("fonts/moonships_font.png"), false);
         //font = new BitmapFont();
 
         // Set font color and scale
         font.setColor(1, 1, 0, 1);
         font.getData().setScale(3);
 
-        img = new Texture(Gdx.files.internal("title_moonship.PNG"));
+        img = new Texture(Gdx.files.internal("sprites/title_moonship.png"));
 
         glyphLayout = new GlyphLayout();
         viewport = new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());

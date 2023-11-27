@@ -1,4 +1,4 @@
-package com.campee.starship;
+package com.campee.starship.objects;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
@@ -38,19 +38,19 @@ public class BuildingObject extends GameObject {
         bounds.height *= collisionRatio;
 
         // flag sprites and textures
-        Texture pickupTexture = new Texture(Gdx.files.internal("pickup flag.PNG"));
+        Texture pickupTexture = new Texture(Gdx.files.internal("sprites/pickup_flag.png"));
         pickupTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         TextureRegion pickUpRegion = new TextureRegion(pickupTexture, 0, 0, pickupTexture.getWidth(), pickupTexture.getHeight());
         pickSprite = new Sprite(pickUpRegion);
         pickSprite.setPosition(getBounds().getX() + (getBounds().getWidth() / 2), getBounds().getY() + ((getBounds().getHeight() * 2)));
 
-        Texture pickupTextureYellow = new Texture(Gdx.files.internal("pickup flag yellow.PNG"));
+        Texture pickupTextureYellow = new Texture(Gdx.files.internal("sprites/pickup_flag_yellow.png"));
         pickupTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         TextureRegion pickUpRegionYellow = new TextureRegion(pickupTextureYellow, 0, 0, pickupTextureYellow.getWidth(), pickupTextureYellow.getHeight());
         pickSpriteYellow = new Sprite(pickUpRegionYellow);
         pickSpriteYellow.setPosition(pickSprite.getX(), pickSprite.getY());
 
-        Texture dropoffTexture = new Texture(Gdx.files.internal("dropoff flag.PNG"));
+        Texture dropoffTexture = new Texture(Gdx.files.internal("sprites/dropoff_flag.png"));
         dropoffTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         TextureRegion dropOffRegion = new TextureRegion(dropoffTexture, 0, 0, dropoffTexture.getWidth(), dropoffTexture.getHeight());
         dropSprite = new Sprite(dropOffRegion);
