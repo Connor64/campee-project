@@ -187,8 +187,45 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         layers = new ArrayList<>();
         loadLevel(fileName);
 
-        minOrders = 2/*levelData.minOrders*/;
-        goalTime = 300/*levelData.goalTime*/;
+        //Level information
+        /*
+        if ("".equals(fileName)) {
+            GameDifficulty.tutorial = true;
+        }
+        */
+        if ("level_6".equals(fileName)) {
+            GameDifficulty.easy = true;
+        }
+         /*
+        if ("".equals(fileName)) {
+            GameDifficulty.medium = true;
+        }
+        */
+        if ("level_5".equals(fileName)) {
+            GameDifficulty.hard = true;
+        }
+
+        if (GameDifficulty.tutorial) {
+            minOrders = 2   /*levelData.minOrders*/;
+            goalTime = 300 /*levelData.goalTime*/;
+            countdownMinutes = 15;
+        }
+
+        if (GameDifficulty.easy) {
+            minOrders = 2;
+            goalTime = 400;
+            countdownMinutes = 5;
+        }
+        if (GameDifficulty.medium) {
+            minOrders = 3;
+            goalTime = 500;
+            countdownMinutes = 4;
+        }
+        if (GameDifficulty.hard) {
+            minOrders = 4;
+            goalTime = 300;
+            countdownMinutes = 3;
+        }
 
         // Define side panel properties
         sidePanelWidth = Gdx.graphics.getWidth() / 5; // Width
