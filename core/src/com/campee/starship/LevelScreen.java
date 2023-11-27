@@ -193,6 +193,11 @@ public class LevelScreen extends ScreenAdapter {
         ImageButton lockButton = new ImageButton(lockButtonStyle);
         lockButton.getImageCell().size(20, 30);
 
+        ImageButton.ImageButtonStyle unlockButtonStyle = new ImageButton.ImageButtonStyle();
+        unlockButtonStyle.imageUp = new TextureRegionDrawable(new TextureRegion(new Texture("unlock-image.png")));
+        ImageButton unlockButton = new ImageButton(unlockButtonStyle);
+        unlockButton.getImageCell().size(30, 40);
+
 
         Boolean isLocked = false;
         //System.out.println(prevLevelName);
@@ -228,8 +233,9 @@ public class LevelScreen extends ScreenAdapter {
             e.printStackTrace();
         }
         if (isLocked) {
-            //levelWidget.add(lockButton).padBottom(5).colspan(3).center().row();
             levelWidget.add(lockButton).padBottom(5).colspan(3).center().row();
+        } else {
+            levelWidget.add(unlockButton).padBottom(5).colspan(3).center().row();
         }
         //final TextButton levelButton = new TextButton("LOCKED", levelButtonStyle);
 
