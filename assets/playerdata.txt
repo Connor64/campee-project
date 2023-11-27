@@ -1,2 +1,3 @@
 Level 0:passed
 Level 1:passed
+Level 6:passed

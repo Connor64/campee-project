@@ -20,6 +20,9 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import static com.badlogic.gdx.Input.Keys.U;
+
+
 public class LevelScreen extends ScreenAdapter {
     public static String nameOfFile;
     private final Game game;
@@ -35,6 +38,7 @@ public class LevelScreen extends ScreenAdapter {
     private boolean isSettingButtonHovered = false;
     private boolean isButtonHovered = false;
     private Stage stage2;
+    //private String prevLevelName;
 
     public LevelScreen(final Game game) {
         this.game = game;
@@ -64,8 +68,13 @@ public class LevelScreen extends ScreenAdapter {
 
             // Add up to three level widgets in this row
             for (int j = i; j < Math.min(i + 3, levelFiles.length); j++) {
-                Table levelWidget = createLevelWidget(levelFiles[j].nameWithoutExtension());
-                rowTable.add(levelWidget).pad(40).center();
+                if (j - 1 >= 0) {
+                    Table levelWidget = createLevelWidget(levelFiles[j].nameWithoutExtension(), levelFiles[j - 1].nameWithoutExtension());
+                    rowTable.add(levelWidget).pad(40).center();
+                } else {
+                    Table levelWidget = createLevelWidget(levelFiles[j].nameWithoutExtension(), "");
+                    rowTable.add(levelWidget).pad(40).center();
+                }
             }
 
             // Add the rowTable to the innerTable
@@ -154,7 +163,7 @@ public class LevelScreen extends ScreenAdapter {
         style.fontColor = color;
         return style;
     }
-    private Table createLevelWidget(final String levelName) {
+    private Table createLevelWidget(final String levelName, final String prevLevelName) {
         Table levelWidget = new Table();
 //        levelWidget.setBackground(new TextureRegionDrawable(new TextureRegion(new Texture(createPixmap(new Color(0.8f, 0.6f, 1f, 1f))))));
 
@@ -173,7 +182,8 @@ public class LevelScreen extends ScreenAdapter {
         levelButtonStyle.font = levelButtonFont;
         levelButtonStyle.fontColor = Color.BLACK;
         levelButtonStyle.up = new TextureRegionDrawable(new TextureRegion(new Texture(createRoundedRectanglePixmap(100, 45, 15, Color.DARK_GRAY))));
-        //levelButtonStyle.down = new TextureRegionDrawable(new TextureRegion(new Texture(createRoundedRectanglePixmap(150, 60, 15, Color.YELLOW))));
+        //levelButtonStyle.down = new TextureRegionDrawable(new TextureRegion(new Texture(createRoundedRectanglePixmap(150, 60, 15, Color.YELLOW))))
+
 
         final TextButton levelButton = new TextButton("LOCKED", levelButtonStyle);
         try {
@@ -183,8 +193,13 @@ public class LevelScreen extends ScreenAdapter {
                 if (line.trim().equals(levelName + ":passed")) {
                     levelButtonStyle.up = new TextureRegionDrawable(
                             new TextureRegion(new Texture(createRoundedRectanglePixmap(100, 45, 15, Color.GREEN))));
-                    levelButton.setText("UNLOCKED");
+                    levelButton.setText("UNLOCKED" + "\uD83D\uDD12");
                     break; // Stop checking once the level is unlocked
+                } else if (line.trim().equals(prevLevelName + ":passed")) {
+                    levelButtonStyle.up = new TextureRegionDrawable(
+                            new TextureRegion(new Texture(createRoundedRectanglePixmap(100, 45, 15, Color.GREEN))));
+                    levelButton.setText("UNLOCKED" + "\uD83D\uDD12");
+                    break;
                 } else {
                     levelButtonStyle.up = new TextureRegionDrawable(
                             new TextureRegion(new Texture(createRoundedRectanglePixmap(100, 45, 15, Color.DARK_GRAY))));
