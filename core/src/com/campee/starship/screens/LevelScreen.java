@@ -24,6 +24,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.badlogic.gdx.Input.Keys.U;
+
+
 public class LevelScreen extends ScreenAdapter {
     public static String nameOfFile;
     private final Game game;
@@ -39,6 +42,7 @@ public class LevelScreen extends ScreenAdapter {
     private boolean isSettingButtonHovered = false;
     private boolean isButtonHovered = false;
     private Stage stage2;
+    //private String prevLevelName;
 
     public LevelScreen(final Game game) {
         this.game = game;
@@ -165,6 +169,7 @@ public class LevelScreen extends ScreenAdapter {
         style.fontColor = color;
         return style;
     }
+
     private Table createLevelWidget(final String levelNumber) {
         Table levelWidget = new Table();
 //        levelWidget.setBackground(new TextureRegionDrawable(new TextureRegion(new Texture(createPixmap(new Color(0.8f, 0.6f, 1f, 1f))))));
@@ -184,8 +189,22 @@ public class LevelScreen extends ScreenAdapter {
         levelButtonStyle.font = levelButtonFont;
         levelButtonStyle.fontColor = Color.BLACK;
         levelButtonStyle.up = new TextureRegionDrawable(new TextureRegion(new Texture(createRoundedRectanglePixmap(100, 45, 15, Color.DARK_GRAY))));
-        //levelButtonStyle.down = new TextureRegionDrawable(new TextureRegion(new Texture(createRoundedRectanglePixmap(150, 60, 15, Color.YELLOW))));
+        //levelButtonStyle.down = new TextureRegionDrawable(new TextureRegion(new Texture(createRoundedRectanglePixmap(150, 60, 15, Color.YELLOW))))
 
+
+        ImageButton.ImageButtonStyle lockButtonStyle = new ImageButton.ImageButtonStyle();
+        lockButtonStyle.imageUp = new TextureRegionDrawable(new TextureRegion(new Texture("lock-image.png")));
+        ImageButton lockButton = new ImageButton(lockButtonStyle);
+        lockButton.getImageCell().size(20, 30);
+
+        ImageButton.ImageButtonStyle unlockButtonStyle = new ImageButton.ImageButtonStyle();
+        unlockButtonStyle.imageUp = new TextureRegionDrawable(new TextureRegion(new Texture("unlock-image.png")));
+        ImageButton unlockButton = new ImageButton(unlockButtonStyle);
+        unlockButton.getImageCell().size(30, 40);
+
+
+        boolean isLocked = false;
+        //System.out.println(prevLevelName);
         final TextButton levelButton = new TextButton("LOCKED", levelButtonStyle);
 
         if (DataManager.INSTANCE.levelExists(levelNumber)) {
@@ -193,37 +212,16 @@ public class LevelScreen extends ScreenAdapter {
                 levelButtonStyle.up = new TextureRegionDrawable(
                         new TextureRegion(new Texture(createRoundedRectanglePixmap(100, 45, 15, Color.GREEN))));
                 levelButton.setText("UNLOCKED");
+                levelWidget.add(unlockButton).padBottom(5).colspan(3).center().row();
             } else {
                 levelButtonStyle.up = new TextureRegionDrawable(
                         new TextureRegion(new Texture(createRoundedRectanglePixmap(100, 45, 15, Color.DARK_GRAY))));
                 levelButton.setText("LOCKED");
+                levelWidget.add(lockButton).padBottom(5).colspan(3).center().row();
+                isLocked = true;
             }
         }
-
-//        try {
-//            FileHandle playerDataFile = Gdx.files.internal("playerdata.txt");
-//            String[] lines = playerDataFile.readString().split("\n");
-//            for (String line : lines) {
-//                if (line.trim().equals("Level " + levelNumber + ":passed")) {
-//                    levelButtonStyle.up = new TextureRegionDrawable(
-//                            new TextureRegion(new Texture(createRoundedRectanglePixmap(100, 45, 15, Color.GREEN))));
-//                    levelButton.setText("UNLOCKED");
-//                    break; // Stop checking once the level is unlocked
-//                } else {
-//                    levelButtonStyle.up = new TextureRegionDrawable(
-//                            new TextureRegion(new Texture(createRoundedRectanglePixmap(100, 45, 15, Color.DARK_GRAY))));
-//                    levelButton.setText("LOCKED");
-//                }
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-
         //final TextButton levelButton = new TextButton("LOCKED", levelButtonStyle);
-
-
-
-
 
         levelButton.setSize(10, 20);
         levelButton.addListener(new ClickListener() {
@@ -278,6 +276,7 @@ public class LevelScreen extends ScreenAdapter {
         levelWidget.pad(30);
 
         return levelWidget;
+
     }
 
     private Label.LabelStyle createLabelStyle(Color color) {
