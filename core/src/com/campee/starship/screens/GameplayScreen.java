@@ -96,6 +96,11 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     // music and sound
     Music gameplayMusic;
     Sound coinCollect;
+    Sound dropoffSuccess;
+    Sound pickupSuccess;
+    Sound levelWin;
+    Sound levelFail;
+    Sound newOrderNotif;
 
 
     // Create a TimerTask to decrement the countdown timer
@@ -225,8 +230,10 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         gameplayMusic = Gdx.audio.newMusic(Gdx.files.internal("audio/music_demo.mp3"));
         gameplayMusic.setLooping(true);
         gameplayMusic.setVolume(0.5f);
+        dropoffSuccess = Gdx.audio.newSound(Gdx.files.internal("audio/successful dropoff.mp3"));
+        pickupSuccess = Gdx.audio.newSound(Gdx.files.internal("audio/pickup success.wav"));
+        newOrderNotif = Gdx.audio.newSound(Gdx.files.internal("audio/new order notification.mp3"));
         coinCollect = Gdx.audio.newSound(Gdx.files.internal("audio/coin_collect.mp3"));
-
         gamepopup = new GamePopup(this, "", game, fileName);
         keepplayingpopup = new KeepPlayingPopup(this, "", game, fileName);
 
@@ -428,6 +435,11 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             // start music
             gameplayMusic.play();
 
+            if (keepplayingpopup.isVisible()) {
+                gameplayMusic.pause();
+                newOrderNotif.pause();
+            }
+
             // coin collision
             for (CoinObject coin : coins) {
                 if (!coin.isCollected()) {
@@ -518,6 +530,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                             pickupLabel.setVisible(true);
                             if (keyProcessor.pPressed) {
                                 order.setPickedUp(true);
+                                long id = pickupSuccess.play();
+                                pickupSuccess.setVolume(id, 0.3f);
                                 order.setDroppedOff(false);
                                 pickupLabel.setVisible(false);
                             }
@@ -531,6 +545,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                             if (keyProcessor.oPressed) {
                                 order.setPickedUp(false);
                                 order.setDroppedOff(true);
+                                long id = dropoffSuccess.play();
+                                dropoffSuccess.setVolume(id, 0.09f);
                                 playerAttributes.ordersCompleted++;
                                 minOrderLabel.setText("Orders Completed: " + playerAttributes.ordersCompleted + "/" + minOrders);
                                 totalOrdersCompleted++;
@@ -674,6 +690,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             batch.end();
         } else {
             gameplayMusic.pause();
+            newOrderNotif.pause();
         }
         boolean timeLeft = true;
         if (countdownSeconds == 0 && countdownMinutes == 0) {
@@ -792,6 +809,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             public void run() {
                 if (!popupInAction) {
                     showTimedPopup(); // Show the popup
+                    long id = newOrderNotif.play();
+                    newOrderNotif.setVolume(id, 0.9f);
                     scheduler.schedule(new Runnable() {
                         @Override
                         public void run() {
