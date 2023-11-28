@@ -264,7 +264,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             //make done button
             doneButton = new TextButton("Done!", buttonStyle);
             doneButton.setVisible(false);
-            doneButton.setPosition(0, 0); // Adjust the position as necessary
+            doneButton.setPosition(0, 30); // Adjust the position as necessary
             doneButton.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
