@@ -17,6 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.campee.starship.screens.GameplayScreen;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -29,16 +30,17 @@ public class TutorialPopups implements Screen {
     ScheduledExecutorService scheduler2;
     private BitmapFont font;
     public boolean OKClicked;
+    public boolean isOKButtonHovered;
     private boolean countDone;
     private Label messageLabel;
     private TextButton OKButton;
     private int currentStep;
     private String[] tutorialMessages = {
-            "Use WASD or arrow keys \nto move around the map!",
-            "Click Accept button \n to accept an order!",
-            "Travel to the pickup building and \n press p to pick up the order!",
-            "Make sure to collect coins \n on the way!",
-            "Travel to the destination building and \n press d to drop off the order!"
+            "Use WASD or arrow keys\nto move around the map! You\nneed to complete the required\norders in the given time!",
+            "Click Accept button to accept an\norder! You can see order\ninformation in this popup and\nin the order panel once accepted!",
+            "Travel to the pickup building and\npress p to pick up the order! You\nwill see the order change color\nwhen its picked up.",
+            "Make sure to collect coins on the\nway! You can see how many\nyou've collected at the top of the\nscreen.",
+            "Travel to the destination building\nand press d to drop off the order!\nThe orders completed will be\nincremented and you will see the\ngame stats screen when time is up!"
     };
 
     private float popupWidth;
@@ -59,12 +61,13 @@ public class TutorialPopups implements Screen {
         OKClicked = false;
         countDone = false;
         currentStep = 0;
+        isOKButtonHovered = false;
 
         font = new BitmapFont();
         font.setColor(1, 1, 1, 1); // White color
 
-        popupWidth = (float) (Gdx.graphics.getWidth() / 4);
-        popupHeight = 100;
+        popupWidth = (float) (Gdx.graphics.getWidth() / 3.3);
+        popupHeight = 135;
         popupX = 0;
         popupY = 0;
 
@@ -105,6 +108,20 @@ public class TutorialPopups implements Screen {
 
                 }
             }
+
+            @Override
+            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+                super.enter(event, x, y, pointer, fromActor);
+                isOKButtonHovered = true;
+                OKButton.setColor(Color.LIGHT_GRAY);
+            }
+
+            @Override
+            public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
+                super.exit(event, x, y, pointer, toActor);
+                isOKButtonHovered = false;
+                OKButton.setColor(Color.WHITE);
+            }
         });
 
         stage.addActor(OKButton);
@@ -129,7 +146,7 @@ public class TutorialPopups implements Screen {
             Gdx.gl.glEnable(GL20.GL_BLEND);
             Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
             shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-            shapeRenderer.setColor(new Color(0, 0, 0, 0.5f));
+            shapeRenderer.setColor(new Color(0, 0, 0, 0.7f));
             shapeRenderer.rect(popupX, popupY, popupWidth, popupHeight);
             shapeRenderer.end();
             Gdx.gl.glDisable(GL20.GL_BLEND);
@@ -180,10 +197,10 @@ public class TutorialPopups implements Screen {
             @Override
             public void run() {
                 show();
-                System.out.println("Task executed after 5 seconds.");
+                System.out.println("Task executed after 3 seconds.");
                 // Your logic here
             }
-        }, 5, TimeUnit.SECONDS);
+        }, 1, TimeUnit.SECONDS);
     }
 
 

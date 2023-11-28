@@ -21,6 +21,8 @@ import com.badlogic.gdx.utils.ScreenUtils;
 
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
+import com.campee.starship.GameDifficulty;
+import com.campee.starship.TutorialPopups;
 import com.campee.starship.objects.*;
 import com.campee.starship.managers.*;
 import com.campee.starship.userinterface.*;
@@ -244,7 +246,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         buttonStyle.font = buttonFont;
         buttonStyle.fontColor = Color.BLACK;
 
-        if ("Level 5".equals(fileName)) {
+        if ("level_5".equals(fileName)) {
+            System.out.println("in tutorial");
             tutorialPopups = new TutorialPopups(this);
             //isTutorialPopupsVisible = true;
             GameDifficulty.tutorial = true;
@@ -254,7 +257,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             //make done button
             doneButton = new TextButton("Done!", buttonStyle);
             doneButton.setVisible(false);
-            doneButton.setPosition(10, Gdx.graphics.getHeight() - 160); // Adjust the position as necessary
+            doneButton.setPosition(0, 0); // Adjust the position as necessary
             doneButton.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
@@ -426,8 +429,9 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         //If game stats screen is not visible, keep the game going (else pause)
         //if (!gameStatsScreen.isVisible()) {
         if (!gamepopup.isVisible()) {
-
-            player.update(delta, keyProcessor);
+            if (!isTutorialPopupsVisible){
+                player.update(delta, keyProcessor);
+            }
             player.checkBounds(levelWidth, levelHeight);
             for (BuildingObject buildingObject : buildings) {
                 player.checkCollision(buildingObject, true);
