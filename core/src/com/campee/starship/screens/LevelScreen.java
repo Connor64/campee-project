@@ -1,5 +1,6 @@
 package com.campee.starship.screens;
 
+import Serial.LevelData;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
@@ -14,10 +15,14 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.campee.starship.managers.AssetManager;
+import com.campee.starship.managers.DataManager;
 import com.campee.starship.userinterface.CustomScrollPane;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class LevelScreen extends ScreenAdapter {
     public static String nameOfFile;
@@ -43,6 +48,8 @@ public class LevelScreen extends ScreenAdapter {
         font.setColor(Color.BLACK);
         viewport = new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
+        DataManager.INSTANCE.isLevelUnlocked("0");
+
         Table outerTable = new Table();
         outerTable.setFillParent(true);
         stage.addActor(outerTable);
@@ -50,27 +57,31 @@ public class LevelScreen extends ScreenAdapter {
         Table innerTable = new Table();
         outerTable.add(innerTable).center();
 
-        FileHandle levelsFolder = Gdx.files.internal("levels");
-        FileHandle[] levelFiles = levelsFolder.list();
-
         Label titleLabel = new Label("LEVEL SELECT SCREEN", createTitleLabelStyle(Color.BLACK));
 
         // Add title label to the top of the window with some padding
         innerTable.add(titleLabel).padTop(50).colspan(3).center().row();
 
-        for (int i = 0; i < levelFiles.length; i += 3) {
-            Table rowTable = new Table(); // Create a new table for each row
+        int index = 0;
+        HashMap<String, LevelData> levels = AssetManager.INSTANCE.getLevels();
+        Table rowTable = new Table(); // Create a new table for each row
+
+        for (Map.Entry<String, LevelData> entry : levels.entrySet()) {
+            Table levelWidget = createLevelWidget(entry.getKey());
+            rowTable.add(levelWidget).pad(40).center();
+
+            index++;
 
             // Add up to three level widgets in this row
-            for (int j = i; j < Math.min(i + 3, levelFiles.length); j++) {
-                String[] level_name = levelFiles[j].nameWithoutExtension().split("_");
-                Table levelWidget = createLevelWidget(level_name[1]);
-                rowTable.add(levelWidget).pad(40).center();
+            if (index >= 3) {
+                // Add the rowTable to the innerTable
+                innerTable.add(rowTable).row();
+                rowTable = new Table();
+                index = 0;
             }
-
-            // Add the rowTable to the innerTable
-            innerTable.add(rowTable).row();
         }
+
+        if (index != 0) innerTable.add(rowTable).row();
 
         CustomScrollPane customScrollPane = new CustomScrollPane(innerTable, stage);
         customScrollPane.setScrollingDisabled(true, false);
@@ -176,24 +187,37 @@ public class LevelScreen extends ScreenAdapter {
         //levelButtonStyle.down = new TextureRegionDrawable(new TextureRegion(new Texture(createRoundedRectanglePixmap(150, 60, 15, Color.YELLOW))));
 
         final TextButton levelButton = new TextButton("LOCKED", levelButtonStyle);
-        try {
-            FileHandle playerDataFile = Gdx.files.internal("playerdata.txt");
-            String[] lines = playerDataFile.readString().split("\n");
-            for (String line : lines) {
-                if (line.trim().equals("Level " + levelNumber + ":passed")) {
-                    levelButtonStyle.up = new TextureRegionDrawable(
-                            new TextureRegion(new Texture(createRoundedRectanglePixmap(100, 45, 15, Color.GREEN))));
-                    levelButton.setText("UNLOCKED");
-                    break; // Stop checking once the level is unlocked
-                } else {
-                    levelButtonStyle.up = new TextureRegionDrawable(
-                            new TextureRegion(new Texture(createRoundedRectanglePixmap(100, 45, 15, Color.DARK_GRAY))));
-                    levelButton.setText("LOCKED");
-                }
+
+        if (DataManager.INSTANCE.levelExists(levelNumber)) {
+            if (DataManager.INSTANCE.isLevelUnlocked(levelNumber)) {
+                levelButtonStyle.up = new TextureRegionDrawable(
+                        new TextureRegion(new Texture(createRoundedRectanglePixmap(100, 45, 15, Color.GREEN))));
+                levelButton.setText("UNLOCKED");
+            } else {
+                levelButtonStyle.up = new TextureRegionDrawable(
+                        new TextureRegion(new Texture(createRoundedRectanglePixmap(100, 45, 15, Color.DARK_GRAY))));
+                levelButton.setText("LOCKED");
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
+
+//        try {
+//            FileHandle playerDataFile = Gdx.files.internal("playerdata.txt");
+//            String[] lines = playerDataFile.readString().split("\n");
+//            for (String line : lines) {
+//                if (line.trim().equals("Level " + levelNumber + ":passed")) {
+//                    levelButtonStyle.up = new TextureRegionDrawable(
+//                            new TextureRegion(new Texture(createRoundedRectanglePixmap(100, 45, 15, Color.GREEN))));
+//                    levelButton.setText("UNLOCKED");
+//                    break; // Stop checking once the level is unlocked
+//                } else {
+//                    levelButtonStyle.up = new TextureRegionDrawable(
+//                            new TextureRegion(new Texture(createRoundedRectanglePixmap(100, 45, 15, Color.DARK_GRAY))));
+//                    levelButton.setText("LOCKED");
+//                }
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
 
         //final TextButton levelButton = new TextButton("LOCKED", levelButtonStyle);
 
