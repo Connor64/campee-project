@@ -253,7 +253,11 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 //System.out.println("clicked back");
-                game.setScreen(new LevelScreen(game));
+                try {
+                    game.setScreen(new LevelScreen(game));
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
             }
 
             @Override

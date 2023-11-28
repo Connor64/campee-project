@@ -19,6 +19,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 import com.campee.starship.screens.*;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class GamePopup {
@@ -109,7 +110,11 @@ public class GamePopup {
         exitButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(new LevelScreen(game));
+                try {
+                    game.setScreen(new LevelScreen(game));
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
             }
             @Override
             public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {

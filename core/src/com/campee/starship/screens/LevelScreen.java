@@ -8,16 +8,20 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.campee.starship.userinterface.CustomScrollPane;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Scanner;
 
 public class LevelScreen extends ScreenAdapter {
     private final Game game;
@@ -34,7 +38,7 @@ public class LevelScreen extends ScreenAdapter {
     private boolean isButtonHovered = false;
     private Stage stage2;
 
-    public LevelScreen(final Game game) {
+    public LevelScreen(final Game game) throws FileNotFoundException {
         this.game = game;
         stage = new Stage(new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
         //stage = new Stage(new ScreenViewport());
@@ -64,7 +68,7 @@ public class LevelScreen extends ScreenAdapter {
             for (int j = i; j < Math.min(i + 3, levelFiles.length); j++) {
                 String[] level_name = levelFiles[j].nameWithoutExtension().split("_");
                 Table levelWidget = createLevelWidget(level_name[1]);
-                rowTable.add(levelWidget).pad(40).center();
+                rowTable.add(levelWidget).pad(20).center();
             }
 
             // Add the rowTable to the innerTable
@@ -152,13 +156,33 @@ public class LevelScreen extends ScreenAdapter {
         style.fontColor = color;
         return style;
     }
-    private Table createLevelWidget(final String levelNumber) {
+    private Table createLevelWidget(final String levelNumber) throws FileNotFoundException {
         Table levelWidget = new Table();
 //        levelWidget.setBackground(new TextureRegionDrawable(new TextureRegion(new Texture(createPixmap(new Color(0.8f, 0.6f, 1f, 1f))))));
 
         // Create a label
         Label label = new Label("Level " + levelNumber, createLabelStyle(Color.BLACK));
         label.setFontScale(1.2f);
+
+        // read in a thumbnail and time limit
+        Scanner scanner = new Scanner(new File("level_displays/" + "level_" + levelNumber + "_display" + ".txt"));
+        String thumbnailPath = scanner.nextLine();
+        int timeMinutes = Integer.parseInt(scanner.nextLine());
+        int timeSeconds = Integer.parseInt(scanner.nextLine());
+
+
+        Pixmap pix_big = new Pixmap(Gdx.files.internal(thumbnailPath));
+        Pixmap pix_small = new Pixmap(200, (pix_big.getHeight() / pix_big.getWidth()) * 200, pix_big.getFormat());
+        pix_small.drawPixmap(pix_big,
+                0, 0, pix_big.getWidth(), pix_big.getHeight(),
+                0, 0, pix_small.getWidth(), pix_small.getHeight()
+        );
+        Texture thumbTexture = new Texture(pix_small);
+        Image thumbnail = new Image(thumbTexture);
+//        thumbnail.setScale(0.2f);
+//        Texture thumbnail = new Texture(Gdx.files.internal(thumbnailPath));
+//        SpriteBatch batch = new SpriteBatch();
+
 
 
         Label orderLabel = new Label("2 orders", createLabelStyle(Color.BLACK));
@@ -206,9 +230,14 @@ public class LevelScreen extends ScreenAdapter {
 
         // Add the label to the top center of the table
         levelWidget.add(label).padBottom(30).colspan(3).center().row();
+        levelWidget.add(thumbnail).padBottom(30).colspan(3).center().row();
         levelWidget.add(orderLabel).padBottom(10).colspan(3).center().row();
         // Add the button slightly towards the bottom of the rectangle
         levelWidget.add(levelButton).padBottom(30).colspan(3).center().row();
+
+//        batch.begin();
+//        batch.draw(thumbnail, label.getX(), label.getY() - thumbnail.getHeight());
+//        batch.end();
 
         // Set background for the table
         levelWidget.setBackground(new TextureRegionDrawable(new TextureRegion(new Texture(createPixmap(new Color(0.8f, 0.6f, 1f, 1f))))));
