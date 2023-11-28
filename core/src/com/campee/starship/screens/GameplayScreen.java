@@ -219,7 +219,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         if (GameDifficulty.easy) {
             minOrders = 2;
             goalTime = 400;
-            countdownMinutes = 5;
+            countdownMinutes = 3;
         }
         if (GameDifficulty.medium) {
             minOrders = 3;
@@ -227,9 +227,9 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             countdownMinutes = 4;
         }
         if (GameDifficulty.hard) {
-            minOrders = 4;
+            minOrders = 1;
             goalTime = 300;
-            countdownMinutes = 3;
+            countdownMinutes = 5;
         }
 
         // Define side panel properties
@@ -843,6 +843,18 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     // Schedule the popup to display every 1 minute
     private void schedulePopupDisplay() {
         final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+        int hide_popup = 0;
+        int show_popup = 0;
+        if (GameDifficulty.tutorial || GameDifficulty.easy || GameDifficulty.medium) {
+            hide_popup = 5;
+            show_popup = 10;
+        } else if (GameDifficulty.hard) {
+            hide_popup = new Random().nextInt(10) + 2;
+            show_popup = new Random().nextInt(5) + 6;
+        }
+
+        final int finalHide_popup = hide_popup;
+        final int finalShow_popup = show_popup;
         scheduler.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
@@ -857,6 +869,19 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                                 // Hide the popup
                                 hideTimedPopup();
                                 if (!popup.acceptClicked() && !popup.declineClicked() && !ordersDone) {
+                                    //lose coins if do not manually accept or decline 3 times
+                                    if(GameDifficulty.hard) {
+                                        popup.nothingClicked++;
+                                        if (popup.nothingClicked == 3) {
+                                            if (coinCounter > 1) {
+                                                coinCounter -= 2;
+                                            }
+                                            if (coinCounter == 1) {
+                                                coinCounter -= 1;
+                                            }
+                                            coinCollectLabel.setText("Coins Collected: " + coinCounter);
+                                        }
+                                    }
                                     autoDeclineLabel.setVisible(true);
                                     scheduler.schedule(new Runnable() {
                                         @Override
@@ -869,10 +894,10 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                                 }
                             }
                         }
-                    }, 5, TimeUnit.SECONDS); // Schedule to hide the popup after 10 seconds
+                    }, finalHide_popup, TimeUnit.SECONDS); // Schedule to hide the popup after _ seconds
                 }
             }
-        }, 0, 10, TimeUnit.SECONDS); // Schedule the next popup 15 seconds after the first one
+        }, 0, finalShow_popup, TimeUnit.SECONDS); // Schedule the next popup _ seconds after the first one
     }
 
     @Override
