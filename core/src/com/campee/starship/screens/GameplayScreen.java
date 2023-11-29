@@ -50,6 +50,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     public boolean popupInAction = false;
     public boolean ordersDone = false;
 
+    public boolean outOfOrders = false;
+
 
     private Player player;
     public PlayerAttributes playerAttributes;
@@ -449,6 +451,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                 if (!coin.isCollected()) {
                     coin.draw(batch);
                     if (player.checkCollision(coin, false)) {
+                        gameplayMusic.pause();
+                        newOrderNotif.pause();
                         coinCollect.play();
                         coin.setCollected(true);
                         coinCounter++;
@@ -534,6 +538,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                             pickupLabel.setVisible(true);
                             if (keyProcessor.pPressed) {
                                 order.setPickedUp(true);
+                                gameplayMusic.pause();
+                                newOrderNotif.pause();
                                 long id = pickupSuccess.play();
                                 pickupSuccess.setVolume(id, 0.3f);
                                 order.setDroppedOff(false);
@@ -549,6 +555,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                             if (keyProcessor.oPressed) {
                                 order.setPickedUp(false);
                                 order.setDroppedOff(true);
+                                gameplayMusic.pause();
+                                newOrderNotif.pause();
                                 long id = dropoffSuccess.play();
                                 dropoffSuccess.setVolume(id, 0.09f);
                                 playerAttributes.ordersCompleted++;
@@ -790,6 +798,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             popup.declineClicked = false;
         } else {
             popup.setMessage("No more orders!");
+            outOfOrders = true;
             popup.declineButton.remove();
             popup.acceptButton.remove();
             if (ordersDone) {
@@ -813,8 +822,10 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             public void run() {
                 if (!popupInAction) {
                     showTimedPopup(); // Show the popup
-                    long id = newOrderNotif.play();
-                    newOrderNotif.setVolume(id, 0.9f);
+                    if (!outOfOrders) {
+                        long id = newOrderNotif.play();
+                        newOrderNotif.setVolume(id, 0.9f);
+                    }
                     scheduler.schedule(new Runnable() {
                         @Override
                         public void run() {
@@ -858,12 +869,14 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     @Override
     public void hide() {
         gameplayMusic.dispose();
+        newOrderNotif.dispose();
     }
 
     @Override
     public void dispose() {
         batch.dispose();
         gameplayMusic.dispose();
+        newOrderNotif.dispose();
         //incomingOrder.dispose();
         multiplexer.removeProcessor(stage);
     }

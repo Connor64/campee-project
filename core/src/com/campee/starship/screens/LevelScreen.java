@@ -172,7 +172,7 @@ public class LevelScreen extends ScreenAdapter {
 
 
         Pixmap pix_big = new Pixmap(Gdx.files.internal(thumbnailPath));
-        Pixmap pix_small = new Pixmap(200, (pix_big.getHeight() / pix_big.getWidth()) * 200, pix_big.getFormat());
+        Pixmap pix_small = new Pixmap(250, 250, pix_big.getFormat());
         pix_small.drawPixmap(pix_big,
                 0, 0, pix_big.getWidth(), pix_big.getHeight(),
                 0, 0, pix_small.getWidth(), pix_small.getHeight()
