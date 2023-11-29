@@ -170,7 +170,7 @@ public class LevelScreen extends ScreenAdapter {
         int timeMinutes = Integer.parseInt(scanner.nextLine());
         int timeSeconds = Integer.parseInt(scanner.nextLine());
 
-
+        // thumbnail
         Pixmap pix_big = new Pixmap(Gdx.files.internal(thumbnailPath));
         Pixmap pix_small = new Pixmap(250, 250, pix_big.getFormat());
         pix_small.drawPixmap(pix_big,
@@ -179,11 +179,15 @@ public class LevelScreen extends ScreenAdapter {
         );
         Texture thumbTexture = new Texture(pix_small);
         Image thumbnail = new Image(thumbTexture);
-//        thumbnail.setScale(0.2f);
-//        Texture thumbnail = new Texture(Gdx.files.internal(thumbnailPath));
-//        SpriteBatch batch = new SpriteBatch();
 
-
+        // time limits
+        Label timeLabel;
+        if (timeSeconds < 10) {
+            timeLabel = new Label("Time Limit: " + timeMinutes + ": 0" + timeSeconds, createLabelStyle(Color.BLACK));
+        } else {
+            timeLabel = new Label("Time Limit: " + timeMinutes + ": " + timeSeconds, createLabelStyle(Color.BLACK));
+        }
+        timeLabel.setFontScale(1f);
 
         Label orderLabel = new Label("2 orders", createLabelStyle(Color.BLACK));
         orderLabel.setFontScale(1f);
@@ -232,6 +236,7 @@ public class LevelScreen extends ScreenAdapter {
         levelWidget.add(label).padBottom(30).colspan(3).center().row();
         levelWidget.add(thumbnail).padBottom(30).colspan(3).center().row();
         levelWidget.add(orderLabel).padBottom(10).colspan(3).center().row();
+        levelWidget.add(timeLabel).padBottom(10).colspan(3).center().row();
         // Add the button slightly towards the bottom of the rectangle
         levelWidget.add(levelButton).padBottom(30).colspan(3).center().row();
 
