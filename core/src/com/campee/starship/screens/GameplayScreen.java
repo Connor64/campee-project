@@ -854,6 +854,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         popup.hide(); // Display the popup
     }
 
+
     // Schedule the popup to display every 1 minute
     private void schedulePopupDisplay() {
         final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
@@ -886,11 +887,11 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                                     //lose coins if do not manually accept or decline 3 times
                                     if(GameDifficulty.hard) {
                                         popup.nothingClicked++;
-                                        if (popup.nothingClicked == 3) {
+                                        if (popup.nothingClicked >= 3) {
                                             if (coinCounter > 1) {
                                                 coinCounter -= 2;
                                             }
-                                            if (coinCounter == 1) {
+                                            else if (coinCounter == 1) {
                                                 coinCounter -= 1;
                                             }
                                             coinCollectLabel.setText("Coins Collected: " + coinCounter);
@@ -906,6 +907,17 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                                         }
                                     }, 4, TimeUnit.SECONDS);
                                 }
+                                if(GameDifficulty.hard) {
+                                    if (popup.declineCount == 3) {
+                                        if (coinCounter > 1) {
+                                            coinCounter -= 2;
+                                        }
+                                        if (coinCounter == 1) {
+                                            coinCounter -= 1;
+                                        }
+                                    }
+                                    coinCollectLabel.setText("Coins Collected: " + coinCounter);
+                                }
                             }
                         }
                     }, finalHide_popup, TimeUnit.SECONDS); // Schedule to hide the popup after _ seconds
@@ -913,6 +925,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             }
         }, 0, finalShow_popup, TimeUnit.SECONDS); // Schedule the next popup _ seconds after the first one
     }
+
 
     @Override
     public void resize(int width, int height) {

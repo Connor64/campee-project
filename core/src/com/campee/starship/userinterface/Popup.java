@@ -149,6 +149,7 @@ public class Popup implements Screen {
                     if (visible) {
                         declineClicked = true;
                         declineCount++;
+                        //System.out.print(declineCount);
                         if (screen.playerAttributes.array.size() <= 1) {
                             screen.playerAttributes.orderInProgress = false;
                         }
