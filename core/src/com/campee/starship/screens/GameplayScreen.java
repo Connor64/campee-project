@@ -91,6 +91,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     // Declare variables for the countdown timer
     public int countdownMinutes = 3; // 2 minutes
     public int countdownSeconds = 0;
+    int printcounter = 0;
     private Timer countdownTimer = new Timer();
 
     // music and sound
@@ -159,13 +160,11 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     public Order order;
     private String[] orderA;
     private ArrayList<Tile[]> layers;
-    private AssetManager assetManager;
 
     public GameplayScreen(final MoonshipGame game, String fileName) throws IOException, ClassNotFoundException {
         this.GAME = game;
         batch = game.batch;
         visibleText = true;
-        assetManager = new AssetManager();
         world = new World(new Vector2(0, 0), true);
         multiplexer = new InputMultiplexer();
 
@@ -770,6 +769,21 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         keepplayingpopup.show();
         keepplayingpopup.render();
         multiplexer.addProcessor(keepplayingpopup.getStage());
+
+        if (printcounter == 0) {
+            int num = Character.getNumericValue(LevelScreen.nameOfFile.charAt(LevelScreen.nameOfFile.length() - 1));
+            num++;
+
+            DataManager.INSTANCE.setClearStatus(String.valueOf(num), true);
+//            String fileName = "playerdata.txt";
+//            try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, true))) {
+//                writer.write(LevelScreen.nameOfFile + ":passed\n");
+//            } catch (IOException e) {
+//                e.printStackTrace(); // Handle the exception appropriately
+//            }
+
+            printcounter = 1;
+        }
     }
 
     // Trigger the timed popup to show
@@ -918,14 +932,13 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         for (int layerNum = 0; layerNum < levelData.tileData.size(); layerNum++) {
             LevelData.TileData[] tileData = levelData.tileData.get(layerNum);
 
-            // TODO: spawn in the objects
             LevelData.ObjectData[] objectData = levelData.objectData.get(layerNum);
 
             Tile[] tiles = new Tile[tileData.length];
 
             for (int i = 0; i < tileData.length; i++) {
                 tiles[i] = new Tile(
-                        assetManager.getTileSprite(tileData[i].tilesetID,
+                        AssetManager.INSTANCE.getTileSprite(tileData[i].tilesetID,
                                 tileData[i].spriteIndex),
                         tileData[i].x * levelData.tileSize,
                         levelHeight - tileData[i].y * levelData.tileSize
@@ -933,7 +946,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             }
 
             for (int i = 0; i < objectData.length; i++) {
-                GameObject object = assetManager.loadGameObject(objectData[i].objectID);
+                GameObject object = AssetManager.INSTANCE.loadGameObject(objectData[i].objectID);
                 if (object == null) continue;
 
                 if (object instanceof BuildingObject) {
