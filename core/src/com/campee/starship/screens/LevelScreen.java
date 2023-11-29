@@ -183,9 +183,9 @@ public class LevelScreen extends ScreenAdapter {
         // time limits
         Label timeLabel;
         if (timeSeconds < 10) {
-            timeLabel = new Label("Time Limit: " + timeMinutes + ": 0" + timeSeconds, createLabelStyle(Color.BLACK));
+            timeLabel = new Label("Time Limit: " + timeMinutes + ":0" + timeSeconds, createLabelStyle(Color.BLACK));
         } else {
-            timeLabel = new Label("Time Limit: " + timeMinutes + ": " + timeSeconds, createLabelStyle(Color.BLACK));
+            timeLabel = new Label("Time Limit: " + timeMinutes + ":" + timeSeconds, createLabelStyle(Color.BLACK));
         }
         timeLabel.setFontScale(1f);
 

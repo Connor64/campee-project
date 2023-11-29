@@ -165,6 +165,7 @@ public class GamePopup {
     public void showGameStatsMessage(String message) {
         gameStatsMessage.setText(message);
         gameStatsMessage.setVisible(true);
+        System.out.println(message);
         ordersCompletedLabel.setVisible(true);
         ordersOutOfTimeLabel.setVisible(true);
     }

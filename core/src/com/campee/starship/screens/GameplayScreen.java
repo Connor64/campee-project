@@ -167,7 +167,6 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         this.GAME = game;
         batch = game.batch;
         visibleText = true;
-        assetManager = new AssetManager();
         world = new World(new Vector2(0, 0), true);
         multiplexer = new InputMultiplexer();
 
