@@ -1,25 +1,43 @@
 package com.campee.starship.managers;
 
+import Serial.LevelData;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.campee.starship.objects.*;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.HashMap;
 
 public class AssetManager {
+    public static final AssetManager INSTANCE;
+
+    static {
+        try {
+            INSTANCE = new AssetManager();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private HashMap<String, TextureRegion[]> tilesets;
     private HashMap<String, GameObject> gameObjects;
+    private HashMap<String, LevelData> levels;
 
     private final int TILE_SIZE = 16;
 
-    public AssetManager() throws IOException {
+    private AssetManager() throws IOException {
         tilesets = new HashMap<>();
         gameObjects = new HashMap<>();
+        levels = new HashMap<>();
         
         loadTileset("1_terrain.png", "tileset_test_1");
         loadTileset("street.png", "modern_tileset");
@@ -35,6 +53,35 @@ public class AssetManager {
         gameObjects.put("building_turkstra", new BuildingObject("sprites/buildings/prof_turkstra.png", "Turkstra", 0, 0, 0.5f, 0.75f));
         gameObjects.put("building_police", new BuildingObject("sprites/buildings/police_officer.png", "Officer", 0, 0, 0.5f, 0.75f));
         gameObjects.put("coin", new CoinObject(0, 0));
+
+        FileHandle levelsFolder = Gdx.files.internal("levels");
+        FileHandle[] levelFiles = levelsFolder.list();
+
+        for (int i = 0; i < levelFiles.length; i++) {
+            String[] nameFields = levelFiles[i].nameWithoutExtension().split("_");
+
+            InputStream fileStream = Files.newInputStream(new File(levelFiles[i].path()).toPath());
+            ObjectInputStream inputStream = new ObjectInputStream(fileStream);
+
+            try {
+                LevelData levelData = (LevelData) inputStream.readObject();
+                levels.put(nameFields[1], levelData);
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    public HashMap<String, LevelData> getLevels() {
+        return levels;
+    }
+
+    public LevelData getLevel(String key) {
+        return levels.get(key);
+    }
+
+    public int getNumLevels() {
+        return levels.size();
     }
 
     /**

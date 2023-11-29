@@ -19,6 +19,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 import com.campee.starship.screens.*;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 
 public class GamePopup {
@@ -160,6 +162,7 @@ public class GamePopup {
     public void showGameStatsMessage(String message) {
         gameStatsMessage.setText(message);
         gameStatsMessage.setVisible(true);
+        System.out.println(message);
         ordersCompletedLabel.setVisible(true);
         ordersOutOfTimeLabel.setVisible(true);
     }
