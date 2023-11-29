@@ -16,7 +16,6 @@ import java.io.ObjectInputStream;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Map;
 
 public class AssetManager {
     public static final AssetManager INSTANCE;

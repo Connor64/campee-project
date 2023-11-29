@@ -193,12 +193,12 @@ public class LevelScreen extends ScreenAdapter {
 
 
         ImageButton.ImageButtonStyle lockButtonStyle = new ImageButton.ImageButtonStyle();
-        lockButtonStyle.imageUp = new TextureRegionDrawable(new TextureRegion(new Texture("lock-image.png")));
+        lockButtonStyle.imageUp = new TextureRegionDrawable(new TextureRegion(new Texture("sprites/lock_icon.png")));
         ImageButton lockButton = new ImageButton(lockButtonStyle);
         lockButton.getImageCell().size(20, 30);
 
         ImageButton.ImageButtonStyle unlockButtonStyle = new ImageButton.ImageButtonStyle();
-        unlockButtonStyle.imageUp = new TextureRegionDrawable(new TextureRegion(new Texture("unlock-image.png")));
+        unlockButtonStyle.imageUp = new TextureRegionDrawable(new TextureRegion(new Texture("sprites/unlock_icon.png")));
         ImageButton unlockButton = new ImageButton(unlockButtonStyle);
         unlockButton.getImageCell().size(30, 40);
 
