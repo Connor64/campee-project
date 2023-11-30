@@ -123,11 +123,7 @@ public class BuildingObject extends GameObject {
         super.draw(batch);
 
         if (pickupLocation) {
-            if (name.equals("HAAS")) {
-                pickSpriteYellow.draw(batch);
-            } else {
-                pickSprite.draw(batch);
-            }
+            pickSprite.draw(batch);
         } else if (dropoffLocation) {
             dropSprite.draw(batch);
         }
