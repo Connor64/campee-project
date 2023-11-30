@@ -65,6 +65,7 @@ public class LevelScreen extends ScreenAdapter {
 //        FileHandle[] levelFiles = levelsFolder.list();
 
         Label titleLabel = new Label("LEVEL SELECT SCREEN", createTitleLabelStyle(Color.BLACK));
+        titleLabel.setFontScale(2.5f);
 
         // Add title label to the top of the window with some padding
         innerTable.add(titleLabel).padTop(50).colspan(3).center().row();
@@ -200,11 +201,14 @@ public class LevelScreen extends ScreenAdapter {
         String thumbnailPath = "thumbnails/" + scanner.nextLine();
         int timeMinutes = Integer.parseInt(scanner.nextLine());
         int timeSeconds = Integer.parseInt(scanner.nextLine());
+        String levelTitle = scanner.nextLine();
 
         if ((!DataManager.INSTANCE.isLevelUnlocked(levelNumber))) {
             // set thumbnail to lock icon
             thumbnailPath = "sprites/locked_thumbnail.png";
 //            timeMinutes = " ";
+        } else {
+            label = new Label(levelTitle, createLabelStyle(Color.BLACK));
         }
 
         // thumbnail
