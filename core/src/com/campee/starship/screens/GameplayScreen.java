@@ -690,6 +690,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                     //if (order.isPickedUp()) {
                     font.setColor(Color.RED);
                     // }
+                } else if (i == 1 && order.isPickedUp()){
+                    font.setColor(Color.GREEN);
                 } else {
                     font.setColor(Color.WHITE);
                 }
