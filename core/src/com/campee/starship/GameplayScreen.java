@@ -295,7 +295,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 //System.out.println("clicked back");
-                pauseMusic();
+                //pauseMusic();
                 pauseScreen();
                 gamePaused = true;
             }
@@ -776,19 +776,19 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         }
     }
 
-    public void pauseMusic() {
-        if (gameplayMusic.isPlaying()) {
-            System.out.println("Music paused");
-            gameplayMusic.pause();
-        }
-    }
-
-    public void resumeMusic() {
-        if (!gameplayMusic.isPlaying()) {
-            System.out.println("Music resumed");
-            gameplayMusic.play();
-        }
-    }
+//    public void pauseMusic() {
+//        if (gameplayMusic.isPlaying()) {
+//            System.out.println("Music paused");
+//            gameplayMusic.pause();
+//        }
+//    }
+//
+//    public void resumeMusic() {
+//        if (!gameplayMusic.isPlaying()) {
+//            System.out.println("Music resumed");
+//            gameplayMusic.play();
+//        }
+//    }
 
     //show game stats screen
     public void showGameResult() {
@@ -841,9 +841,6 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         String message = "Game Paused!\nSettings:\n";
         //String option = "Keep Playing or End Game?";
         pauseScreen.setMessageLabel(message);
-
-
-
         //stage.addActor(musicSlider);
         //stage.addActor(soundSlider);
         pauseScreen.show();

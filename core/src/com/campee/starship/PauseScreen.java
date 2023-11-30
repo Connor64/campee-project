@@ -110,7 +110,7 @@ public class PauseScreen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 resumeClicked = true;
-                screen.resumeMusic();
+                //screen.resumeMusic();
                 //screen.resume = false;
                 visible = false;
                 screen.gamePaused = false;
