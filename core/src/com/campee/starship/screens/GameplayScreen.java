@@ -168,7 +168,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     public Order order;
     private String[] orderA;
     private ArrayList<Tile[]> layers;
-//    private AssetManager assetManager;
+    private AssetManager assetManager;
 
     public GameplayScreen(final MoonshipGame game, String fileName) throws IOException, ClassNotFoundException {
         this.GAME = game;
@@ -205,19 +205,14 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 //        System.out.println(fileName);
 
         //Level information
-        /*
-        if ("".equals(fileName)) {
-            GameDifficulty.tutorial = true;
-        }
-        */
+
         if ("level_6".equals(fileName)) {
             GameDifficulty.easy = true;
         }
-         /*
-        if ("".equals(fileName)) {
+
+        if ("level_5".equals(fileName)) {
             GameDifficulty.medium = true;
         }
-        */
         if ("level_4".equals(fileName)) {
             GameDifficulty.hard = true;
         }
@@ -239,13 +234,10 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             countdownMinutes = 4;
         }
         if (GameDifficulty.hard) {
-            minOrders = 6;
+            minOrders = 5;
             goalTime = 300;
-            countdownMinutes = 5;
+            countdownMinutes = 6;
         }
-
-        minOrders = getMinOrders(fileName);
-        goalTime = 300/*levelData.goalTime*/;
 
         // Define side panel properties
         sidePanelWidth = Gdx.graphics.getWidth() / 5; // Width
@@ -919,8 +911,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             show_popup = new Random().nextInt(5) + 6;
         }
 
-        //final int finalHide_popup = hide_popup;
-        //final int finalShow_popup = show_popup;
+        final int finalHide_popup = hide_popup;
+        final int finalShow_popup = show_popup;
         scheduler.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
@@ -973,10 +965,10 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                                 }
                             }
                         }
-                    }, 5, TimeUnit.SECONDS); // Schedule to hide the popup after _ seconds
+                    }, finalHide_popup, TimeUnit.SECONDS); // Schedule to hide the popup after _ seconds
                 }
             }
-        }, 0, 10, TimeUnit.SECONDS); // Schedule the next popup _ seconds after the first one
+        }, 0, finalShow_popup, TimeUnit.SECONDS); // Schedule the next popup _ seconds after the first one
     }
 
 
