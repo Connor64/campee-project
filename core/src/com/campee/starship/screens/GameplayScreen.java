@@ -161,7 +161,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     public Order order;
     private String[] orderA;
     private ArrayList<Tile[]> layers;
-    private AssetManager assetManager;
+//    private AssetManager assetManager;
 
     public GameplayScreen(final MoonshipGame game, String fileName) throws IOException, ClassNotFoundException {
         this.GAME = game;
@@ -169,6 +169,9 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         visibleText = true;
         world = new World(new Vector2(0, 0), true);
         multiplexer = new InputMultiplexer();
+
+        countdownMinutes = getCountdownMinutes(fileName);
+        countdownSeconds = getCountdownSeconds(fileName);
 
         player = new Player(world, 150, 200);
         playerAttributes = new PlayerAttributes();
@@ -939,7 +942,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
             for (int i = 0; i < tileData.length; i++) {
                 tiles[i] = new Tile(
-                        assetManager.getTileSprite(tileData[i].tilesetID,
+                        AssetManager.INSTANCE.getTileSprite(tileData[i].tilesetID,
                                 tileData[i].spriteIndex),
                         tileData[i].x * levelData.tileSize,
                         levelHeight - tileData[i].y * levelData.tileSize
@@ -947,7 +950,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             }
 
             for (int i = 0; i < objectData.length; i++) {
-                GameObject object = assetManager.loadGameObject(objectData[i].objectID);
+                GameObject object = AssetManager.INSTANCE.loadGameObject(objectData[i].objectID);
                 if (object == null) continue;
 
                 if (object instanceof BuildingObject) {
@@ -973,5 +976,25 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             layers.add(tiles);
 
         }
+    }
+
+    private int getCountdownMinutes(String filename) throws FileNotFoundException {
+        String file = "level_displays/" + filename + "_display.txt";
+
+        Scanner scanner = new Scanner(new File(file));
+        String thumbnailPath = scanner.nextLine();
+        int timeMinutes = Integer.parseInt(scanner.nextLine());
+        int timeSeconds = Integer.parseInt(scanner.nextLine());
+        return timeMinutes;
+    }
+
+    private int getCountdownSeconds(String filename) throws FileNotFoundException {
+        String file = "level_displays/" + filename + "_display.txt";
+
+        Scanner scanner = new Scanner(new File(file));
+        String thumbnailPath = scanner.nextLine();
+        int timeMinutes = Integer.parseInt(scanner.nextLine());
+        int timeSeconds = Integer.parseInt(scanner.nextLine());
+        return timeSeconds;
     }
 }

@@ -1,5 +1,6 @@
 package com.campee.starship.screens;
 
+import Serial.LevelData;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
@@ -16,14 +17,19 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.campee.starship.managers.AssetManager;
+import com.campee.starship.managers.DataManager;
 import com.campee.starship.userinterface.CustomScrollPane;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 public class LevelScreen extends ScreenAdapter {
+    public static String nameOfFile;
     private final Game game;
     private Stage stage;
     private ScrollPane scrollPane;
@@ -46,6 +52,8 @@ public class LevelScreen extends ScreenAdapter {
         font.setColor(Color.BLACK);
         viewport = new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
+        DataManager.INSTANCE.isLevelUnlocked("0");
+
         Table outerTable = new Table();
         outerTable.setFillParent(true);
         stage.addActor(outerTable);
@@ -53,27 +61,49 @@ public class LevelScreen extends ScreenAdapter {
         Table innerTable = new Table();
         outerTable.add(innerTable).center();
 
-        FileHandle levelsFolder = Gdx.files.internal("levels");
-        FileHandle[] levelFiles = levelsFolder.list();
+//        FileHandle levelsFolder = Gdx.files.internal("levels");
+//        FileHandle[] levelFiles = levelsFolder.list();
 
         Label titleLabel = new Label("LEVEL SELECT SCREEN", createTitleLabelStyle(Color.BLACK));
 
         // Add title label to the top of the window with some padding
         innerTable.add(titleLabel).padTop(50).colspan(3).center().row();
 
-        for (int i = 0; i < levelFiles.length; i += 3) {
-            Table rowTable = new Table(); // Create a new table for each row
+
+        int index = 0;
+        HashMap<String, LevelData> levels = AssetManager.INSTANCE.getLevels();
+        Table rowTable = new Table(); // Create a new table for each row
+
+        for (Map.Entry<String, LevelData> entry : levels.entrySet()) {
+            Table levelWidget = createLevelWidget(entry.getKey());
+            rowTable.add(levelWidget).pad(20).center();
+
+            index++;
 
             // Add up to three level widgets in this row
-            for (int j = i; j < Math.min(i + 3, levelFiles.length); j++) {
-                String[] level_name = levelFiles[j].nameWithoutExtension().split("_");
-                Table levelWidget = createLevelWidget(level_name[1]);
-                rowTable.add(levelWidget).pad(20).center();
+            if (index >= 3) {
+                // Add the rowTable to the innerTable
+                innerTable.add(rowTable).row();
+                rowTable = new Table();
+                index = 0;
             }
-
-            // Add the rowTable to the innerTable
-            innerTable.add(rowTable).row();
         }
+
+        if (index != 0) innerTable.add(rowTable).row();
+
+//        for (int i = 0; i < levelFiles.length; i += 3) {
+//            Table rowTable = new Table(); // Create a new table for each row
+//
+//            // Add up to three level widgets in this row
+//            for (int j = i; j < Math.min(i + 3, levelFiles.length); j++) {
+//                String[] level_name = levelFiles[j].nameWithoutExtension().split("_");
+//                Table levelWidget = createLevelWidget(level_name[1]);
+//                rowTable.add(levelWidget).pad(20).center();
+//            }
+//
+//            // Add the rowTable to the innerTable
+//            innerTable.add(rowTable).row();
+//        }
 
         CustomScrollPane customScrollPane = new CustomScrollPane(innerTable, stage);
         customScrollPane.setScrollingDisabled(true, false);
@@ -164,15 +194,22 @@ public class LevelScreen extends ScreenAdapter {
         Label label = new Label("Level " + levelNumber, createLabelStyle(Color.BLACK));
         label.setFontScale(1.2f);
 
+
         // read in a thumbnail and time limit
         Scanner scanner = new Scanner(new File("level_displays/" + "level_" + levelNumber + "_display" + ".txt"));
-        String thumbnailPath = scanner.nextLine();
+        String thumbnailPath = "thumbnails/" + scanner.nextLine();
         int timeMinutes = Integer.parseInt(scanner.nextLine());
         int timeSeconds = Integer.parseInt(scanner.nextLine());
 
+        if ((!DataManager.INSTANCE.isLevelUnlocked(levelNumber))) {
+            // set thumbnail to lock icon
+            thumbnailPath = "sprites/locked_thumbnail.png";
+//            timeMinutes = " ";
+        }
+
         // thumbnail
         Pixmap pix_big = new Pixmap(Gdx.files.internal(thumbnailPath));
-        Pixmap pix_small = new Pixmap(250, 250, pix_big.getFormat());
+        Pixmap pix_small = new Pixmap(300, 300, pix_big.getFormat());
         pix_small.drawPixmap(pix_big,
                 0, 0, pix_big.getWidth(), pix_big.getHeight(),
                 0, 0, pix_small.getWidth(), pix_small.getHeight()
@@ -201,14 +238,47 @@ public class LevelScreen extends ScreenAdapter {
         levelButtonStyle.up = new TextureRegionDrawable(new TextureRegion(new Texture(createRoundedRectanglePixmap(100, 45, 15, Color.YELLOW))));
         //levelButtonStyle.down = new TextureRegionDrawable(new TextureRegion(new Texture(createRoundedRectanglePixmap(150, 60, 15, Color.YELLOW))));
 
-        final TextButton levelButton = new TextButton("UNLOCKED", levelButtonStyle);
+        ImageButton.ImageButtonStyle lockButtonStyle = new ImageButton.ImageButtonStyle();
+        lockButtonStyle.imageUp = new TextureRegionDrawable(new TextureRegion(new Texture("sprites/lock_icon.png")));
+        ImageButton lockButton = new ImageButton(lockButtonStyle);
+        lockButton.getImageCell().size(40, 40);
+
+        ImageButton.ImageButtonStyle unlockButtonStyle = new ImageButton.ImageButtonStyle();
+        unlockButtonStyle.imageUp = new TextureRegionDrawable(new TextureRegion(new Texture("sprites/unlock_icon.png")));
+        ImageButton unlockButton = new ImageButton(unlockButtonStyle);
+        unlockButton.getImageCell().size(40, 40);
+
+
+        boolean isLocked = false;
+        //System.out.println(prevLevelName);
+        final TextButton levelButton = new TextButton("LOCKED", levelButtonStyle);
+
+        if (DataManager.INSTANCE.levelExists(levelNumber)) {
+            if (DataManager.INSTANCE.isLevelUnlocked(levelNumber)) {
+                levelButtonStyle.up = new TextureRegionDrawable(
+                        new TextureRegion(new Texture(createRoundedRectanglePixmap(100, 45, 15, Color.GREEN))));
+                levelButton.setText("UNLOCKED");
+                levelWidget.add(unlockButton).padBottom(5).colspan(3).center().row();
+            } else {
+                levelButtonStyle.up = new TextureRegionDrawable(
+                        new TextureRegion(new Texture(createRoundedRectanglePixmap(100, 45, 15, Color.DARK_GRAY))));
+                levelButton.setText("LOCKED");
+                levelWidget.add(lockButton).padBottom(5).colspan(3).center().row();
+                isLocked = true;
+            }
+        }
+
         levelButton.setSize(10, 20);
         levelButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 try {
-                    game.setScreen(new GameplayScreen((MoonshipGame) game, "level_" + levelNumber));
-                    //System.out.println("hereeee");
+                    if (levelButton.getText().toString().equals("UNLOCKED")) {
+                        nameOfFile = "Level " + levelNumber;
+//                        game.setScreen(new GameplayScreen((MoonshipGame) game, levelName));
+                        game.setScreen(new GameplayScreen((MoonshipGame) game, "level_" + levelNumber));
+                        //System.out.println("hereeee");
+                    }
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
@@ -222,13 +292,19 @@ public class LevelScreen extends ScreenAdapter {
             public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
                 super.enter(event, x, y, pointer, fromActor);
                 isButtonHovered = true;
-                levelButton.setColor(Color.LIGHT_GRAY);
+                //levelButton.setColor(Color.LIGHT_GRAY);
+                if (levelButton.getText().toString().equals("UNLOCKED")) {
+                    levelButton.setColor(Color.LIGHT_GRAY);
+                }
             }
             @Override
             public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
                 super.exit(event, x, y, pointer, toActor);
                 isButtonHovered = false;
-                levelButton.setColor(Color.WHITE);
+                //levelButton.setColor(Color.WHITE);
+                if (levelButton.getText().toString().equals("UNLOCKED")) {
+                    levelButton.setColor(Color.WHITE);
+                }
             }
         });
 
@@ -236,7 +312,12 @@ public class LevelScreen extends ScreenAdapter {
         levelWidget.add(label).padBottom(30).colspan(3).center().row();
         levelWidget.add(thumbnail).padBottom(30).colspan(3).center().row();
         levelWidget.add(orderLabel).padBottom(10).colspan(3).center().row();
-        levelWidget.add(timeLabel).padBottom(10).colspan(3).center().row();
+        if ((DataManager.INSTANCE.isLevelUnlocked(levelNumber))) {
+            levelWidget.add(timeLabel).padBottom(10).colspan(3).center().row();
+        } else {
+            timeLabel = new Label(" ", createLabelStyle(Color.BLACK));
+            levelWidget.add(timeLabel).padBottom(10).colspan(3).center().row();
+        }
         // Add the button slightly towards the bottom of the rectangle
         levelWidget.add(levelButton).padBottom(30).colspan(3).center().row();
 
@@ -274,12 +355,6 @@ public class LevelScreen extends ScreenAdapter {
         pixmap.fill();
         return pixmap;
     }
-    private Pixmap createPixmap(Color color, int width, int height) {
-        Pixmap pixmap = new Pixmap(width, height, Pixmap.Format.RGBA8888);
-        pixmap.setColor(color);
-        pixmap.fill();
-        return pixmap;
-    }
 
     @Override
     public void render(float delta) {
@@ -303,6 +378,7 @@ public class LevelScreen extends ScreenAdapter {
     public void dispose() {
         stage.dispose();
     }
+
     public Pixmap createRoundedRectanglePixmap(int width, int height, int cornerRadius, Color color) {
         Pixmap pixmap = new Pixmap(width, height, Pixmap.Format.RGBA8888);
         pixmap.setColor(color);
