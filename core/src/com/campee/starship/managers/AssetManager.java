@@ -52,6 +52,14 @@ public class AssetManager {
         gameObjects.put("building_kola", new BuildingObject("sprites/buildings/koca_kola_machine.png", "Kola Machine", 0, 0, 0.5f, 0.75f));
         gameObjects.put("building_turkstra", new BuildingObject("sprites/buildings/prof_turkstra.png", "Turkstra", 0, 0, 0.5f, 0.75f));
         gameObjects.put("building_police", new BuildingObject("sprites/buildings/police_officer.png", "Officer", 0, 0, 0.5f, 0.75f));
+
+        gameObjects.put("building_anushka", new BuildingObject("sprites/buildings/anushka.png", "Anushka", 0, 0, 0.5f, 0.75f));
+        gameObjects.put("building_connor", new BuildingObject("sprites/buildings/connor.png", "Connor", 0, 0, 0.5f, 0.75f));
+        gameObjects.put("building_evelyn", new BuildingObject("sprites/buildings/evelyn.png", "Evelyn", 0, 0, 0.5f, 0.75f));
+        gameObjects.put("building_megan", new BuildingObject("sprites/buildings/megan.png", "Megan", 0, 0, 0.5f, 0.75f));
+        gameObjects.put("building_protima", new BuildingObject("sprites/buildings/protima.png", "Protima", 0, 0, 0.5f, 0.75f));
+        gameObjects.put("building_thor", new BuildingObject("sprites/buildings/thor.png", "Thor", 0, 0, 0.5f, 0.75f));
+
         gameObjects.put("coin", new CoinObject(0, 0));
 
         FileHandle levelsFolder = Gdx.files.internal("levels");
