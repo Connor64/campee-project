@@ -15,6 +15,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
+import java.io.FileNotFoundException;
+
 public class SettingsScreen implements Screen {
     private final Game game;
     private OrthographicCamera camera;
@@ -52,7 +54,11 @@ public class SettingsScreen implements Screen {
         backButton.addListener(new InputListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 // Switch back to the title screen when the BACK button is clicked
-                game.setScreen(new LevelScreen(game)); // Change to the screen you want
+                try {
+                    game.setScreen(new LevelScreen(game)); // Change to the screen you want
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
                 return true;
             }
         });
@@ -75,6 +81,7 @@ public class SettingsScreen implements Screen {
         // Draw the text "SETTINGS" at the top of the screen
         GlyphLayout layout = new GlyphLayout();
         layout.setText(font, "SETTINGS");
+        //add camera stuff so that the extending works
         float textX = (camera.viewportWidth - layout.width) / 2;
         float textY = camera.viewportHeight - 50;
         font.draw(batch, "SETTINGS", textX, textY);
@@ -95,7 +102,11 @@ public class SettingsScreen implements Screen {
         timer -= delta;
         if (timer <= 0) {
             // When the timer reaches 0, switch back to the title screen
-            game.setScreen(new LevelScreen(game)); // Change to the screen you want
+            try {
+                game.setScreen(new LevelScreen(game)); // Change to the screen you want
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
         }
     }
 
