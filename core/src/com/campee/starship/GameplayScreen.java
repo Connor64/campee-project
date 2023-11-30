@@ -96,7 +96,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     private Timer countdownTimer = new Timer();
 
     // music and sound
-    Music gameplayMusic;
+    private Music gameplayMusic;
     Sound coinCollect;
     Skin skin;
     Slider musicSlider;
@@ -295,6 +295,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 //System.out.println("clicked back");
+                pauseMusic();
                 pauseScreen();
                 gamePaused = true;
             }
@@ -772,6 +773,20 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                 //pauseScreen();
                 popupInAction = true;
             }
+        }
+    }
+
+    public void pauseMusic() {
+        if (gameplayMusic.isPlaying()) {
+            System.out.println("Music paused");
+            gameplayMusic.pause();
+        }
+    }
+
+    public void resumeMusic() {
+        if (!gameplayMusic.isPlaying()) {
+            System.out.println("Music resumed");
+            gameplayMusic.play();
         }
     }
 
