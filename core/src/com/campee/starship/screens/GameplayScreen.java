@@ -195,8 +195,9 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         layers = new ArrayList<>();
         loadLevel(fileName);
+//        System.out.println(fileName);
 
-        minOrders = 2/*levelData.minOrders*/;
+        minOrders = getMinOrders(fileName);
         goalTime = 300/*levelData.goalTime*/;
 
         // Define side panel properties
@@ -996,5 +997,17 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         int timeMinutes = Integer.parseInt(scanner.nextLine());
         int timeSeconds = Integer.parseInt(scanner.nextLine());
         return timeSeconds;
+    }
+
+    private int getMinOrders(String filename) throws FileNotFoundException {
+        String file = "level_displays/" + filename + "_display.txt";
+
+        Scanner scanner = new Scanner(new File(file));
+        String thumbnailPath = scanner.nextLine();
+        int timeMinutes = Integer.parseInt(scanner.nextLine());
+        int timeSeconds = Integer.parseInt(scanner.nextLine());
+        String name = scanner.nextLine();
+        int minOrders = Integer.parseInt(scanner.nextLine());
+        return minOrders;
     }
 }
