@@ -202,6 +202,7 @@ public class LevelScreen extends ScreenAdapter {
         int timeMinutes = Integer.parseInt(scanner.nextLine());
         int timeSeconds = Integer.parseInt(scanner.nextLine());
         String levelTitle = scanner.nextLine();
+        int numOrders = Integer.parseInt(scanner.nextLine());
 
         if ((!DataManager.INSTANCE.isLevelUnlocked(levelNumber))) {
             // set thumbnail to lock icon
@@ -230,8 +231,19 @@ public class LevelScreen extends ScreenAdapter {
         }
         timeLabel.setFontScale(1f);
 
-        Label orderLabel = new Label("2 orders", createLabelStyle(Color.BLACK));
-        orderLabel.setFontScale(1f);
+
+        // number of orders
+        Label ordersLabel;
+        if ((DataManager.INSTANCE.isLevelUnlocked(levelNumber))) {
+            // set thumbnail to lock icon
+            ordersLabel = new Label(numOrders + " orders", createLabelStyle(Color.BLACK));
+        } else {
+            ordersLabel = new Label("   ", createLabelStyle(Color.BLACK));
+        }
+
+        ordersLabel.setFontScale(1f);
+
+
 
         // Create a button
         TextButton.TextButtonStyle levelButtonStyle = new TextButton.TextButtonStyle();
@@ -315,7 +327,7 @@ public class LevelScreen extends ScreenAdapter {
         // Add the label to the top center of the table
         levelWidget.add(label).padBottom(30).colspan(3).center().row();
         levelWidget.add(thumbnail).padBottom(30).colspan(3).center().row();
-        levelWidget.add(orderLabel).padBottom(10).colspan(3).center().row();
+        levelWidget.add(ordersLabel).padBottom(10).colspan(3).center().row();
         if ((DataManager.INSTANCE.isLevelUnlocked(levelNumber))) {
             levelWidget.add(timeLabel).padBottom(10).colspan(3).center().row();
         } else {

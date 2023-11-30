@@ -2,3 +2,4 @@ level_0_thumbnail.png
 3
 2
 Ugly Level
+1

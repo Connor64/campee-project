@@ -202,6 +202,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         layers = new ArrayList<>();
         loadLevel(fileName);
+//        System.out.println(fileName);
 
         //Level information
         /*
@@ -217,7 +218,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             GameDifficulty.medium = true;
         }
         */
-        if ("level_5".equals(fileName)) {
+        if ("level_4".equals(fileName)) {
             GameDifficulty.hard = true;
         }
 
@@ -238,10 +239,13 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             countdownMinutes = 4;
         }
         if (GameDifficulty.hard) {
-            minOrders = 1;
+            minOrders = 6;
             goalTime = 300;
             countdownMinutes = 5;
         }
+
+        minOrders = getMinOrders(fileName);
+        goalTime = 300/*levelData.goalTime*/;
 
         // Define side panel properties
         sidePanelWidth = Gdx.graphics.getWidth() / 5; // Width
@@ -376,7 +380,9 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         multiplexer.addProcessor(stage);
         multiplexer.addProcessor(keyProcessor);
         multiplexer.addProcessor(popup.getStage());
-        multiplexer.addProcessor(tutorialPopups.getStage());
+        if (tutorialPopups != null) {
+            multiplexer.addProcessor(tutorialPopups.getStage());
+        }
 
         Gdx.input.setInputProcessor(multiplexer);
 
@@ -445,7 +451,9 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         autoDeclineLabel.setSize(font.getScaleX() * 16, font.getScaleY() * 16);
 
         schedulePopupDisplay();
-        tutorialPopups.scheduleStepDelay();
+        if (tutorialPopups != null) {
+            tutorialPopups.scheduleStepDelay();
+        }
         //tutorialPopups.scheduleStep();
 
     }
@@ -765,6 +773,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                     //if (order.isPickedUp()) {
                     font.setColor(Color.RED);
                     // }
+                } else if (i == 1 && order.isPickedUp()){
+                    font.setColor(Color.GREEN);
                 } else {
                     font.setColor(Color.WHITE);
                 }
@@ -909,8 +919,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             show_popup = new Random().nextInt(5) + 6;
         }
 
-        final int finalHide_popup = hide_popup;
-        final int finalShow_popup = show_popup;
+        //final int finalHide_popup = hide_popup;
+        //final int finalShow_popup = show_popup;
         scheduler.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
@@ -963,10 +973,10 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                                 }
                             }
                         }
-                    }, finalHide_popup, TimeUnit.SECONDS); // Schedule to hide the popup after _ seconds
+                    }, 5, TimeUnit.SECONDS); // Schedule to hide the popup after _ seconds
                 }
             }
-        }, 0, finalShow_popup, TimeUnit.SECONDS); // Schedule the next popup _ seconds after the first one
+        }, 0, 10, TimeUnit.SECONDS); // Schedule the next popup _ seconds after the first one
     }
 
 
@@ -1113,5 +1123,17 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         int timeMinutes = Integer.parseInt(scanner.nextLine());
         int timeSeconds = Integer.parseInt(scanner.nextLine());
         return timeSeconds;
+    }
+
+    private int getMinOrders(String filename) throws FileNotFoundException {
+        String file = "level_displays/" + filename + "_display.txt";
+
+        Scanner scanner = new Scanner(new File(file));
+        String thumbnailPath = scanner.nextLine();
+        int timeMinutes = Integer.parseInt(scanner.nextLine());
+        int timeSeconds = Integer.parseInt(scanner.nextLine());
+        String name = scanner.nextLine();
+        int minOrders = Integer.parseInt(scanner.nextLine());
+        return minOrders;
     }
 }

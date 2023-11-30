@@ -37,7 +37,8 @@ public class TutorialPopups implements Screen {
     private int currentStep;
     private String[] tutorialMessages = {
             "Use WASD or arrow keys\nto move around the map! You\nneed to complete the required\norders in the given time!",
-            "Click Accept button to accept an\norder! You can see order\ninformation in this popup and\nin the order panel once accepted!",
+            "Click Accept button to accept an\norder! You can see order info in this\npopup and in the order panel once\naccepted! Make sure " +
+                    "not to decline\nor timeout an order >3 times,\nor else you lose coins.",
             "Travel to the pickup building and\npress p to pick up the order! You\nwill see the order change color\nwhen its picked up.",
             "Make sure to collect coins on the\nway! You can see how many\nyou've collected at the top of the\nscreen.",
             "Travel to the destination building\nand press d to drop off the order!\nThe orders completed will be\nincremented and you will see the\ngame stats screen when time is up!"
@@ -67,7 +68,7 @@ public class TutorialPopups implements Screen {
         font.setColor(1, 1, 1, 1); // White color
 
         popupWidth = (float) (Gdx.graphics.getWidth() / 3.3);
-        popupHeight = 135;
+        popupHeight = 150;
         popupX = 0;
         popupY = 0;
 
