@@ -203,8 +203,45 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         layers = new ArrayList<>();
         loadLevel(fileName);
 
-        minOrders = 2/*levelData.minOrders*/;
-        goalTime = 300/*levelData.goalTime*/;
+        //Level information
+        /*
+        if ("".equals(fileName)) {
+            GameDifficulty.tutorial = true;
+        }
+        */
+        if ("level_6".equals(fileName)) {
+            GameDifficulty.easy = true;
+        }
+         /*
+        if ("".equals(fileName)) {
+            GameDifficulty.medium = true;
+        }
+        */
+        if ("level_5".equals(fileName)) {
+            GameDifficulty.hard = true;
+        }
+
+        if (GameDifficulty.tutorial) {
+            minOrders = 2   /*levelData.minOrders*/;
+            goalTime = 300 /*levelData.goalTime*/;
+            countdownMinutes = 15;
+        }
+
+        if (GameDifficulty.easy) {
+            minOrders = 2;
+            goalTime = 400;
+            countdownMinutes = 3;
+        }
+        if (GameDifficulty.medium) {
+            minOrders = 3;
+            goalTime = 500;
+            countdownMinutes = 4;
+        }
+        if (GameDifficulty.hard) {
+            minOrders = 1;
+            goalTime = 300;
+            countdownMinutes = 5;
+        }
 
         // Define side panel properties
         sidePanelWidth = Gdx.graphics.getWidth() / 5; // Width
@@ -858,9 +895,22 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         popup.hide(); // Display the popup
     }
 
+
     // Schedule the popup to display every 1 minute
     private void schedulePopupDisplay() {
         final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+        int hide_popup = 0;
+        int show_popup = 0;
+        if (GameDifficulty.tutorial || GameDifficulty.easy || GameDifficulty.medium) {
+            hide_popup = 5;
+            show_popup = 10;
+        } else if (GameDifficulty.hard) {
+            hide_popup = new Random().nextInt(10) + 2;
+            show_popup = new Random().nextInt(5) + 6;
+        }
+
+        final int finalHide_popup = hide_popup;
+        final int finalShow_popup = show_popup;
         scheduler.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
@@ -877,6 +927,19 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                                 // Hide the popup
                                 hideTimedPopup();
                                 if (!popup.acceptClicked() && !popup.declineClicked() && !ordersDone) {
+                                    //lose coins if do not manually accept or decline 3 times
+                                    if(GameDifficulty.hard) {
+                                        popup.nothingClicked++;
+                                        if (popup.nothingClicked >= 3) {
+                                            if (coinCounter > 1) {
+                                                coinCounter -= 2;
+                                            }
+                                            else if (coinCounter == 1) {
+                                                coinCounter -= 1;
+                                            }
+                                            coinCollectLabel.setText("Coins Collected: " + coinCounter);
+                                        }
+                                    }
                                     autoDeclineLabel.setVisible(true);
                                     scheduler.schedule(new Runnable() {
                                         @Override
@@ -887,13 +950,25 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                                         }
                                     }, 4, TimeUnit.SECONDS);
                                 }
+                                if(GameDifficulty.hard) {
+                                    if (popup.declineCount == 3) {
+                                        if (coinCounter > 1) {
+                                            coinCounter -= 2;
+                                        }
+                                        if (coinCounter == 1) {
+                                            coinCounter -= 1;
+                                        }
+                                    }
+                                    coinCollectLabel.setText("Coins Collected: " + coinCounter);
+                                }
                             }
                         }
-                    }, 5, TimeUnit.SECONDS); // Schedule to hide the popup after 10 seconds
+                    }, finalHide_popup, TimeUnit.SECONDS); // Schedule to hide the popup after _ seconds
                 }
             }
-        }, 0, 10, TimeUnit.SECONDS); // Schedule the next popup 15 seconds after the first one
+        }, 0, finalShow_popup, TimeUnit.SECONDS); // Schedule the next popup _ seconds after the first one
     }
+
 
     @Override
     public void resize(int width, int height) {
