@@ -225,17 +225,27 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             //System.out.println("easy");
         }
 
+        if ("level_2".equals(fileName)) {
+            GameDifficulty.easy = true;
+            //System.out.println("easy");
+        }
+
         if ("level_3".equals(fileName)) {
             GameDifficulty.medium = true;
             //System.out.println("medium");
         }
         if ("level_4".equals(fileName)) {
+            GameDifficulty.medium = true;
+            //System.out.println("hard");
+        }
+
+        if ("level_5".equals(fileName)) {
             GameDifficulty.hard = true;
             //System.out.println("hard");
         }
 
         if (GameDifficulty.tutorial) {
-            minOrders = 2   /*levelData.minOrders*/;
+            minOrders = 1   /*levelData.minOrders*/;
             goalTime = 300 /*levelData.goalTime*/;
             countdownMinutes = 15;
         }
@@ -251,9 +261,9 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             countdownMinutes = 4;
         }
         if (GameDifficulty.hard) {
-            minOrders = 5;
+            minOrders = 4;
             goalTime = 300;
-            countdownMinutes = 6;
+            countdownMinutes = 5;
         }
 
         // Define side panel properties
