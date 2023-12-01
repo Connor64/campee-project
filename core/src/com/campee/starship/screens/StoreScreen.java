@@ -54,7 +54,7 @@ public class StoreScreen implements Screen {
 
         music = Gdx.audio.newMusic(Gdx.files.internal("audio/menu screen sound.mp3"));
         music.setLooping(true);
-        music.setVolume(0.35f);
+        music.setVolume(DataManager.INSTANCE.getMenuSFXVolume());
 
         backButton = HoverableButton.generate("BACK", true, Color.valueOf("98FF98"), Color.BLACK, 1.5f);
         backButton.setPosition(30, Gdx.graphics.getHeight() - 80);

@@ -19,8 +19,9 @@
     },
     "purchased_upgrades": {
         "speed_boost": true,
-        "sparkle_purple": false
+        "grass": true
     },
-    "gameplay_music_volume": 0.5,
-    "menu_music_volume": 0.2
+    "gameplay_music_volume": 0.1,
+    "menu_music_volume": 0,
+    "menu_sfx_volume": 0
 }

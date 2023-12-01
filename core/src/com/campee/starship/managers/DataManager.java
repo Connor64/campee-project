@@ -7,6 +7,7 @@ import java.io.*;
 import java.util.*;
 
 import com.badlogic.gdx.files.FileHandle;
+import com.campee.starship.objects.Customization;
 import org.json.*;
 
 public class DataManager {
@@ -16,6 +17,7 @@ public class DataManager {
     private final String GAMEPLAY_MUSIC = "gameplay_music_volume";
     private final String GAMEPLAY_SFX = "gameplay_sfx_volume";
     private final String MENU_MUSIC = "menu_music_volume";
+    private final String MENU_SFX = "menu_sfx_volume";
     private final String HIGH_SCORES = "high_scores";
     private final String FILE_NAME = "save_data.json";
 
@@ -29,6 +31,7 @@ public class DataManager {
     private float gameplayMusicVolume;
     private float gameplaySFXVolume;
     private float menuMusicVolume;
+    private float menuSFXVolume;
 
     private DataManager() {
         levelUnlocks = new HashMap<>();
@@ -74,6 +77,7 @@ public class DataManager {
             gameplayMusicVolume = root.getFloat(GAMEPLAY_MUSIC);
             gameplaySFXVolume = root.getFloat(GAMEPLAY_SFX);
             menuMusicVolume = root.getFloat(MENU_MUSIC);
+            menuSFXVolume = root.getFloat(MENU_SFX);
 
         } catch (IOException e) {
             // If the file doesn't exist (or something is fucked)
@@ -125,6 +129,7 @@ public class DataManager {
         obj.put(GAMEPLAY_MUSIC, gameplayMusicVolume);
         obj.put(GAMEPLAY_SFX, gameplaySFXVolume);
         obj.put(MENU_MUSIC, menuMusicVolume);
+        obj.put(MENU_SFX, menuSFXVolume);
 
         handle.writeString(obj.toString(4), false); // Write to file
     }
@@ -183,6 +188,30 @@ public class DataManager {
         return activeUpgrades.get(upgradeID);
     }
 
+    public void toggleUpgrade(String upgradeID, boolean diskWrite) {
+        if (!activeUpgrades.containsKey(upgradeID)) return;
+
+        if (activeUpgrades.get(upgradeID) && AssetManager.INSTANCE.getUpgrade(upgradeID) instanceof Customization) {
+            for (Map.Entry<String, Boolean> entry : activeUpgrades.entrySet()) {
+                if (AssetManager.INSTANCE.getUpgrade(entry.getKey()) instanceof Customization) {
+                    if (!entry.getKey().equals(upgradeID)) {
+                        activeUpgrades.put(entry.getKey(), false);
+                    }
+                }
+            }
+        }
+
+        activeUpgrades.put(upgradeID, !activeUpgrades.get(upgradeID));
+
+        if (diskWrite) {
+            saveProgress();
+        }
+    }
+
+    public Set<Map.Entry<String, Boolean>> getPurchases() {
+        return activeUpgrades.entrySet();
+    }
+
     public void addCoins(int coinDiff, boolean diskWrite) {
         System.out.println("adding coins!! current: " + coinCount + "  diff: " + coinDiff);
         coinCount = Math.max(0, coinCount + coinDiff);
@@ -214,6 +243,12 @@ public class DataManager {
         if (diskWrite) saveProgress();
     }
 
+    public void setMenuSFXVolume(float volume, boolean diskWrite) {
+        menuSFXVolume = volume;
+
+        if (diskWrite) saveProgress();
+    }
+
     public float getGameplayMusicVolume() {
         return gameplayMusicVolume;
     }
@@ -223,6 +258,10 @@ public class DataManager {
     }
 
     public float getMenuMusicVolume() {
+        return menuMusicVolume;
+    }
+
+    public float getMenuSFXVolume() {
         return menuMusicVolume;
     }
 }

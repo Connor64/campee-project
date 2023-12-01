@@ -1,24 +1,20 @@
 package com.campee.starship.userinterface;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.campee.starship.managers.DataManager;
 import com.campee.starship.objects.Upgrade;
 
 public class UpgradePanel extends Table {
-    private HoverableButton purchaseButton;
+    private HoverableButton purchaseButton, activeButton;
     private Upgrade upgrade;
 
     public UpgradePanel(Upgrade _upgrade) {
@@ -51,6 +47,9 @@ public class UpgradePanel extends Table {
                     DataManager.INSTANCE.addCoins(upgrade.getCost() * -1, true);
                     DataManager.INSTANCE.addPurchase(upgrade.getID(), true);
                     purchaseButton.setHoverable(false, true);
+
+                    activeButton = HoverableButton.generate("TOGGLE", true, Color.GREEN, Color.BLACK, 1.5f);
+                    activeButton.setHoverable(true, false);
                 }
                 return true;
             }
@@ -59,12 +58,30 @@ public class UpgradePanel extends Table {
             purchaseButton.setHoverable(false, true);
         }
 
+        if (DataManager.INSTANCE.isUpgradePurchased(upgrade.getID())) {
+            activeButton = HoverableButton.generate("TOGGLE", true, Color.GREEN, Color.BLACK, 1.5f);
+        } else {
+            activeButton = HoverableButton.generate("TOGGLE", true, Color.DARK_GRAY, Color.BLACK, 1.5f);
+            activeButton.setHoverable(false, true);
+        }
+
+        activeButton.addListener(new ClickListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                if (DataManager.INSTANCE.isUpgradePurchased(upgrade.getID())) {
+                    DataManager.INSTANCE.toggleUpgrade(upgrade.getID(), true);
+                }
+                return true;
+            }
+        });
+
         setBackground(new TextureRegionDrawable(new TextureRegion(new Texture(createPixmap(new Color(0.8f, 0.6f, 1f, 1f))))));
 
         add(nameLabel).padTop(5).colspan(3).center().row();
         add(upgrade.getIcon()).pad(50).colspan(3).center().row();
         add(costlabel).padBottom(15).colspan(3).center().row();
         add(purchaseButton).padBottom(5).colspan(3).center().row();
+        add(activeButton).padBottom(0).colspan(3).center().row();
 
         pad(50);
     }
