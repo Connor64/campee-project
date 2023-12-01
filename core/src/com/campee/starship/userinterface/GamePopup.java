@@ -135,6 +135,7 @@ public class GamePopup {
             public void clicked(InputEvent event, float x, float y) {
                 try {
                     game.setScreen(new GameplayScreen((MoonshipGame) game, fileName));
+                    //System.out.println("sdjkfjhgkfdkjdk game replay");
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 } catch (ClassNotFoundException e) {
@@ -165,7 +166,7 @@ public class GamePopup {
     public void showGameStatsMessage(String message) {
         gameStatsMessage.setText(message);
         gameStatsMessage.setVisible(true);
-        System.out.println(message);
+//        System.out.println(message);
         ordersCompletedLabel.setVisible(true);
         ordersOutOfTimeLabel.setVisible(true);
     }
