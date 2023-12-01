@@ -339,7 +339,7 @@ public class LevelScreen extends ScreenAdapter {
                 super.enter(event, x, y, pointer, fromActor);
                 isButtonHovered = true;
                 //levelButton.setColor(Color.LIGHT_GRAY);
-                if (levelButton.getText().toString().equals("PLAYGIT ")) {
+                if (levelButton.getText().toString().equals("PLAY")) {
                     levelButton.setColor(Color.LIGHT_GRAY);
                 }
             }
