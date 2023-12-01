@@ -1008,6 +1008,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                 int num = Character.getNumericValue(LevelScreen.nameOfFile.charAt(LevelScreen.nameOfFile.length() - 1));
                 num++;
                 DataManager.INSTANCE.setClearStatus(String.valueOf(num), true, false);
+                DataManager.INSTANCE.setHighScore(String.valueOf(num - 1), totalOrdersCompleted, false);
                 DataManager.INSTANCE.addCoins(coinCounter, true);
 
                 savedData = true;
