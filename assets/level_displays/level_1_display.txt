@@ -2,4 +2,5 @@ level_1_thumbnail.png
 3
 1
 Flower Fields
+[EASY]
 1

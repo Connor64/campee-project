@@ -2,4 +2,5 @@ level_3_thumbnail.png
 4
 2
 The Tree
+[EASY]
 2
