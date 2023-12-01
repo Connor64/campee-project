@@ -220,12 +220,12 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         //Level information
 
-        if ("level_6".equals(fileName)) {
+        if ("level_1".equals(fileName)) {
             GameDifficulty.easy = true;
             //System.out.println("easy");
         }
 
-        if ("level_5".equals(fileName)) {
+        if ("level_3".equals(fileName)) {
             GameDifficulty.medium = true;
             //System.out.println("medium");
         }
@@ -332,8 +332,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         buttonStyle.font = buttonFont;
         buttonStyle.fontColor = Color.BLACK;
 
-        if ("level_5".equals(fileName)) {
-            System.out.println("in tutorial");
+        if ("level_0".equals(fileName)) {
+            //System.out.println("in tutorial");
             tutorialPopups = new TutorialPopups(this);
             //isTutorialPopupsVisible = true;
             GameDifficulty.tutorial = true;
