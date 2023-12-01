@@ -5,6 +5,7 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
@@ -43,6 +44,7 @@ public class LevelScreen extends ScreenAdapter {
     private boolean isSettingButtonHovered = false;
     private boolean isButtonHovered = false;
     private Stage stage2;
+    Music music;
 
     public LevelScreen(final Game game) throws FileNotFoundException {
         this.game = game;
@@ -51,6 +53,10 @@ public class LevelScreen extends ScreenAdapter {
         font = new BitmapFont();
         font.setColor(Color.BLACK);
         viewport = new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+
+        music = Gdx.audio.newMusic(Gdx.files.internal("audio/menu screen sound.mp3"));
+        music.setLooping(true);
+        music.setVolume(0.35f);
 
         DataManager.INSTANCE.isLevelUnlocked("0");
 
@@ -129,6 +135,7 @@ public class LevelScreen extends ScreenAdapter {
         backButton.addListener(new InputListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 // Switch back to the title screen when the BACK button is clicked
+                music.pause();
                 game.setScreen(new TitleScreen((MoonshipGame) game)); // Change to the screen you want
                 return true;
             }
@@ -156,6 +163,7 @@ public class LevelScreen extends ScreenAdapter {
         settingsButton.setSize(150, 60);
         settingsButton.addListener(new InputListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                music.pause();
                 game.setScreen(new SettingsScreen(game));
                 return true;
             }
@@ -292,6 +300,7 @@ public class LevelScreen extends ScreenAdapter {
                     if (levelButton.getText().toString().equals("UNLOCKED")) {
                         nameOfFile = "Level " + levelNumber;
 //                        game.setScreen(new GameplayScreen((MoonshipGame) game, levelName));
+                        music.pause();
                         game.setScreen(new GameplayScreen((MoonshipGame) game, "level_" + levelNumber));
                         //System.out.println("hereeee");
                     }
@@ -378,6 +387,7 @@ public class LevelScreen extends ScreenAdapter {
         Gdx.gl.glClear(Gdx.gl20.GL_COLOR_BUFFER_BIT);
 
         stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 80f));
+        music.play();
         //stage.act(delta);
         stage.draw();
     }
