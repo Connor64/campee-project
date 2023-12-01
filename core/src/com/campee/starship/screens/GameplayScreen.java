@@ -1297,6 +1297,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         int timeMinutes = Integer.parseInt(scanner.nextLine());
         int timeSeconds = Integer.parseInt(scanner.nextLine());
         String name = scanner.nextLine();
+        scanner.nextLine();
         int minOrders = Integer.parseInt(scanner.nextLine());
         return minOrders;
     }

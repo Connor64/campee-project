@@ -1,5 +1,6 @@
 level_0_thumbnail.png
-3
-2
-Ugly Level
+15
+0
+The Beginning
+[TUTORIAL]
 1
