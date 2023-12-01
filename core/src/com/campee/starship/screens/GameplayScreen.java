@@ -1273,8 +1273,10 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                     building.setPosition(
                             objectData[i].x * levelData.tileSize,
                             // Setting the y-position is like this bc libgdx is stupid :)
-                            levelHeight - (objectData[i].y + 1) * levelData.tileSize - building.getBounds().height
+                            levelHeight - (objectData[i].y - 1) * levelData.tileSize - building.getHeight()
                     );
+
+                    System.out.println("Height: " + building.getHeight());
 //                    System.out.println(objectData[i].objectID);
                     buildings.add(building);
                 } else if (object instanceof CoinObject) {
