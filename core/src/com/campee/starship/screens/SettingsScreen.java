@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -43,9 +44,11 @@ public class SettingsScreen implements Screen {
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 800, 600); // Set the camera dimensions as per your requirement
         batch = new SpriteBatch();
-        font = new BitmapFont();
+        font = new BitmapFont(Gdx.files.internal("fonts/moonships_font.fnt"), Gdx.files.internal("fonts/moonships_font.png"), false);
         font.setColor(Color.BLACK);
-        font.getData().setScale(2.0f); // Set the font scale to make the text larger
+        font.getData().setScale(0.8f);
+//        font.setColor(Color.BLACK);
+//        font.getData().setScale(2.0f); // Set the font scale to make the text larger
 
         music = Gdx.audio.newMusic(Gdx.files.internal("audio/menu screen sound.mp3"));
         music.setLooping(true);
@@ -96,6 +99,17 @@ public class SettingsScreen implements Screen {
                     e.printStackTrace();
                 }
                 return true;
+            }
+            @Override
+            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+                super.enter(event, x, y, pointer, fromActor);
+                backButton.setColor(Color.LIGHT_GRAY);
+            }
+            @Override
+            public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
+                super.exit(event, x, y, pointer, toActor);
+//                isPlayButtonHovered = false;
+                backButton.setColor(Color.WHITE);
             }
         });
         stage.addActor(settingsMusicSlider);
