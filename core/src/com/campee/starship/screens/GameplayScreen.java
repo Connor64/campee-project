@@ -992,7 +992,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             // TODO: rewrite this to not rely on file name
             int num = Character.getNumericValue(LevelScreen.nameOfFile.charAt(LevelScreen.nameOfFile.length() - 1));
             num++;
-            DataManager.INSTANCE.setClearStatus(String.valueOf(num), true, true);
+            DataManager.INSTANCE.setClearStatus(String.valueOf(num), true, false);
+            DataManager.INSTANCE.addCoins(coinCounter, true);
 
             levelResult = "Congrats, level completed!";
         } else {
