@@ -2,6 +2,7 @@ package com.campee.starship.objects;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -18,9 +19,13 @@ public class Player extends GameObject {
     private final TextureRegion[] directionalSprites;
     private final float MOVEMENT_SPEED = 10;
     public Music music;
+    public Sound sound;
 
     public Player(World world, float x, float y) {
         super(x, y);
+
+        sound = Gdx.audio.newSound(Gdx.files.internal("audio/ping.mp3"));
+
 
         // Set up directional sprites
         Texture upTexture = new Texture(Gdx.files.internal("sprites/moonship_up.png"));
@@ -110,6 +115,8 @@ public class Player extends GameObject {
         // Check if within the collision bounds
         if (Intersector.overlaps(getBounds(), object.getBounds())) {
             if (rigid) {
+                long id = sound.play();
+                sound.setVolume(id, .5f);
                 if (Math.abs(body.getLinearVelocity().x) > 0) {
                     body.setLinearVelocity(body.getLinearVelocity().x * -2, body.getLinearVelocity().y);
                 }
