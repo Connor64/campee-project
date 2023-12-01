@@ -158,6 +158,12 @@ public class AssetManager {
         return upgrades.entrySet();
     }
 
+    public Upgrade getUpgrade(String upgradeID) {
+        if (!upgrades.containsKey(upgradeID)) return null;
+
+        return upgrades.get(upgradeID);
+    }
+
     /**
      * Loads the specified tileset and adds it to the asset manager's list of tilesets
      *

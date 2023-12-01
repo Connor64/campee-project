@@ -7,6 +7,7 @@ import java.io.*;
 import java.util.*;
 
 import com.badlogic.gdx.files.FileHandle;
+import com.campee.starship.objects.Customization;
 import org.json.*;
 
 public class DataManager {
@@ -181,6 +182,30 @@ public class DataManager {
         if (!activeUpgrades.containsKey(upgradeID)) return false;
 
         return activeUpgrades.get(upgradeID);
+    }
+
+    public void toggleUpgrade(String upgradeID, boolean diskWrite) {
+        if (!activeUpgrades.containsKey(upgradeID)) return;
+
+        if (activeUpgrades.get(upgradeID) && AssetManager.INSTANCE.getUpgrade(upgradeID) instanceof Customization) {
+            for (Map.Entry<String, Boolean> entry : activeUpgrades.entrySet()) {
+                if (AssetManager.INSTANCE.getUpgrade(entry.getKey()) instanceof Customization) {
+                    if (!entry.getKey().equals(upgradeID)) {
+                        activeUpgrades.put(entry.getKey(), false);
+                    }
+                }
+            }
+        }
+
+        activeUpgrades.put(upgradeID, !activeUpgrades.get(upgradeID));
+
+        if (diskWrite) {
+            saveProgress();
+        }
+    }
+
+    public Set<Map.Entry<String, Boolean>> getPurchases() {
+        return activeUpgrades.entrySet();
     }
 
     public void addCoins(int coinDiff, boolean diskWrite) {
