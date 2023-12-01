@@ -46,9 +46,9 @@ public class SettingsScreen implements Screen {
         stage = new Stage(viewport);
         Gdx.input.setInputProcessor(stage);
 
-        BitmapFont buttonFont = new BitmapFont();
+        BitmapFont buttonFont = new BitmapFont(Gdx.files.internal("fonts/moonships_font.fnt"), Gdx.files.internal("fonts/moonships_font.png"), false);
         TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
-        buttonFont.getData().setScale(1.5f);
+        buttonFont.getData().setScale(0.8f);
         textButtonStyle.font = buttonFont;
         textButtonStyle.fontColor = Color.BLACK;
         Pixmap backgroundPixmap = createRoundedRectanglePixmap(150, 60, 15, Color.valueOf("98FF98"));

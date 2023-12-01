@@ -1,6 +1,6 @@
-level_4_thumbnail.png
+level5.png
 3
-2
-Town Friends
-[EASY]
-4
+20
+The City
+[MEDIUM]
+3

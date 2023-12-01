@@ -1,6 +1,6 @@
-level5.png
+level_4_thumbnail.png
 3
 2
-The City
-[EASY]
-3
+Town Friends
+[HARD]
+4

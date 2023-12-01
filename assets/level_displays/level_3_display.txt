@@ -1,6 +1,6 @@
-level_3_thumbnail.png
+connor_apple.jpg
 4
 2
 The Tree
-[EASY]
+[MEDIUM]
 2
