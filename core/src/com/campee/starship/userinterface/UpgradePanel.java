@@ -11,21 +11,18 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.campee.starship.managers.DataManager;
 import com.campee.starship.objects.Upgrade;
 
-import javax.xml.crypto.Data;
-
 public class UpgradePanel extends Table {
     private HoverableButton purchaseButton;
     private Upgrade upgrade;
 
-    public UpgradePanel(String spritePath, final Upgrade upgrade) {
-        this.upgrade = upgrade;
+    public UpgradePanel(String spritePath, Upgrade _upgrade) {
+        upgrade = _upgrade;
 
         // Create name label
         Label.LabelStyle nameStyle = new Label.LabelStyle();
@@ -36,7 +33,7 @@ public class UpgradePanel extends Table {
         Label nameLabel = new Label(upgrade.getName(), nameStyle);
 
         Label.LabelStyle costStyle = new Label.LabelStyle();
-        costStyle.font = new BitmapFont();;
+        costStyle.font = new BitmapFont();
         costStyle.fontColor = Color.BLACK;
         Label costlabel = new Label("Cost: " + upgrade.getCost(), costStyle);
 
@@ -50,8 +47,11 @@ public class UpgradePanel extends Table {
         purchaseButton.addListener(new ClickListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                DataManager.INSTANCE.savePurchase(upgrade.getID(), true);
-                purchaseButton.setHoverable(false, true);
+                if (!purchaseButton.isDisabled() && DataManager.INSTANCE.getCoinCount() >= upgrade.getCost()) {
+                    DataManager.INSTANCE.addCoins(upgrade.getCost() * -1, true);
+                    DataManager.INSTANCE.addPurchase(upgrade.getID(), true);
+                    purchaseButton.setHoverable(false, true);
+                }
                 return true;
             }
         });

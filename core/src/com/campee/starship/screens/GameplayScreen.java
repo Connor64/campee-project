@@ -63,6 +63,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     public ArrayList<CoinObject> coins;
     private final KeepPlayingPopup keepplayingpopup;
     public int coinCounter;
+    private boolean doubleCoins;
     private boolean visibleText;
 
     private int totalOrdersCompleted;
@@ -201,6 +202,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         sidePanelColor = new Color(0.2f, 0.2f, 0.2f, 0.5f); // Background color (RGBA)
 
         coinCounter = 0;
+        doubleCoins = DataManager.INSTANCE.isUpgradePurchased("coin_boost");
 
         visibleQ = new ArrayList<>();
         playerAttributes.setArray(visibleQ);
@@ -445,7 +447,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                     if (player.checkCollision(coin, false)) {
                         coinCollect.play();
                         coin.setCollected(true);
-                        coinCounter++;
+                        coinCounter += doubleCoins ? 2 : 1;
                         coinCollectLabel.setText("Coins Collected: " + coinCounter);
                     }
                 }

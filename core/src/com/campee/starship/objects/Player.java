@@ -15,10 +15,14 @@ import com.campee.starship.managers.*;
 public class Player extends GameObject {
     private Body body;
     private final TextureRegion[] directionalSprites;
-    private final float MOVEMENT_SPEED = 10;
+    private float movementSpeed = 10;
 
     public Player(World world, float x, float y) {
         super(x, y);
+
+        if (DataManager.INSTANCE.isUpgradePurchased("speed_boost")) {
+            movementSpeed += 20;
+        }
 
         // Set up directional sprites
         Texture upTexture = new Texture(Gdx.files.internal("sprites/moonship_up.png"));
@@ -85,7 +89,7 @@ public class Player extends GameObject {
             setSprite(3);
         }
 
-        body.applyLinearImpulse(direction.scl(MOVEMENT_SPEED), body.getPosition(), true);
+        body.applyLinearImpulse(direction.scl(movementSpeed), body.getPosition(), true);
         super.setPosition(body.getPosition());
     }
 

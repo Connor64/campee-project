@@ -51,7 +51,7 @@ public class DataManager {
         }
     }
 
-    public void savePurchase(String upgradeID, boolean diskWrite) {
+    public void addPurchase(String upgradeID, boolean diskWrite) {
         if (purchasedUpgrades.contains(upgradeID)) return;
 
         purchasedUpgrades.add(upgradeID);
@@ -59,6 +59,18 @@ public class DataManager {
         if (diskWrite) {
             saveProgress();
         }
+    }
+
+    public void addCoins(int coinDiff, boolean diskWrite) {
+        coinCount = Math.max(0, coinCount + coinDiff);
+
+        if (diskWrite) {
+            saveProgress();
+        }
+    }
+
+    public int getCoinCount() {
+        return coinCount;
     }
 
     private void loadFile() {
@@ -121,6 +133,7 @@ public class DataManager {
         // Write to JSON outer JSON object
         obj.put(UNLOCKED_LEVELS, unlockedLevelsObj);
         obj.put(PURCHASED_UPGRADES, purchasedUpgradesObj);
+        obj.put(COIN_COUNT, coinCount);
 
         handle.writeString(obj.toString(4), false); // Write to file
     }

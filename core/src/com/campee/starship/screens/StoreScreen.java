@@ -20,22 +20,23 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.campee.starship.managers.AssetManager;
+import com.campee.starship.managers.DataManager;
 import com.campee.starship.objects.Upgrade;
 import com.campee.starship.userinterface.CustomScrollPane;
 import com.campee.starship.userinterface.HoverableButton;
 import com.campee.starship.userinterface.UpgradePanel;
 
+import javax.xml.crypto.Data;
 import java.util.Map;
 import java.util.Set;
 
 public class StoreScreen implements Screen {
     private final Game game;
     private Stage stage;
-    private BitmapFont font;
     private HoverableButton backButton;
     private ExtendViewport viewport;
 
-    private Label shopBanner;
+    private Label shopBanner, coinLabel;
 
     public StoreScreen (final Game game) {
         this.game = game;
@@ -53,13 +54,24 @@ public class StoreScreen implements Screen {
             }
         });
 
-        Label.LabelStyle labelStyle = new Label.LabelStyle();
+        Label.LabelStyle coinStyle = new Label.LabelStyle();
+        BitmapFont coinFont = new BitmapFont();
+        coinFont.getData().scale(1.5f);
+        coinStyle.font = coinFont;
+        coinStyle.fontColor = Color.BLACK;
+
+        coinLabel = new Label("Coins " + DataManager.INSTANCE.getCoinCount(), coinStyle);
+        coinLabel.setAlignment(Align.right);
+        coinLabel.setSize(Gdx.graphics.getWidth(), 120);
+        coinLabel.setPosition(-10, Gdx.graphics.getHeight() - coinLabel.getHeight());
+
+        Label.LabelStyle titleStyle = new Label.LabelStyle();
         BitmapFont labelFont = new BitmapFont();
         labelFont.getData().scale(5);
-        labelStyle.font = labelFont;
-        labelStyle.fontColor = Color.BLACK;
+        titleStyle.font = labelFont;
+        titleStyle.fontColor = Color.BLACK;
 
-        shopBanner = new Label("The Bits Shop", labelStyle);
+        shopBanner = new Label("THE BITS SHOP", titleStyle);
         shopBanner.setAlignment(Align.center);
         shopBanner.setSize(Gdx.graphics.getWidth(), 240);
         shopBanner.setPosition(0, Gdx.graphics.getHeight() - shopBanner.getHeight());
@@ -78,6 +90,7 @@ public class StoreScreen implements Screen {
 
         stage.addActor(customScrollPane);
         stage.addActor(shopBanner);
+        stage.addActor(coinLabel);
         stage.addActor(backButton);
     }
 
@@ -92,6 +105,8 @@ public class StoreScreen implements Screen {
         // Clear the screen with a background color
         Gdx.gl.glClearColor(0.7f, 0.9f, 1f, 1);
         Gdx.gl.glClear(Gdx.gl20.GL_COLOR_BUFFER_BIT);
+
+        coinLabel.setText("Coins: " + DataManager.INSTANCE.getCoinCount());
 
 //        stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 80f));
         // Update and render game elements
@@ -130,6 +145,9 @@ public class StoreScreen implements Screen {
                 Math.max(0.0f, (viewport.getWorldWidth() - shopBanner.getWidth()) / 2.0f),
                 viewport.getWorldHeight() - shopBanner.getHeight()
         );
+
+        coinLabel.setWidth(viewport.getWorldWidth());
+        coinLabel.setPosition(-10, viewport.getWorldHeight() - coinLabel.getHeight());
 
         stage.getViewport().update(width, height, true);
     }
