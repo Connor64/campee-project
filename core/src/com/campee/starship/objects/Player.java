@@ -1,6 +1,7 @@
 package com.campee.starship.objects;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -16,6 +17,7 @@ public class Player extends GameObject {
     private Body body;
     private final TextureRegion[] directionalSprites;
     private final float MOVEMENT_SPEED = 10;
+    public Music music;
 
     public Player(World world, float x, float y) {
         super(x, y);
