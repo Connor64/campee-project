@@ -62,6 +62,7 @@ public class DataManager {
     }
 
     public void addCoins(int coinDiff, boolean diskWrite) {
+        System.out.println("adding coins!! current: " + coinCount + "  diff: " + coinDiff);
         coinCount = Math.max(0, coinCount + coinDiff);
 
         if (diskWrite) {

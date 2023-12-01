@@ -1,5 +1,5 @@
 {
-    "coins": 500,
+    "coins": 0,
     "unlocked_levels": {
         "0": true,
         "1": true,
@@ -9,6 +9,5 @@
         "5": true,
         "6": true
     },
-    "purchased_upgrades": [
-    ]
+    "purchased_upgrades": []
 }

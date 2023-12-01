@@ -155,6 +155,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     private Stage stage;
     private KeyProcessor keyProcessor;
     private float timeSinceLastMove;
+    private boolean savedData = false;
 
     private PlayerCamera camera;
 
@@ -990,10 +991,14 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         String levelResult;
         if (win) {
             // TODO: rewrite this to not rely on file name
-            int num = Character.getNumericValue(LevelScreen.nameOfFile.charAt(LevelScreen.nameOfFile.length() - 1));
-            num++;
-            DataManager.INSTANCE.setClearStatus(String.valueOf(num), true, false);
-            DataManager.INSTANCE.addCoins(coinCounter, true);
+            if (!savedData) {
+                int num = Character.getNumericValue(LevelScreen.nameOfFile.charAt(LevelScreen.nameOfFile.length() - 1));
+                num++;
+                DataManager.INSTANCE.setClearStatus(String.valueOf(num), true, false);
+                DataManager.INSTANCE.addCoins(coinCounter, true);
+
+                savedData = true;
+            }
 
             levelResult = "Congrats, level completed!";
         } else {
