@@ -108,6 +108,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     Sound levelWin;
     Sound levelFail;
     Sound newOrderNotif;
+    int hide_popup;
 
 
     // Create a TimerTask to decrement the countdown timer
@@ -259,7 +260,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         orderArray = new ArrayList<>();
         order.setArray(orderArray, fileName + "_orders");
         Collections.shuffle(orderArray);
-        System.out.println(orderArray);
+        //System.out.println(orderArray);
         orderA = order.arrayToArray();
         order.seti(order.i++);
         int time = Integer.parseInt(orderA[3]);
@@ -280,6 +281,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         coinCollect = Gdx.audio.newSound(Gdx.files.internal("audio/coin_collect.mp3"));
         gamepopup = new GamePopup(this, "", game, fileName);
         keepplayingpopup = new KeepPlayingPopup(this, "", game, fileName);
+        int hide_popup = 0;
 
         // Make button style
         Pixmap backgroundPixmap = createRoundedRectanglePixmap(200, 50, 10, new Color(0.9f, 0, 0.9f, 0.6f)); // Adjust size and color
@@ -900,22 +902,24 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
     // Schedule the popup to display every 1 minute
     private void schedulePopupDisplay() {
+        //System.out.println("hi in schedule");
         final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-        int hide_popup = 0;
-        int show_popup = 0;
-        if (GameDifficulty.tutorial || GameDifficulty.easy || GameDifficulty.medium) {
-            hide_popup = 5;
-            show_popup = 10;
-        } else if (GameDifficulty.hard) {
-            hide_popup = new Random().nextInt(10) + 2;
-            show_popup = new Random().nextInt(5) + 6;
-        }
+//        int hide_popup = 0;
+        //int show_popup = 0;
 
-        final int finalHide_popup = hide_popup;
-        final int finalShow_popup = show_popup;
         scheduler.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
+                if (GameDifficulty.tutorial || GameDifficulty.easy || GameDifficulty.medium) {
+                    hide_popup = 5;
+                    //show_popup = 10;
+                } else if (GameDifficulty.hard) {
+                    hide_popup = new Random().nextInt(7)+1;
+                    System.out.println("random num: "+hide_popup);
+                    //show_popup = 10;
+//            show_popup = new Random().nextInt(5) + 6;
+                    //System.out.println("random num2: "+show_popup);
+                }
                 if (!popupInAction && !isTutorialPopupsVisible) {
                     showTimedPopup(); // Show the popup
                     if (!outOfOrders) {
@@ -965,10 +969,10 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                                 }
                             }
                         }
-                    }, finalHide_popup, TimeUnit.SECONDS); // Schedule to hide the popup after _ seconds
+                    }, hide_popup, TimeUnit.SECONDS); // Schedule to hide the popup after _ seconds
                 }
             }
-        }, 0, finalShow_popup, TimeUnit.SECONDS); // Schedule the next popup _ seconds after the first one
+        }, 0, 10, TimeUnit.SECONDS); // Schedule the next popup _ seconds after the first one
     }
 
 
