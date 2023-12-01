@@ -21,7 +21,7 @@ public class UpgradePanel extends Table {
     private HoverableButton purchaseButton;
     private Upgrade upgrade;
 
-    public UpgradePanel(String spritePath, Upgrade _upgrade) {
+    public UpgradePanel(Upgrade _upgrade) {
         upgrade = _upgrade;
 
         // Create name label
@@ -36,12 +36,6 @@ public class UpgradePanel extends Table {
         costStyle.font = new BitmapFont();
         costStyle.fontColor = Color.BLACK;
         Label costlabel = new Label("Cost: " + upgrade.getCost(), costStyle);
-
-        // Create icon sprite
-        Texture texture = new Texture(Gdx.files.internal(spritePath));
-        texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-        TextureRegion region = new TextureRegion(texture, 0, 0, texture.getWidth(), texture.getHeight());
-        Image icon = new Image(new SpriteDrawable(new Sprite(region)));
 
         if (DataManager.INSTANCE.getCoinCount() >= upgrade.getCost()) {
             purchaseButton = HoverableButton.generate("PURCHASE", true, Color.GREEN, Color.BLACK, 1.5f);
@@ -68,11 +62,11 @@ public class UpgradePanel extends Table {
         setBackground(new TextureRegionDrawable(new TextureRegion(new Texture(createPixmap(new Color(0.8f, 0.6f, 1f, 1f))))));
 
         add(nameLabel).padTop(5).colspan(3).center().row();
-        add(icon).padTop(20).colspan(3).center().row();
-        add(costlabel).padBottom(20).colspan(3).center().row();
+        add(upgrade.getIcon()).pad(50).colspan(3).center().row();
+        add(costlabel).padBottom(15).colspan(3).center().row();
         add(purchaseButton).padBottom(5).colspan(3).center().row();
 
-        pad(30);
+        pad(50);
     }
 
     public Upgrade getUpgrade() {

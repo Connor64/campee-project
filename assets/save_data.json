@@ -17,7 +17,9 @@
         "4": 0,
         "5": 0
     },
-    "purchased_upgrades": ["speed_boost"],
+    "purchased_upgrades": {
+        "speed_boost": true
+    },
     "gameplay_music_volume": 0.1,
     "menu_music_volume": 0
 }
