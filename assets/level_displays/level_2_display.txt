@@ -1,6 +1,6 @@
-level_2_thumbnail.png
+level_6_thumbnail.png
 3
 2
-Chaos
+The Tunnels
 [EASY]
-1
+2

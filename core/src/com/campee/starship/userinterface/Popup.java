@@ -58,11 +58,11 @@ public class Popup implements Screen {
         nothingClicked = 0;
         declineCount = 0;
 
-        font = new BitmapFont();
+        font = new BitmapFont(Gdx.files.internal("fonts/moonships_font.fnt"), Gdx.files.internal("fonts/moonships_font.png"), false);;
 
         // Set font color and scale
         font.setColor(1, 1, 0, 1);
-        font.getData().setScale(1.25f);
+        font.getData().setScale(0.37f);
 
         popupWidth = (float)(Gdx.graphics.getWidth() / 4.21);
         popupHeight = 100; // Set the height of the popup
@@ -71,8 +71,8 @@ public class Popup implements Screen {
 
 
         messageLabel = new Label(notificationMessage, new Label.LabelStyle(font, Color.WHITE));
-        messageLabel.setFontScale(1f);
-        messageLabel.setPosition(670, popupY + 15);
+        messageLabel.setFontScale(0.41f);
+        messageLabel.setPosition(635, popupY + 38);
 
         //add(messageLabel).padRight(100).padTop(5);
 

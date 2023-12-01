@@ -1,6 +1,6 @@
-level_4_thumbnail.png
-6
-2
-Town Friends
-[HARD]
-5
+connor_apple.jpg
+3
+20
+The City
+[MEDIUM]
+3

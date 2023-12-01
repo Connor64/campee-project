@@ -49,11 +49,11 @@ public class PauseScreen {
 
         font = new BitmapFont(Gdx.files.internal("fonts/moonships_font.fnt"), Gdx.files.internal("fonts/moonships_font.png"), false);
 
-        buttonFont = new BitmapFont();
+        buttonFont = new BitmapFont(Gdx.files.internal("fonts/moonships_font.fnt"), Gdx.files.internal("fonts/moonships_font.png"), false);;
 
         // Set font color and scale
         buttonFont.setColor(1, 1, 0, 1);
-        buttonFont.getData().setScale(1.25f);
+        buttonFont.getData().setScale(0.38f);
 
         messageLabel = new Label(notificationMessage, new Label.LabelStyle(font, Color.WHITE));
         messageLabel.setFontScale(1f);
@@ -81,14 +81,14 @@ public class PauseScreen {
 //        soundSlider.setPosition(200f, Gdx.graphics.getHeight() - 400f);
         stage.addActor(soundSlider);
 
-        Pixmap resumeBackgroundPixmap = createRoundedRectanglePixmap(1000, 200, 10, Color.GREEN); // Adjust size and color
+        Pixmap resumeBackgroundPixmap = createRoundedRectanglePixmap(1200, 150, 15, Color.GREEN); // Adjust size and color
         TextButton.TextButtonStyle resumeButtonStyle = new TextButton.TextButtonStyle();
         resumeButtonStyle.font = buttonFont;
         resumeButtonStyle.fontColor = Color.BLACK;
         resumeButtonStyle.up = new TextureRegionDrawable(new TextureRegion(new Texture(resumeBackgroundPixmap)));
 
 
-        Pixmap exitBackgroundPixmap = createRoundedRectanglePixmap(1000, 200, 10, Color.RED); // Adjust size and color
+        Pixmap exitBackgroundPixmap = createRoundedRectanglePixmap(1200, 150, 15, Color.RED); // Adjust size and color
         TextButton.TextButtonStyle exitButtonStyle = new TextButton.TextButtonStyle();
         exitButtonStyle.font =  buttonFont;
         exitButtonStyle.fontColor = Color.BLACK;
