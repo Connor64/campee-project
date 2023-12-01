@@ -111,7 +111,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     Sound coinCollect;
     Skin skin;
     Slider musicSlider;
-    Slider soundSlider;
+    public static Slider soundSlider;
     long soundId;
     //private boolean coinCollectPlayed;
     //boolean soundPlayed;
@@ -741,8 +741,9 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                                 gameplayMusic.pause();
                                 newOrderNotif.pause();
 
-                                long id = pickupSuccess.play();
-                                pickupSuccess.setVolume(id, 0.5f);
+                                soundId = pickupSuccess.play();
+                                //pickupSuccess.setVolume(id, 0.5f);
+                                pickupSuccess.setVolume(soundId, soundSlider.getValue());
 
                                 order.setDroppedOff(false);
                                 pickupLabel.setVisible(false);
@@ -762,12 +763,14 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
                                 if (order.dropoffBuilding.getName().equals("Turkstra")) {
                                     if (playerAttributes.ordersCompleted == minOrders - 1) {
-                                        long id = pie.play();
-                                        pie.setVolume(id, .8f);
+                                        soundId = pie.play();
+                                        //pie.setVolume(id, .8f);
+                                        pie.setVolume(soundId, soundSlider.getValue());
                                     }
                                 } else {
-                                    long id = dropoffSuccess.play();
-                                    dropoffSuccess.setVolume(id, 0.5f);
+                                    soundId = dropoffSuccess.play();
+                                    //dropoffSuccess.setVolume(id, 0.5f);
+                                    dropoffSuccess.setVolume(soundId, soundSlider.getValue());
                                 }
 
 

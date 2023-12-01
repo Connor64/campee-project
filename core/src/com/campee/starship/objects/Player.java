@@ -13,6 +13,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 
 import com.campee.starship.managers.*;
+import com.campee.starship.screens.GameplayScreen;
 
 public class Player extends GameObject {
     private Body body;
@@ -119,7 +120,8 @@ public class Player extends GameObject {
         if (Intersector.overlaps(getBounds(), object.getBounds())) {
             if (rigid) {
                 long id = sound.play();
-                sound.setVolume(id, .5f);
+                //sound.setVolume(id, .5f);
+                sound.setVolume(id, GameplayScreen.soundSlider.getValue());
                 if (Math.abs(body.getLinearVelocity().x) > 0) {
                     body.setLinearVelocity(body.getLinearVelocity().x * -2, body.getLinearVelocity().y);
                 }
