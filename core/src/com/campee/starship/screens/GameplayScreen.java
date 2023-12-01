@@ -106,8 +106,9 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     Skin skin;
     Slider musicSlider;
     Slider soundSlider;
-    private boolean coinCollectPlayed;
-    boolean coinCollected;
+    long soundId;
+    //private boolean coinCollectPlayed;
+    //boolean soundPlayed;
     Sound dropoffSuccess;
     Sound pickupSuccess;
     Sound levelWin;
@@ -266,8 +267,9 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         soundSlider.setPosition(200f, Gdx.graphics.getHeight() - 400f);
 
         pauseScreen = new PauseScreen(this, "", game, skin, musicSlider, soundSlider);
-        coinCollectPlayed = false;
-        coinCollected = false;
+        //coinCollectPlayed = false;
+        //soundPlayed = false;
+        long soundId = 0;
 
 
         // Make button style
@@ -465,7 +467,6 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         //If game stats screen is not visible, keep the game going (else pause)
         //if (!gameStatsScreen.isVisible()) {
-        long soundId = 0;
 //        if (coinCollected && !coinCollectPlayed) {
 //            soundId = coinCollect.play();
 //            coinCollect.setVolume(soundId, soundSlider.getValue());
@@ -523,11 +524,12 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                     if (player.checkCollision(coin, false)) {
                         soundId = coinCollect.play();
                         coinCollect.setVolume(soundId, soundSlider.getValue());
+                        //System.out.println("volume set!");
                         gameplayMusic.pause();
                         newOrderNotif.pause();
-                        coinCollect.play();
+                        //coinCollect.play();
                         coin.setCollected(true);
-                        coinCollected = true;
+                        //soundPlayed = true;
                         coinCounter++;
                         coinCollectLabel.setText("Coins Collected: " + coinCounter);
                     }
@@ -613,8 +615,9 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                                 order.setPickedUp(true);
                                 gameplayMusic.pause();
                                 newOrderNotif.pause();
-                                long id = pickupSuccess.play();
-                                pickupSuccess.setVolume(id, 0.3f);
+                                soundId = pickupSuccess.play();
+                                //pickupSuccess.setVolume(id, 0.3f);
+                                pickupSuccess.setVolume(soundId, soundSlider.getValue());
                                 order.setDroppedOff(false);
                                 pickupLabel.setVisible(false);
                             }
@@ -630,8 +633,9 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                                 order.setDroppedOff(true);
                                 gameplayMusic.pause();
                                 newOrderNotif.pause();
-                                long id = dropoffSuccess.play();
-                                dropoffSuccess.setVolume(id, 0.09f);
+                                soundId = dropoffSuccess.play();
+                                //dropoffSuccess.setVolume(id, 0.09f);
+                                dropoffSuccess.setVolume(soundId, soundSlider.getValue());
                                 playerAttributes.ordersCompleted++;
                                 minOrderLabel.setText("Orders Completed: " + playerAttributes.ordersCompleted + "/" + minOrders);
                                 totalOrdersCompleted++;
@@ -928,8 +932,9 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                 if (!popupInAction && !gamePaused) {
                     showTimedPopup(); // Show the popup
                     if (!outOfOrders) {
-                        long id = newOrderNotif.play();
-                        newOrderNotif.setVolume(id, 0.9f);
+                        soundId = newOrderNotif.play();
+                        //newOrderNotif.setVolume(id, 0.9f);
+                        newOrderNotif.setVolume(soundId, soundSlider.getValue());
                     }
                     scheduler.schedule(new Runnable() {
                         @Override
