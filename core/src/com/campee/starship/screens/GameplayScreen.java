@@ -13,14 +13,14 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
+import com.campee.starship.userinterface.TutorialPopups;
 import com.campee.starship.objects.*;
 import com.campee.starship.managers.*;
 import com.campee.starship.userinterface.*;
@@ -36,6 +36,7 @@ import java.util.concurrent.TimeUnit;
 public class GameplayScreen extends ApplicationAdapter implements Screen {
 
     private TextButton backButton;
+    public TextButton doneButton;
     private TextButton nextOrderButton;
     private TextButton gameStatsButton;
 
@@ -50,6 +51,13 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     public boolean popupInAction = false;
     public boolean ordersDone = false;
 
+    //pause screen
+    private TextButton pauseButton;
+    //public boolean resume = true;
+    private boolean isPauseButtonHovered = false;
+    public boolean gamePaused = false;
+    public boolean outOfOrders = false;
+
 
     private Player player;
     public PlayerAttributes playerAttributes;
@@ -59,9 +67,12 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
     private final Popup popup;
     private final GamePopup gamepopup;
+    public TutorialPopups tutorialPopups;
+    public boolean isTutorialPopupsVisible;
     private ArrayList<BuildingObject> buildings;
     public ArrayList<CoinObject> coins;
     private final KeepPlayingPopup keepplayingpopup;
+    private final PauseScreen pauseScreen;
     public int coinCounter;
     private boolean doubleCoins;
     private boolean visibleText;
@@ -91,24 +102,33 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     // Declare variables for the countdown timer
     public int countdownMinutes = 3; // 2 minutes
     public int countdownSeconds = 0;
-    int printcounter = 0;
     private Timer countdownTimer = new Timer();
 
     // music and sound
     Music gameplayMusic;
+    Music fastMusic;
+
     Sound coinCollect;
+    Skin skin;
+    Slider musicSlider;
+    Slider soundSlider;
+    long soundId;
+    //private boolean coinCollectPlayed;
+    //boolean soundPlayed;
     Sound dropoffSuccess;
+    Sound pie;
     Sound pickupSuccess;
     Sound levelWin;
     Sound levelFail;
     Sound newOrderNotif;
+    int hide_popup;
 
 
     // Create a TimerTask to decrement the countdown timer
     private TimerTask countdownTask = new TimerTask() {
         @Override
         public void run() {
-            if (!popupInAction) {
+            if (!popupInAction && !gamePaused && !isTutorialPopupsVisible) {
                 if (countdownSeconds > 0) {
                     countdownSeconds--;
                 } else {
@@ -134,11 +154,13 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     private SpriteBatch batch;
     private Stage stage;
     private KeyProcessor keyProcessor;
+    private float timeSinceLastMove;
 
     private PlayerCamera camera;
 
     private ShapeRenderer shapeRenderer;
     private boolean isBackButtonHovered = false;
+    private boolean isDoneButtonHovered = false;
     private boolean isOrderButtonHovered = false;
     float screenWidth;
     float screenHeight;
@@ -160,6 +182,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     public Order order;
     private String[] orderA;
     private ArrayList<Tile[]> layers;
+    private AssetManager assetManager;
 
     public GameplayScreen(final MoonshipGame game, String fileName) throws IOException, ClassNotFoundException {
         this.GAME = game;
@@ -167,6 +190,9 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         visibleText = true;
         world = new World(new Vector2(0, 0), true);
         multiplexer = new InputMultiplexer();
+
+        countdownMinutes = getCountdownMinutes(fileName);
+        countdownSeconds = getCountdownSeconds(fileName);
 
         player = new Player(world, 150, 200);
         playerAttributes = new PlayerAttributes();
@@ -190,9 +216,45 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         layers = new ArrayList<>();
         loadLevel(fileName);
+//        System.out.println(fileName);
 
-        minOrders = 2/*levelData.minOrders*/;
-        goalTime = 300/*levelData.goalTime*/;
+        //Level information
+
+        if ("level_1".equals(fileName)) {
+            GameDifficulty.easy = true;
+            //System.out.println("easy");
+        }
+
+        if ("level_3".equals(fileName)) {
+            GameDifficulty.medium = true;
+            //System.out.println("medium");
+        }
+        if ("level_4".equals(fileName)) {
+            GameDifficulty.hard = true;
+            //System.out.println("hard");
+        }
+
+        if (GameDifficulty.tutorial) {
+            minOrders = 2   /*levelData.minOrders*/;
+            goalTime = 300 /*levelData.goalTime*/;
+            countdownMinutes = 15;
+        }
+
+        if (GameDifficulty.easy) {
+            minOrders = 2;
+            goalTime = 400;
+            countdownMinutes = 3;
+        }
+        if (GameDifficulty.medium) {
+            minOrders = 3;
+            goalTime = 500;
+            countdownMinutes = 4;
+        }
+        if (GameDifficulty.hard) {
+            minOrders = 5;
+            goalTime = 300;
+            countdownMinutes = 6;
+        }
 
         // Define side panel properties
         sidePanelWidth = Gdx.graphics.getWidth() / 5; // Width
@@ -215,7 +277,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         orderArray = new ArrayList<>();
         order.setArray(orderArray, fileName + "_orders");
         Collections.shuffle(orderArray);
-        System.out.println(orderArray);
+        //System.out.println(orderArray);
         orderA = order.arrayToArray();
         order.seti(order.i++);
         int time = Integer.parseInt(orderA[3]);
@@ -227,24 +289,96 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         order.setPickupBounds(-levelWidth + 50, -levelHeight + 50, 16, 16);
         order.setDropoffBounds(levelWidth - 100, levelHeight - 100, 16, 16);
 
-        gameplayMusic = Gdx.audio.newMusic(Gdx.files.internal("audio/music_demo.mp3"));
+        gameplayMusic = Gdx.audio.newMusic(Gdx.files.internal("audio/we like this one.mp3"));
+        fastMusic = Gdx.audio.newMusic(Gdx.files.internal("audio/Calmer Fast.mp3"));
+        fastMusic.setLooping(true);
+        fastMusic.setVolume(.5f);
         gameplayMusic.setLooping(true);
         gameplayMusic.setVolume(0.5f);
+
         dropoffSuccess = Gdx.audio.newSound(Gdx.files.internal("audio/successful dropoff.mp3"));
-        pickupSuccess = Gdx.audio.newSound(Gdx.files.internal("audio/pickup success.wav"));
+        pie = Gdx.audio.newSound(Gdx.files.internal("audio/pumpkin pie.mp3"));
+        pickupSuccess = Gdx.audio.newSound(Gdx.files.internal("audio/pickup success.mp3"));
         newOrderNotif = Gdx.audio.newSound(Gdx.files.internal("audio/new order notification.mp3"));
         coinCollect = Gdx.audio.newSound(Gdx.files.internal("audio/coin_collect.mp3"));
         gamepopup = new GamePopup(this, "", game, fileName);
         keepplayingpopup = new KeepPlayingPopup(this, "", game, fileName);
+        int hide_popup = 0;
+        skin = new Skin(Gdx.files.internal("uiskin.json"));
+
+        //musicSlider = pauseScreen.getMusicSlider();
+        musicSlider = new Slider(0f, 1f, 0.1f, false, skin);
+        musicSlider.setValue(1f);
+        musicSlider.setSize(250f, 25f);
+        musicSlider.setPosition(200f, Gdx.graphics.getHeight() - 300f);
+
+        //soundSlider = pauseScreen.getSoundSlider();
+        soundSlider = new Slider(0f, 1f, 0.1f, false, skin);
+        soundSlider.setValue(1f);
+        soundSlider.setSize(250f, 25f);
+        soundSlider.setPosition(200f, Gdx.graphics.getHeight() - 400f);
+
+        pauseScreen = new PauseScreen(this, "", game, skin, musicSlider, soundSlider);
+        //coinCollectPlayed = false;
+        //soundPlayed = false;
+        long soundId = 0;
+
 
         // Make button style
-        Pixmap backgroundPixmap = createRoundedRectanglePixmap(200, 50, 10, new Color(0.9f, 0, 0.9f, 0.6f)); // Adjust size and color
+        Pixmap backgroundPixmap = createRoundedRectanglePixmap(100, 50, 10, new Color(0.9f, 0, 0.9f, 0.6f)); // Adjust size and color
         TextButton.TextButtonStyle buttonStyle = new TextButton.TextButtonStyle();
         buttonStyle.up = new TextureRegionDrawable(new TextureRegion(new Texture(backgroundPixmap)));
         BitmapFont buttonFont = new BitmapFont();
         buttonFont.getData().setScale(1.5f);
         buttonStyle.font = buttonFont;
         buttonStyle.fontColor = Color.BLACK;
+
+        if ("level_0".equals(fileName)) {
+            //System.out.println("in tutorial");
+            tutorialPopups = new TutorialPopups(this);
+            //isTutorialPopupsVisible = true;
+            GameDifficulty.tutorial = true;
+            minOrders = 1;
+            countdownMinutes = 15;
+
+            //make done button
+            doneButton = new TextButton("Done!", buttonStyle);
+            doneButton.setVisible(false);
+            doneButton.setPosition(0, 30); // Adjust the position as necessary
+            doneButton.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    //System.out.println("clicked back");
+                    isTutorialPopupsVisible = true;
+                    doneButton.setVisible(false);
+                }
+
+                @Override
+                public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+                    super.enter(event, x, y, pointer, fromActor);
+                    isDoneButtonHovered = true;
+                    doneButton.setColor(Color.LIGHT_GRAY);
+                }
+
+                @Override
+                public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
+                    super.exit(event, x, y, pointer, toActor);
+                    isDoneButtonHovered = false;
+                    doneButton.setColor(Color.WHITE);
+                }
+            });
+
+            if(tutorialPopups.OKClicked) {
+                doneButton.setVisible(true);
+            }
+            stage.addActor(doneButton);
+
+        } else {
+            tutorialPopups = null; // If fileName is not "Level 5", set tutorialPopups to null
+            //isTutorialPopupsVisible = false;
+        }
+
+
 
         // Make back button
         backButton = new TextButton("Back", buttonStyle);
@@ -253,7 +387,11 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 //System.out.println("clicked back");
-                game.setScreen(new LevelScreen(game));
+                try {
+                    game.setScreen(new LevelScreen(game));
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
             }
 
             @Override
@@ -268,6 +406,34 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                 super.exit(event, x, y, pointer, toActor);
                 isBackButtonHovered = false;
                 backButton.setColor(Color.WHITE);
+            }
+        });
+
+
+        // Make pause button
+        pauseButton = new TextButton("| |", buttonStyle);
+        pauseButton.setPosition(120, Gdx.graphics.getHeight() - 60); // Adjust the position as necessary
+        pauseButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                //System.out.println("clicked back");
+                //pauseMusic();
+                pauseScreen();
+                gamePaused = true;
+            }
+
+            @Override
+            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+                super.enter(event, x, y, pointer, fromActor);
+                isPauseButtonHovered = true;
+                pauseButton.setColor(Color.LIGHT_GRAY);
+            }
+
+            @Override
+            public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
+                super.exit(event, x, y, pointer, toActor);
+                isPauseButtonHovered = false;
+                pauseButton.setColor(Color.WHITE);
             }
         });
 
@@ -302,12 +468,15 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         });
 
         stage.addActor(backButton);
+        stage.addActor(pauseButton);
 
         multiplexer = new InputMultiplexer();
         multiplexer.addProcessor(stage);
         multiplexer.addProcessor(keyProcessor);
         multiplexer.addProcessor(popup.getStage());
-
+        if (tutorialPopups != null) {
+            multiplexer.addProcessor(tutorialPopups.getStage());
+        }
 
         Gdx.input.setInputProcessor(multiplexer);
 
@@ -376,7 +545,10 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         autoDeclineLabel.setSize(font.getScaleX() * 16, font.getScaleY() * 16);
 
         schedulePopupDisplay();
-
+        if (tutorialPopups != null) {
+            tutorialPopups.scheduleStepDelay();
+        }
+        //tutorialPopups.scheduleStep();
 
     }
 
@@ -392,6 +564,16 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         // Set font color and scale
         font.setColor(1, 1, 0, 1);
         font.getData().setScale(0.5f);
+
+    }
+
+
+    public boolean isTutorialPopupsVisible() {
+        return isTutorialPopupsVisible;
+    }
+
+    public void setTutorialPopupsVisible(boolean visible) {
+        isTutorialPopupsVisible = visible;
     }
 
     @Override
@@ -400,12 +582,24 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         //If game stats screen is not visible, keep the game going (else pause)
         //if (!gameStatsScreen.isVisible()) {
+//        if (coinCollected && !coinCollectPlayed) {
+//            soundId = coinCollect.play();
+//            coinCollect.setVolume(soundId, soundSlider.getValue());
+//            coinCollectPlayed = true; // Mark that the sound has been played
+//        }
+        //long soundId = coinCollect.play();
+        gameplayMusic.setVolume(musicSlider.getValue());
+
         if (!gamepopup.isVisible()) {
-            player.update(delta, keyProcessor);
+            if (!isTutorialPopupsVisible && !gamePaused){
+
+                player.update(delta, keyProcessor);
+            }
             player.checkBounds(levelWidth, levelHeight);
             for (BuildingObject buildingObject : buildings) {
                 player.checkCollision(buildingObject, true);
             }
+
             world.step(1 / 60f, 6, 2); // Physics calculations
 
             camera.follow(player.getPosition(), levelWidth, levelHeight);
@@ -445,7 +639,12 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                 if (!coin.isCollected()) {
                     coin.draw(batch);
                     if (player.checkCollision(coin, false)) {
-                        coinCollect.play();
+                        soundId = coinCollect.play();
+                        coinCollect.setVolume(soundId, soundSlider.getValue());
+                        //System.out.println("volume set!");
+                        gameplayMusic.pause();
+                        newOrderNotif.pause();
+                        //coinCollect.play();
                         coin.setCollected(true);
                         coinCounter += doubleCoins ? 2 : 1;
                         coinCollectLabel.setText("Coins Collected: " + coinCounter);
@@ -453,7 +652,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                 }
             }
 
-            // Inside the render metho
+            // Inside the render method
             String sec;
             if (countdownSeconds < 10) {
                 sec = "0" + String.valueOf(countdownSeconds);
@@ -465,10 +664,17 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                 mainTimer.setText(str);
                 mainTimer.setVisible(true);
                 lowTimer.setVisible(false);
+
             } else {
                 lowTimer.setText(str);
+                gameplayMusic.pause();
+                gameplayMusic = fastMusic;
+                gameplayMusic.play();
                 lowTimer.setVisible(true);
                 mainTimer.setVisible(false);
+            }
+            if (countdownMinutes == 0 && countdownSeconds == 0) {
+                gameplayMusic.pause();
             }
 
             // building collisions and transparency
@@ -507,9 +713,9 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 //                    String str2 = s[2];
 //                    String currDrop = str3.substring(0, str3.length() - 6);
 //                    String currPick = str2.substring(0, str2.length() - 3);
-                    System.out.println("pick:" + currPick);
+//                    System.out.println("pick:" + currPick);
                     for (BuildingObject building : buildings) {
-                        System.out.println("name: " + building.getName());
+//                        System.out.println("name: " + building.getName());
                         // assign the building to the correct order
                         if (building.getName().equals(currPick) && !order.isPickedUp()) {
                             building.setPickupLocation(true);
@@ -520,6 +726,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                         if (building.getName().equals(currDrop) && !order.isDroppedOff() && order.isPickedUp()) {
                             building.setDropoffLocation(true);
                             order.setDropoffBounds(building.getBounds().getX(), building.getBounds().getY(), building.getWidth(), building.getHeight());
+                            order.dropoffBuilding = building;
                         } else {
                             building.setDropoffLocation(false);
                         }
@@ -530,8 +737,12 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                             pickupLabel.setVisible(true);
                             if (keyProcessor.pPressed) {
                                 order.setPickedUp(true);
+                                gameplayMusic.pause();
+                                newOrderNotif.pause();
+
                                 long id = pickupSuccess.play();
-                                pickupSuccess.setVolume(id, 0.3f);
+                                pickupSuccess.setVolume(id, 0.5f);
+
                                 order.setDroppedOff(false);
                                 pickupLabel.setVisible(false);
                             }
@@ -545,15 +756,28 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                             if (keyProcessor.oPressed) {
                                 order.setPickedUp(false);
                                 order.setDroppedOff(true);
-                                long id = dropoffSuccess.play();
-                                dropoffSuccess.setVolume(id, 0.09f);
+                                gameplayMusic.pause();
+                                newOrderNotif.pause();
+
+                                if (order.dropoffBuilding.getName().equals("Turkstra")) {
+                                    if (playerAttributes.ordersCompleted == minOrders - 1) {
+                                        long id = pie.play();
+                                        pie.setVolume(id, .8f);
+                                    }
+                                } else {
+                                    long id = dropoffSuccess.play();
+                                    dropoffSuccess.setVolume(id, 0.5f);
+                                }
+
+
                                 playerAttributes.ordersCompleted++;
                                 minOrderLabel.setText("Orders Completed: " + playerAttributes.ordersCompleted + "/" + minOrders);
                                 totalOrdersCompleted++;
+
 //                                String orderID = playerAttributes.array.get(1).substring(4,9)/*order.getOrderString()*/;
                                 //if (!deliveredOrderIDs.contains(orderID)) {
-                                    deliveredOrderIDs.add(orderID);
-                                    System.out.println("Order " + orderID + " (before removing) has been delivered and added to the list.");
+                                deliveredOrderIDs.add(orderID);
+//                                System.out.println("Order " + orderID + " (before removing) has been delivered and added to the list.");
 
                                 //}
                                 playerAttributes.array.remove(1);
@@ -617,7 +841,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                         playerAttributes.array.remove(i);
                         messageTimer = 0.0f;
                     } else {
-                        if (!popupInAction) {
+                        if (!popupInAction && !isTutorialPopupsVisible && !gamePaused) {
+
                             if (timeCount[i - 1] % 60 == 0) {
                                 time -= 1;
                                 orderTimeLeft[i - 1] = time;
@@ -689,11 +914,16 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             stage.draw();
             popup.render();
             gamepopup.render();
+            if (this.tutorialPopups != null) {
+                tutorialPopups.render();
+            }
+            pauseScreen.render();
             batch.end();
         } else {
             gameplayMusic.pause();
             newOrderNotif.pause();
         }
+
         boolean timeLeft = true;
         if (countdownSeconds == 0 && countdownMinutes == 0) {
             if (playerAttributes.orderInProgress) {
@@ -722,10 +952,25 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             }
             if (playerAttributes.ordersCompleted == minOrders && keepPlaying) {
                 keepPlayingPopup();
+                //pauseScreen();
                 popupInAction = true;
             }
         }
     }
+
+//    public void pauseMusic() {
+//        if (gameplayMusic.isPlaying()) {
+//            System.out.println("Music paused");
+//            gameplayMusic.pause();
+//        }
+//    }
+//
+//    public void resumeMusic() {
+//        if (!gameplayMusic.isPlaying()) {
+//            System.out.println("Music resumed");
+//            gameplayMusic.play();
+//        }
+//    }
 
     //show game stats screen
     public void showGameResult() {
@@ -744,6 +989,11 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         String levelResult;
         if (win) {
+            // TODO: rewrite this to not rely on file name
+            int num = Character.getNumericValue(LevelScreen.nameOfFile.charAt(LevelScreen.nameOfFile.length() - 1));
+            num++;
+            DataManager.INSTANCE.setClearStatus(String.valueOf(num), true, true);
+
             levelResult = "Congrats, level completed!";
         } else {
             levelResult = "Game Over! :(";
@@ -754,6 +1004,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         gamepopup.showOrderCompletedList(orderIDsMessage);
         gamepopup.showOutoffTimeList(notInTimeorderIDsMessage);
         gamepopup.showLevelResultMessage(levelResult);
+        gamepopup.setWin(win);
         gamepopup.show();
         gamepopup.render();
         multiplexer.addProcessor(gamepopup.getStage());
@@ -770,21 +1021,19 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         keepplayingpopup.show();
         keepplayingpopup.render();
         multiplexer.addProcessor(keepplayingpopup.getStage());
+    }
 
-        if (printcounter == 0) {
-            int num = Character.getNumericValue(LevelScreen.nameOfFile.charAt(LevelScreen.nameOfFile.length() - 1));
-            num++;
-
-            DataManager.INSTANCE.setClearStatus(String.valueOf(num), true, true);
-//            String fileName = "playerdata.txt";
-//            try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, true))) {
-//                writer.write(LevelScreen.nameOfFile + ":passed\n");
-//            } catch (IOException e) {
-//                e.printStackTrace(); // Handle the exception appropriately
-//            }
-
-            printcounter = 1;
-        }
+    // pause screen pop up
+    public void pauseScreen() {
+        visibleText = false;
+        String message = "Game Paused!\nSettings:\n";
+        //String option = "Keep Playing or End Game?";
+        pauseScreen.setMessageLabel(message);
+        //stage.addActor(musicSlider);
+        //stage.addActor(soundSlider);
+        pauseScreen.show();
+        pauseScreen.render();
+        multiplexer.addProcessor(pauseScreen.getStage());
     }
 
     // Trigger the timed popup to show
@@ -803,6 +1052,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             popup.declineClicked = false;
         } else {
             popup.setMessage("No more orders!");
+            outOfOrders = true;
             popup.declineButton.remove();
             popup.acceptButton.remove();
             if (ordersDone) {
@@ -818,40 +1068,86 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         popup.hide(); // Display the popup
     }
 
+
     // Schedule the popup to display every 1 minute
     private void schedulePopupDisplay() {
+        //System.out.println("hi in schedule");
         final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+//        int hide_popup = 0;
+        //int show_popup = 0;
+
         scheduler.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
-                if (!popupInAction) {
+                if (GameDifficulty.tutorial || GameDifficulty.easy || GameDifficulty.medium) {
+                    hide_popup = 5;
+                    //show_popup = 10;
+                } else if (GameDifficulty.hard) {
+                    hide_popup = new Random().nextInt(6)+1;
+                    System.out.println("random num: "+hide_popup);
+                    //show_popup = 10;
+//            show_popup = new Random().nextInt(5) + 6;
+                    //System.out.println("random num2: "+show_popup);
+                }
+                if (!popupInAction && !isTutorialPopupsVisible && !gamePaused) {
+
                     showTimedPopup(); // Show the popup
-                    long id = newOrderNotif.play();
-                    newOrderNotif.setVolume(id, 0.9f);
+                    if (!outOfOrders) {
+                        soundId = newOrderNotif.play();
+                        //newOrderNotif.setVolume(id, 0.9f);
+                        newOrderNotif.setVolume(soundId, soundSlider.getValue());
+                    }
                     scheduler.schedule(new Runnable() {
                         @Override
                         public void run() {
-                            if (!popupInAction) {
+                            if (!popupInAction && !isTutorialPopupsVisible && !gamePaused) {
+
                                 // Hide the popup
                                 hideTimedPopup();
                                 if (!popup.acceptClicked() && !popup.declineClicked() && !ordersDone) {
+                                    //lose coins if do not manually accept or decline 3 times
+                                    if(GameDifficulty.hard) {
+                                        popup.nothingClicked++;
+                                        if (popup.nothingClicked >= 3) {
+                                            if (coinCounter > 1) {
+                                                coinCounter -= 2;
+                                            }
+                                            else if (coinCounter == 1) {
+                                                coinCounter -= 1;
+                                            }
+                                            coinCollectLabel.setText("Coins Collected: " + coinCounter);
+                                        }
+                                    }
                                     autoDeclineLabel.setVisible(true);
                                     scheduler.schedule(new Runnable() {
                                         @Override
                                         public void run() {
-                                            if (!popupInAction) {
+                                            if (!popupInAction && !isTutorialPopupsVisible && !gamePaused) {
+
                                                 autoDeclineLabel.setVisible(false); // Remove the label from the display
                                             }
                                         }
                                     }, 4, TimeUnit.SECONDS);
                                 }
+                                if(GameDifficulty.hard) {
+                                    if (popup.declineCount == 3) {
+                                        if (coinCounter > 1) {
+                                            coinCounter -= 2;
+                                        }
+                                        if (coinCounter == 1) {
+                                            coinCounter -= 1;
+                                        }
+                                    }
+                                    coinCollectLabel.setText("Coins Collected: " + coinCounter);
+                                }
                             }
                         }
-                    }, 5, TimeUnit.SECONDS); // Schedule to hide the popup after 10 seconds
+                    }, hide_popup, TimeUnit.SECONDS); // Schedule to hide the popup after _ seconds
                 }
             }
-        }, 0, 10, TimeUnit.SECONDS); // Schedule the next popup 15 seconds after the first one
+        }, 0, 10, TimeUnit.SECONDS); // Schedule the next popup _ seconds after the first one
     }
+
 
     @Override
     public void resize(int width, int height) {
@@ -871,12 +1167,14 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     @Override
     public void hide() {
         gameplayMusic.dispose();
+        newOrderNotif.dispose();
     }
 
     @Override
     public void dispose() {
         batch.dispose();
         gameplayMusic.dispose();
+        newOrderNotif.dispose();
         //incomingOrder.dispose();
         multiplexer.removeProcessor(stage);
     }
@@ -933,6 +1231,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         for (int layerNum = 0; layerNum < levelData.tileData.size(); layerNum++) {
             LevelData.TileData[] tileData = levelData.tileData.get(layerNum);
 
+            // TODO: spawn in the objects
             LevelData.ObjectData[] objectData = levelData.objectData.get(layerNum);
 
             Tile[] tiles = new Tile[tileData.length];
@@ -957,7 +1256,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                             // Setting the y-position is like this bc libgdx is stupid :)
                             levelHeight - (objectData[i].y + 1) * levelData.tileSize - building.getBounds().height
                     );
-                    System.out.println(objectData[i].objectID);
+//                    System.out.println(objectData[i].objectID);
                     buildings.add(building);
                 } else if (object instanceof CoinObject) {
                     CoinObject coin = new CoinObject((CoinObject) object);
@@ -973,5 +1272,38 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             layers.add(tiles);
 
         }
+    }
+
+    private int getCountdownMinutes(String filename) throws FileNotFoundException {
+        String file = "level_displays/" + filename + "_display.txt";
+
+        Scanner scanner = new Scanner(new File(file));
+        String thumbnailPath = scanner.nextLine();
+        int timeMinutes = Integer.parseInt(scanner.nextLine());
+        int timeSeconds = Integer.parseInt(scanner.nextLine());
+        return timeMinutes;
+    }
+
+    private int getCountdownSeconds(String filename) throws FileNotFoundException {
+        String file = "level_displays/" + filename + "_display.txt";
+
+        Scanner scanner = new Scanner(new File(file));
+        String thumbnailPath = scanner.nextLine();
+        int timeMinutes = Integer.parseInt(scanner.nextLine());
+        int timeSeconds = Integer.parseInt(scanner.nextLine());
+        return timeSeconds;
+    }
+
+    private int getMinOrders(String filename) throws FileNotFoundException {
+        String file = "level_displays/" + filename + "_display.txt";
+
+        Scanner scanner = new Scanner(new File(file));
+        String thumbnailPath = scanner.nextLine();
+        int timeMinutes = Integer.parseInt(scanner.nextLine());
+        int timeSeconds = Integer.parseInt(scanner.nextLine());
+        String name = scanner.nextLine();
+        scanner.nextLine();
+        int minOrders = Integer.parseInt(scanner.nextLine());
+        return minOrders;
     }
 }

@@ -19,7 +19,6 @@ public class KeyProcessor implements InputProcessor {
         this.screen = screen;
     }
 
-
     @Override
     public boolean keyDown(int keycode) {
         if (!screen.popupInAction) {

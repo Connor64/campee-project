@@ -52,16 +52,24 @@ public class AssetManager {
 
         /* ================== Load and create custom game objects ================== */
 
-        // Buildings (and people I guess lol)
+        // Buildings
         gameObjects.put("building_haas", new BuildingObject("sprites/buildings/haas.png", "HAAS", 0, 0, 0.5f, 0.75f));
         gameObjects.put("building_pmu", new BuildingObject("sprites/buildings/pmu.png", "PMU", 0, 0, 0.5f, 0.75f));
         gameObjects.put("building_msee", new BuildingObject("sprites/buildings/msee.png", "MSEE", 0, 0, 0.5f, 0.75f));
         gameObjects.put("building_fountain", new BuildingObject("sprites/buildings/fountain.png", "fountain", 0, 0, 0, 1));
-        gameObjects.put("building_panera", new BuildingObject("sprites/buildings/panera.png", "Panera", 0, 0, 0.5f, 0.75f));
+        gameObjects.put("building_panera", new BuildingObject("sprites/buildings/panera.png", "Banera", 0, 0, 0.5f, 0.75f));
         gameObjects.put("building_bepsi", new BuildingObject("sprites/buildings/bepsi_machine.png", "Bepsi Machine", 0, 0, 0.5f, 0.75f));
         gameObjects.put("building_kola", new BuildingObject("sprites/buildings/koca_kola_machine.png", "Kola Machine", 0, 0, 0.5f, 0.75f));
+
+        // People (technically still buildings)
         gameObjects.put("building_turkstra", new BuildingObject("sprites/buildings/prof_turkstra.png", "Turkstra", 0, 0, 0.5f, 0.75f));
         gameObjects.put("building_police", new BuildingObject("sprites/buildings/police_officer.png", "Officer", 0, 0, 0.5f, 0.75f));
+        gameObjects.put("building_anushka", new BuildingObject("sprites/buildings/anushka.png", "Anushka", 0, 0, 0.5f, 0.75f));
+        gameObjects.put("building_connor", new BuildingObject("sprites/buildings/connor.png", "Connor", 0, 0, 0.5f, 0.75f));
+        gameObjects.put("building_evelyn", new BuildingObject("sprites/buildings/evelyn.png", "Evelyn", 0, 0, 0.5f, 0.75f));
+        gameObjects.put("building_megan", new BuildingObject("sprites/buildings/megan.png", "Megan", 0, 0, 0.5f, 0.75f));
+        gameObjects.put("building_protima", new BuildingObject("sprites/buildings/protima.png", "Protima", 0, 0, 0.5f, 0.75f));
+        gameObjects.put("building_thor", new BuildingObject("sprites/buildings/thor.png", "Thor", 0, 0, 0.5f, 0.75f));
 
         // Other game objects
         gameObjects.put("coin", new CoinObject(0, 0));

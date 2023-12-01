@@ -27,6 +27,7 @@ import com.campee.starship.userinterface.HoverableButton;
 import com.campee.starship.userinterface.UpgradePanel;
 
 import javax.xml.crypto.Data;
+import java.io.FileNotFoundException;
 import java.util.Map;
 import java.util.Set;
 
@@ -49,7 +50,11 @@ public class StoreScreen implements Screen {
         backButton.setSize(150, 60);
         backButton.addListener(new ClickListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                game.setScreen(new LevelScreen(game));
+                try {
+                    game.setScreen(new LevelScreen(game));
+                } catch (FileNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
                 return true;
             }
         });
