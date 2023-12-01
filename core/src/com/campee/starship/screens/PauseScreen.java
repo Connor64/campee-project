@@ -18,6 +18,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.campee.starship.managers.DataManager;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -41,7 +42,7 @@ public class PauseScreen {
     //private Slider soundSlider;
 
 
-    public PauseScreen(final GameplayScreen screen, final String notificationMessage, final Game game, Skin skin, Slider musicSlider, Slider soundSlider) {
+    public PauseScreen(final GameplayScreen screen, final String notificationMessage, final Game game, Skin skin, final Slider musicSlider, final Slider soundSlider) {
         this.game = game;
         stage = new Stage();
         shapeRenderer = new ShapeRenderer();
@@ -116,6 +117,9 @@ public class PauseScreen {
                 visible = false;
                 screen.gamePaused = false;
                 //add logic
+
+                DataManager.INSTANCE.setGameplayMusicVolume(musicSlider.getValue(), false);
+                DataManager.INSTANCE.setGameplaySFXVolume(soundSlider.getValue(), true);
             }
             @Override
             public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
@@ -142,6 +146,9 @@ public class PauseScreen {
                 screen.gamePaused = false;
 
                 try {
+                    DataManager.INSTANCE.setGameplayMusicVolume(musicSlider.getValue(), false);
+                    DataManager.INSTANCE.setGameplaySFXVolume(soundSlider.getValue(), true);
+
                     game.setScreen(new LevelScreen(game));
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();

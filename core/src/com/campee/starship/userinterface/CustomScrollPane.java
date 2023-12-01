@@ -14,7 +14,6 @@ public class CustomScrollPane extends ScrollPane {
         super(widget);
         setupScrollBar();
         stage.addActor(this);
-//        widget.setScrollFocus(this);
     }
 
     private void setupScrollBar() {
@@ -36,7 +35,9 @@ public class CustomScrollPane extends ScrollPane {
         // Create a ScrollBar widget using the skin
         ScrollPane.ScrollPaneStyle scrollPaneStyle = new ScrollPane.ScrollPaneStyle();
         scrollPaneStyle.vScroll = skin.getDrawable("track");
+        scrollPaneStyle.hScroll = skin.getDrawable("track");
         scrollPaneStyle.vScrollKnob = skin.getDrawable("knob");
+        scrollPaneStyle.hScrollKnob = skin.getDrawable("knob");
 
         setFadeScrollBars(false);
 
