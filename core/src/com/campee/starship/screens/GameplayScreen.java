@@ -97,6 +97,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
     // music and sound
     Music gameplayMusic;
+    Music fastMusic;
     Sound coinCollect;
     Sound dropoffSuccess;
     Sound pickupSuccess;
@@ -232,11 +233,15 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         order.setPickupBounds(-levelWidth + 50, -levelHeight + 50, 16, 16);
         order.setDropoffBounds(levelWidth - 100, levelHeight - 100, 16, 16);
 
-        gameplayMusic = Gdx.audio.newMusic(Gdx.files.internal("audio/music_demo.mp3"));
+        gameplayMusic = Gdx.audio.newMusic(Gdx.files.internal("audio/we like this one.mp3"));
+        fastMusic = Gdx.audio.newMusic(Gdx.files.internal("audio/Calmer Fast.mp3"));
+        fastMusic.setLooping(true);
+        fastMusic.setVolume(.5f);
         gameplayMusic.setLooping(true);
         gameplayMusic.setVolume(0.5f);
+
         dropoffSuccess = Gdx.audio.newSound(Gdx.files.internal("audio/successful dropoff.mp3"));
-        pickupSuccess = Gdx.audio.newSound(Gdx.files.internal("audio/pickup success.wav"));
+        pickupSuccess = Gdx.audio.newSound(Gdx.files.internal("audio/pickup success.mp3"));
         newOrderNotif = Gdx.audio.newSound(Gdx.files.internal("audio/new order notification.mp3"));
         coinCollect = Gdx.audio.newSound(Gdx.files.internal("audio/coin_collect.mp3"));
         gamepopup = new GamePopup(this, "", game, fileName);
@@ -476,10 +481,17 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                 mainTimer.setText(str);
                 mainTimer.setVisible(true);
                 lowTimer.setVisible(false);
+
             } else {
                 lowTimer.setText(str);
+                gameplayMusic.pause();
+                gameplayMusic = fastMusic;
+                gameplayMusic.play();
                 lowTimer.setVisible(true);
                 mainTimer.setVisible(false);
+            }
+            if (countdownMinutes == 0 && countdownSeconds == 0) {
+                gameplayMusic.pause();
             }
 
             // building collisions and transparency
@@ -544,7 +556,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                                 gameplayMusic.pause();
                                 newOrderNotif.pause();
                                 long id = pickupSuccess.play();
-                                pickupSuccess.setVolume(id, 0.3f);
+                                pickupSuccess.setVolume(id, 0.5f);
                                 order.setDroppedOff(false);
                                 pickupLabel.setVisible(false);
                             }
@@ -561,7 +573,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                                 gameplayMusic.pause();
                                 newOrderNotif.pause();
                                 long id = dropoffSuccess.play();
-                                dropoffSuccess.setVolume(id, 0.09f);
+                                dropoffSuccess.setVolume(id, 0.5f);
                                 playerAttributes.ordersCompleted++;
                                 minOrderLabel.setText("Orders Completed: " + playerAttributes.ordersCompleted + "/" + minOrders);
                                 totalOrdersCompleted++;
@@ -769,6 +781,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         gamepopup.showOrderCompletedList(orderIDsMessage);
         gamepopup.showOutoffTimeList(notInTimeorderIDsMessage);
         gamepopup.showLevelResultMessage(levelResult);
+        gamepopup.setWin(win);
         gamepopup.show();
         gamepopup.render();
         multiplexer.addProcessor(gamepopup.getStage());

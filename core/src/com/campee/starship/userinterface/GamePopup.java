@@ -16,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.audio.Music;
 
 import com.campee.starship.screens.*;
 
@@ -33,8 +34,11 @@ public class GamePopup {
     private Label levelResultMessage;
     private Label ordersOutOfTimeLabel;
     private BitmapFont font;
+    private boolean win;
     private boolean isExitButtonHovered = false;
     private boolean isReplayButtonHovered = false;
+    Music gameOverMusic;
+    Music loseMusic;
 
     float popupWidth;
     float popupHeight;
@@ -46,6 +50,13 @@ public class GamePopup {
         stage = new Stage();
         shapeRenderer = new ShapeRenderer();
         visible = false;
+
+
+        gameOverMusic = Gdx.audio.newMusic(Gdx.files.internal("audio/Moon Final.mp3"));
+        loseMusic = Gdx.audio.newMusic(Gdx.files.internal("audio/Moon Final Slow.mp3"));
+        gameOverMusic.setLooping(true);
+        gameOverMusic.setVolume(0.5f);
+
 
         gameStatsfont = new BitmapFont(Gdx.files.internal("fonts/moonships_font.fnt"), Gdx.files.internal("fonts/moonships_font.png"), false);
 
@@ -111,6 +122,7 @@ public class GamePopup {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 try {
+                    gameOverMusic.pause();
                     game.setScreen(new LevelScreen(game));
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
@@ -134,6 +146,7 @@ public class GamePopup {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 try {
+                    gameOverMusic.pause();
                     game.setScreen(new GameplayScreen((MoonshipGame) game, fileName));
                 } catch (IOException e) {
                     throw new RuntimeException(e);
@@ -159,6 +172,10 @@ public class GamePopup {
 
         stage.addActor(exitButton);
         stage.addActor(replayButton);
+    }
+
+    public void setWin(boolean win) {
+        this.win = win;
     }
 
 
@@ -223,6 +240,7 @@ public class GamePopup {
     }
 
 
+
     public void render() {
         if (visible) {
             // Clear the background
@@ -232,6 +250,11 @@ public class GamePopup {
             shapeRenderer.setColor(new Color(0, 0, 0, 0.7f));
             shapeRenderer.rect(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
             shapeRenderer.end();
+            if (!win) {
+                gameOverMusic.pause();
+                gameOverMusic = loseMusic;
+            }
+            gameOverMusic.play();
 
             stage.act();
             stage.draw();
