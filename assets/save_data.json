@@ -1,5 +1,5 @@
 {
-    "coins": 400,
+    "coins": 0,
     "unlocked_levels": {
         "0": true,
         "1": true,
@@ -10,7 +10,5 @@
         "6": true
     },
     "purchased_upgrades": [
-        "speed_boost",
-        "coin_boost"
     ]
 }

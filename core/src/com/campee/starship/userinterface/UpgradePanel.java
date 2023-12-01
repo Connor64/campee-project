@@ -43,7 +43,13 @@ public class UpgradePanel extends Table {
         TextureRegion region = new TextureRegion(texture, 0, 0, texture.getWidth(), texture.getHeight());
         Image icon = new Image(new SpriteDrawable(new Sprite(region)));
 
-        purchaseButton = HoverableButton.generate("PURCHASE", true, Color.GREEN, Color.BLACK, 1.5f);
+        if (DataManager.INSTANCE.getCoinCount() >= upgrade.getCost()) {
+            purchaseButton = HoverableButton.generate("PURCHASE", true, Color.GREEN, Color.BLACK, 1.5f);
+        } else {
+            purchaseButton = HoverableButton.generate("NEED FUNDS", true, Color.RED, Color.BLACK, 1.5f);
+            purchaseButton.setHoverable(false, false);
+        }
+
         purchaseButton.addListener(new ClickListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
