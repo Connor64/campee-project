@@ -40,6 +40,7 @@ public class StoreScreen implements Screen {
 
     private Label shopBanner, coinLabel;
     private Music music;
+    private BitmapFont font;
 
     public StoreScreen (final Game game) {
         this.game = game;
@@ -47,9 +48,13 @@ public class StoreScreen implements Screen {
         stage = new Stage(viewport);
         Gdx.input.setInputProcessor(stage);
 
+        font = new BitmapFont(Gdx.files.internal("fonts/moonships_font.fnt"), Gdx.files.internal("fonts/moonships_font.png"), false);
+        font.setColor(1, 1, 0, 1);
+        font.getData().setScale(0.8f);
+
         music = Gdx.audio.newMusic(Gdx.files.internal("audio/menu screen sound.mp3"));
         music.setLooping(true);
-        music.setVolume(0.35f);
+        music.setVolume(DataManager.INSTANCE.getMenuSFXVolume());
 
         backButton = HoverableButton.generate("BACK", true, Color.valueOf("98FF98"), Color.BLACK, 1.5f);
         backButton.setPosition(30, Gdx.graphics.getHeight() - 80);
@@ -67,8 +72,9 @@ public class StoreScreen implements Screen {
         });
 
         Label.LabelStyle coinStyle = new Label.LabelStyle();
-        BitmapFont coinFont = new BitmapFont();
-        coinFont.getData().scale(1.5f);
+        BitmapFont coinFont = new BitmapFont(Gdx.files.internal("fonts/moonships_font.fnt"), Gdx.files.internal("fonts/moonships_font.png"), false);
+        coinFont.setColor(1, 1, 0, 1);
+        coinFont.getData().setScale(0.9f);;
         coinStyle.font = coinFont;
         coinStyle.fontColor = Color.BLACK;
 
@@ -78,8 +84,8 @@ public class StoreScreen implements Screen {
         coinLabel.setPosition(-10, Gdx.graphics.getHeight() - coinLabel.getHeight());
 
         Label.LabelStyle titleStyle = new Label.LabelStyle();
-        BitmapFont labelFont = new BitmapFont();
-        labelFont.getData().scale(5);
+        BitmapFont labelFont = font;
+        labelFont.getData().scale(1f);
         titleStyle.font = labelFont;
         titleStyle.fontColor = Color.BLACK;
 
@@ -120,7 +126,9 @@ public class StoreScreen implements Screen {
         Gdx.gl.glClear(Gdx.gl20.GL_COLOR_BUFFER_BIT);
 
         coinLabel.setText("Coins: " + DataManager.INSTANCE.getCoinCount());
-        music.play();
+        if (SettingsScreen.instantiated) {
+            music.setVolume(SettingsScreen.settingsMusicSlider.getValue());
+        }music.play();
 
 //        stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 80f));
         // Update and render game elements
