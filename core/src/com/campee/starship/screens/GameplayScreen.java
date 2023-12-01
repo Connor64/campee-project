@@ -112,6 +112,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     //private boolean coinCollectPlayed;
     //boolean soundPlayed;
     Sound dropoffSuccess;
+    Sound pie;
     Sound pickupSuccess;
     Sound levelWin;
     Sound levelFail;
@@ -253,6 +254,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         gameplayMusic.setVolume(0.5f);
 
         dropoffSuccess = Gdx.audio.newSound(Gdx.files.internal("audio/successful dropoff.mp3"));
+        pie = Gdx.audio.newSound(Gdx.files.internal("audio/pumpkin pie.mp3"));
         pickupSuccess = Gdx.audio.newSound(Gdx.files.internal("audio/pickup success.mp3"));
         newOrderNotif = Gdx.audio.newSound(Gdx.files.internal("audio/new order notification.mp3"));
         coinCollect = Gdx.audio.newSound(Gdx.files.internal("audio/coin_collect.mp3"));
@@ -616,6 +618,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                         if (building.getName().equals(currDrop) && !order.isDroppedOff() && order.isPickedUp()) {
                             building.setDropoffLocation(true);
                             order.setDropoffBounds(building.getBounds().getX(), building.getBounds().getY(), building.getWidth(), building.getHeight());
+                            order.dropoffBuilding = building;
                         } else {
                             building.setDropoffLocation(false);
                         }
@@ -648,8 +651,14 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                                 gameplayMusic.pause();
                                 newOrderNotif.pause();
 
-                                long id = dropoffSuccess.play();
-                                dropoffSuccess.setVolume(id, 0.5f);
+                                if (order.dropoffBuilding.getName().equals("Turkstra")) {
+                                    long id = pie.play();
+                                    pie.setVolume(id, .5f);
+                                } else {
+                                    long id = dropoffSuccess.play();
+                                    dropoffSuccess.setVolume(id, 0.5f);
+                                }
+
 
                                 playerAttributes.ordersCompleted++;
                                 minOrderLabel.setText("Orders Completed: " + playerAttributes.ordersCompleted + "/" + minOrders);
