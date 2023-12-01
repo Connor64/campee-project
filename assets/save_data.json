@@ -1,5 +1,6 @@
 {
     "coins": 0,
+    "gameplay_sfx_volume": 0.3,
     "unlocked_levels": {
         "0": true,
         "1": true,
@@ -9,5 +10,7 @@
         "5": true,
         "6": true
     },
-    "purchased_upgrades": []
+    "purchased_upgrades": [],
+    "gameplay_music_volume": 0.1,
+    "menu_music_volume": 0.1
 }

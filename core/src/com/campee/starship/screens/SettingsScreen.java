@@ -18,7 +18,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.campee.starship.managers.DataManager;
 
+import javax.xml.crypto.Data;
 import java.io.FileNotFoundException;
 
 public class SettingsScreen implements Screen {
@@ -54,7 +56,7 @@ public class SettingsScreen implements Screen {
 
         /*****************************************************/
         //set value to saved volume value from data file (which is initialized to 1f for the first time and saves updated volume value using getValue())
-        settingsMusicSlider.setValue(1f);
+        settingsMusicSlider.setValue(DataManager.INSTANCE.getMenuMusicVolume());
         /*****************************************************/
         settingsMusicSlider.setSize(500f, 250f);
         settingsMusicSlider.setPosition(160f, Gdx.graphics.getHeight() - 400f);
@@ -79,6 +81,7 @@ public class SettingsScreen implements Screen {
                 // Switch back to the title screen when the BACK button is clicked
                 try {
                     music.pause();
+                    DataManager.INSTANCE.setMenuMusicVolume(settingsMusicSlider.getValue(), true);
                     game.setScreen(new LevelScreen(game)); // Change to the screen you want
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();

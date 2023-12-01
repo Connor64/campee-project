@@ -13,6 +13,9 @@ public class DataManager {
     private final String UNLOCKED_LEVELS = "unlocked_levels";
     private final String PURCHASED_UPGRADES = "purchased_upgrades";
     private final String COIN_COUNT = "coins";
+    private final String GAMEPLAY_MUSIC = "gameplay_music_volume";
+    private final String GAMEPLAY_SFX = "gameplay_sfx_volume";
+    private final String MENU_MUSIC = "menu_music_volume";
     private final String FILE_NAME = "save_data.json";
 
     public static final DataManager INSTANCE = new DataManager();
@@ -21,57 +24,16 @@ public class DataManager {
     private ArrayList<String> purchasedUpgrades;
     private int coinCount;
 
+    private float gameplayMusicVolume;
+    private float gameplaySFXVolume;
+    private float menuMusicVolume;
+
     private DataManager() {
         levelUnlocks = new HashMap<>();
         purchasedUpgrades = new ArrayList<>();
         coinCount = 0;
 
         loadFile();
-    }
-
-    public boolean levelExists(String levelID) {
-        return levelUnlocks.containsKey(levelID);
-    }
-
-    public boolean isLevelUnlocked(String levelID) {
-        return levelUnlocks.get(levelID);
-    }
-
-    public boolean isUpgradePurchased(String upgradeID) {
-        return purchasedUpgrades.contains(upgradeID);
-    }
-
-    public void setClearStatus(String levelID, boolean unlocked, boolean diskWrite) {
-        if (!levelUnlocks.containsKey(levelID)) return;
-
-        levelUnlocks.put(levelID, unlocked);
-
-        if (diskWrite) {
-            saveProgress();
-        }
-    }
-
-    public void addPurchase(String upgradeID, boolean diskWrite) {
-        if (purchasedUpgrades.contains(upgradeID)) return;
-
-        purchasedUpgrades.add(upgradeID);
-
-        if (diskWrite) {
-            saveProgress();
-        }
-    }
-
-    public void addCoins(int coinDiff, boolean diskWrite) {
-        System.out.println("adding coins!! current: " + coinCount + "  diff: " + coinDiff);
-        coinCount = Math.max(0, coinCount + coinDiff);
-
-        if (diskWrite) {
-            saveProgress();
-        }
-    }
-
-    public int getCoinCount() {
-        return coinCount;
     }
 
     private void loadFile() {
@@ -95,6 +57,10 @@ public class DataManager {
             }
 
             coinCount = root.getInt(COIN_COUNT);
+
+            gameplayMusicVolume = root.getFloat(GAMEPLAY_MUSIC);
+            gameplaySFXVolume = root.getFloat(GAMEPLAY_SFX);
+            menuMusicVolume = root.getFloat(MENU_MUSIC);
 
         } catch (IOException e) {
             // If the file doesn't exist (or something is fucked)
@@ -135,7 +101,86 @@ public class DataManager {
         obj.put(UNLOCKED_LEVELS, unlockedLevelsObj);
         obj.put(PURCHASED_UPGRADES, purchasedUpgradesObj);
         obj.put(COIN_COUNT, coinCount);
+        obj.put(GAMEPLAY_MUSIC, gameplayMusicVolume);
+        obj.put(GAMEPLAY_SFX, gameplaySFXVolume);
+        obj.put(MENU_MUSIC, menuMusicVolume);
 
         handle.writeString(obj.toString(4), false); // Write to file
+    }
+
+    public void setClearStatus(String levelID, boolean unlocked, boolean diskWrite) {
+        if (!levelUnlocks.containsKey(levelID)) return;
+
+        levelUnlocks.put(levelID, unlocked);
+
+        if (diskWrite) {
+            saveProgress();
+        }
+    }
+
+    public boolean levelExists(String levelID) {
+        return levelUnlocks.containsKey(levelID);
+    }
+
+    public boolean isLevelUnlocked(String levelID) {
+        return levelUnlocks.get(levelID);
+    }
+
+    public void addPurchase(String upgradeID, boolean diskWrite) {
+        if (purchasedUpgrades.contains(upgradeID)) return;
+
+        purchasedUpgrades.add(upgradeID);
+
+        if (diskWrite) {
+            saveProgress();
+        }
+    }
+
+    public boolean isUpgradePurchased(String upgradeID) {
+        return purchasedUpgrades.contains(upgradeID);
+    }
+
+
+    public void addCoins(int coinDiff, boolean diskWrite) {
+        System.out.println("adding coins!! current: " + coinCount + "  diff: " + coinDiff);
+        coinCount = Math.max(0, coinCount + coinDiff);
+
+        if (diskWrite) {
+            saveProgress();
+        }
+    }
+
+    public int getCoinCount() {
+        return coinCount;
+    }
+
+    public void setGameplayMusicVolume(float volume, boolean diskWrite) {
+        gameplayMusicVolume = volume;
+
+        if (diskWrite) saveProgress();
+    }
+
+    public void setGameplaySFXVolume(float volume, boolean diskWrite) {
+        gameplaySFXVolume = volume;
+
+        if (diskWrite) saveProgress();
+    }
+
+    public void setMenuMusicVolume(float volume, boolean diskWrite) {
+        menuMusicVolume = volume;
+
+        if (diskWrite) saveProgress();
+    }
+
+    public float getGameplayMusicVolume() {
+        return gameplayMusicVolume;
+    }
+
+    public float getGameplaySFXVolume() {
+        return gameplaySFXVolume;
+    }
+
+    public float getMenuMusicVolume() {
+        return menuMusicVolume;
     }
 }

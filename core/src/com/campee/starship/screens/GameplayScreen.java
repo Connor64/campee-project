@@ -309,13 +309,13 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         //musicSlider = pauseScreen.getMusicSlider();
         musicSlider = new Slider(0f, 1f, 0.1f, false, skin);
-        musicSlider.setValue(1f);
+        musicSlider.setValue(DataManager.INSTANCE.getGameplayMusicVolume());
         musicSlider.setSize(250f, 25f);
         musicSlider.setPosition(200f, Gdx.graphics.getHeight() - 300f);
 
         //soundSlider = pauseScreen.getSoundSlider();
         soundSlider = new Slider(0f, 1f, 0.1f, false, skin);
-        soundSlider.setValue(1f);
+        soundSlider.setValue(DataManager.INSTANCE.getGameplaySFXVolume());
         soundSlider.setSize(250f, 25f);
         soundSlider.setPosition(200f, Gdx.graphics.getHeight() - 400f);
 

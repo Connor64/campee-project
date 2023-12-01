@@ -54,7 +54,7 @@ public class LevelScreen extends ScreenAdapter {
 
         music = Gdx.audio.newMusic(Gdx.files.internal("audio/menu screen sound.mp3"));
         music.setLooping(true);
-        music.setVolume(0.35f);
+        music.setVolume(DataManager.INSTANCE.getMenuMusicVolume());
 
         DataManager.INSTANCE.isLevelUnlocked("0");
 
