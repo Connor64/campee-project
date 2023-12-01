@@ -1,6 +1,6 @@
 level_4_thumbnail.png
-3
+6
 2
 Town Friends
-[EASY]
-4
+[HARD]
+5
