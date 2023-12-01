@@ -166,6 +166,7 @@ public class LevelScreen extends ScreenAdapter {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 music.pause();
                 game.setScreen(new SettingsScreen(game));
+                SettingsScreen.instantiated = true;
                 return true;
             }
             @Override
@@ -417,6 +418,9 @@ public class LevelScreen extends ScreenAdapter {
         Gdx.gl.glClear(Gdx.gl20.GL_COLOR_BUFFER_BIT);
 
         stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 80f));
+        if (SettingsScreen.instantiated) {
+            music.setVolume(SettingsScreen.settingsMusicSlider.getValue());
+        }
         music.play();
         //stage.act(delta);
         stage.draw();

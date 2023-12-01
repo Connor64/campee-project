@@ -192,6 +192,9 @@ public class TitleScreen implements Screen {
         float imgX = (viewport.getWorldWidth() - imgWidth) / 2;
         float imgY = 30; // Adjust this value to move the image up or down
         batch.draw(img, imgX, imgY, imgWidth, imgHeight);
+        if (SettingsScreen.instantiated) {
+            music.setVolume(SettingsScreen.settingsMusicSlider.getValue());
+        }
         music.play();
 
         batch.end();
