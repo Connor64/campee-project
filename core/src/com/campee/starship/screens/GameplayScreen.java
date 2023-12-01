@@ -652,8 +652,10 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                                 newOrderNotif.pause();
 
                                 if (order.dropoffBuilding.getName().equals("Turkstra")) {
-                                    long id = pie.play();
-                                    pie.setVolume(id, .5f);
+                                    if (playerAttributes.ordersCompleted == minOrders - 1) {
+                                        long id = pie.play();
+                                        pie.setVolume(id, .8f);
+                                    }
                                 } else {
                                     long id = dropoffSuccess.play();
                                     dropoffSuccess.setVolume(id, 0.5f);
