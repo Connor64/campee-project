@@ -268,7 +268,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         }
 
         // Define side panel properties
-        sidePanelWidth = Gdx.graphics.getWidth() / 5; // Width
+        sidePanelWidth = (Gdx.graphics.getWidth() / 4) + 10; // Width
         sidePanelX = Gdx.graphics.getWidth() - sidePanelWidth; // Position the panel on the right side
         sidePanelY = 100; // Y position
         sidePanelHeight = Gdx.graphics.getHeight() - 110; // Height
