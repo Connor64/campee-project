@@ -240,6 +240,15 @@ public class LevelScreen extends ScreenAdapter {
         String difficulty = scanner.nextLine();
         int numOrders = Integer.parseInt(scanner.nextLine());
 
+        int highscore = DataManager.INSTANCE.getHighScore(levelNumber);
+        Label scoreLabel;
+        if ((DataManager.INSTANCE.isLevelUnlocked(levelNumber))) {
+            // set thumbnail to lock icon
+            scoreLabel = new Label("Highscore: " + highscore + "", createLabelStyle(Color.BLACK));
+        } else {
+            scoreLabel = new Label("    ", createLabelStyle(Color.BLACK));
+        }
+
         if ((!DataManager.INSTANCE.isLevelUnlocked(levelNumber))) {
             // set thumbnail to lock icon
             thumbnailPath = "sprites/locked_thumbnail.png";
@@ -294,7 +303,7 @@ public class LevelScreen extends ScreenAdapter {
         }
 
         difficultyLabel.setFontScale(0.45f);
-
+        scoreLabel.setFontScale(0.45f);
 
 
         // Create a button
@@ -382,6 +391,7 @@ public class LevelScreen extends ScreenAdapter {
         levelWidget.add(label).padBottom(20).colspan(3).center().row();
         levelWidget.add(difficultyLabel).padBottom(20).colspan(3).center().row();
         levelWidget.add(thumbnail).padBottom(30).colspan(3).center().row();
+        levelWidget.add(scoreLabel).padBottom(30).colspan(3).center().row();
         levelWidget.add(ordersLabel).padBottom(10).colspan(3).center().row();
         if ((DataManager.INSTANCE.isLevelUnlocked(levelNumber))) {
             levelWidget.add(timeLabel).padBottom(10).colspan(3).center().row();
