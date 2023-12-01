@@ -37,6 +37,7 @@ public class Order {
     private Rectangle dropoffBounds;
     private boolean pickedUp;
     private boolean droppedOff;
+    public BuildingObject dropoffBuilding;
     String[] words;
 
 

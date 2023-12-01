@@ -13,8 +13,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -50,6 +49,11 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     public boolean popupInAction = false;
     public boolean ordersDone = false;
 
+    //pause screen
+    private TextButton pauseButton;
+    //public boolean resume = true;
+    private boolean isPauseButtonHovered = false;
+    public boolean gamePaused = false;
     public boolean outOfOrders = false;
 
 
@@ -64,6 +68,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     private ArrayList<BuildingObject> buildings;
     public ArrayList<CoinObject> coins;
     private final KeepPlayingPopup keepplayingpopup;
+    private final PauseScreen pauseScreen;
     public int coinCounter;
     private boolean visibleText;
 
@@ -97,8 +102,17 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
     // music and sound
     Music gameplayMusic;
+    Music fastMusic;
+
     Sound coinCollect;
+    Skin skin;
+    Slider musicSlider;
+    Slider soundSlider;
+    long soundId;
+    //private boolean coinCollectPlayed;
+    //boolean soundPlayed;
     Sound dropoffSuccess;
+    Sound pie;
     Sound pickupSuccess;
     Sound levelWin;
     Sound levelFail;
@@ -109,7 +123,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     private TimerTask countdownTask = new TimerTask() {
         @Override
         public void run() {
-            if (!popupInAction) {
+            if (!popupInAction && !gamePaused) {
                 if (countdownSeconds > 0) {
                     countdownSeconds--;
                 } else {
@@ -232,18 +246,42 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         order.setPickupBounds(-levelWidth + 50, -levelHeight + 50, 16, 16);
         order.setDropoffBounds(levelWidth - 100, levelHeight - 100, 16, 16);
 
-        gameplayMusic = Gdx.audio.newMusic(Gdx.files.internal("audio/music_demo.mp3"));
+        gameplayMusic = Gdx.audio.newMusic(Gdx.files.internal("audio/we like this one.mp3"));
+        fastMusic = Gdx.audio.newMusic(Gdx.files.internal("audio/Calmer Fast.mp3"));
+        fastMusic.setLooping(true);
+        fastMusic.setVolume(.5f);
         gameplayMusic.setLooping(true);
         gameplayMusic.setVolume(0.5f);
+
         dropoffSuccess = Gdx.audio.newSound(Gdx.files.internal("audio/successful dropoff.mp3"));
-        pickupSuccess = Gdx.audio.newSound(Gdx.files.internal("audio/pickup success.wav"));
+        pie = Gdx.audio.newSound(Gdx.files.internal("audio/pumpkin pie.mp3"));
+        pickupSuccess = Gdx.audio.newSound(Gdx.files.internal("audio/pickup success.mp3"));
         newOrderNotif = Gdx.audio.newSound(Gdx.files.internal("audio/new order notification.mp3"));
         coinCollect = Gdx.audio.newSound(Gdx.files.internal("audio/coin_collect.mp3"));
         gamepopup = new GamePopup(this, "", game, fileName);
         keepplayingpopup = new KeepPlayingPopup(this, "", game, fileName);
+        skin = new Skin(Gdx.files.internal("uiskin.json"));
+
+        //musicSlider = pauseScreen.getMusicSlider();
+        musicSlider = new Slider(0f, 1f, 0.1f, false, skin);
+        musicSlider.setValue(1f);
+        musicSlider.setSize(250f, 25f);
+        musicSlider.setPosition(200f, Gdx.graphics.getHeight() - 300f);
+
+        //soundSlider = pauseScreen.getSoundSlider();
+        soundSlider = new Slider(0f, 1f, 0.1f, false, skin);
+        soundSlider.setValue(1f);
+        soundSlider.setSize(250f, 25f);
+        soundSlider.setPosition(200f, Gdx.graphics.getHeight() - 400f);
+
+        pauseScreen = new PauseScreen(this, "", game, skin, musicSlider, soundSlider);
+        //coinCollectPlayed = false;
+        //soundPlayed = false;
+        long soundId = 0;
+
 
         // Make button style
-        Pixmap backgroundPixmap = createRoundedRectanglePixmap(200, 50, 10, new Color(0.9f, 0, 0.9f, 0.6f)); // Adjust size and color
+        Pixmap backgroundPixmap = createRoundedRectanglePixmap(100, 50, 10, new Color(0.9f, 0, 0.9f, 0.6f)); // Adjust size and color
         TextButton.TextButtonStyle buttonStyle = new TextButton.TextButtonStyle();
         buttonStyle.up = new TextureRegionDrawable(new TextureRegion(new Texture(backgroundPixmap)));
         BitmapFont buttonFont = new BitmapFont();
@@ -280,6 +318,33 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             }
         });
 
+        // Make pause button
+        pauseButton = new TextButton("| |", buttonStyle);
+        pauseButton.setPosition(120, Gdx.graphics.getHeight() - 60); // Adjust the position as necessary
+        pauseButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                //System.out.println("clicked back");
+                //pauseMusic();
+                pauseScreen();
+                gamePaused = true;
+            }
+
+            @Override
+            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+                super.enter(event, x, y, pointer, fromActor);
+                isPauseButtonHovered = true;
+                pauseButton.setColor(Color.LIGHT_GRAY);
+            }
+
+            @Override
+            public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
+                super.exit(event, x, y, pointer, toActor);
+                isPauseButtonHovered = false;
+                pauseButton.setColor(Color.WHITE);
+            }
+        });
+
         //Make game stats button
         gameStatsButton = new TextButton("Game Stats", buttonStyle);
         gameStatsButton.setPosition(Gdx.graphics.getWidth() - 600, 10);
@@ -311,6 +376,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         });
 
         stage.addActor(backButton);
+        stage.addActor(pauseButton);
 
         multiplexer = new InputMultiplexer();
         multiplexer.addProcessor(stage);
@@ -409,8 +475,18 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         //If game stats screen is not visible, keep the game going (else pause)
         //if (!gameStatsScreen.isVisible()) {
+//        if (coinCollected && !coinCollectPlayed) {
+//            soundId = coinCollect.play();
+//            coinCollect.setVolume(soundId, soundSlider.getValue());
+//            coinCollectPlayed = true; // Mark that the sound has been played
+//        }
+        //long soundId = coinCollect.play();
+        gameplayMusic.setVolume(musicSlider.getValue());
+
         if (!gamepopup.isVisible()) {
-            player.update(delta, keyProcessor);
+            if (!gamePaused) {
+                player.update(delta, keyProcessor);
+            }
             player.checkBounds(levelWidth, levelHeight);
             for (BuildingObject buildingObject : buildings) {
                 player.checkCollision(buildingObject, true);
@@ -454,10 +530,14 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                 if (!coin.isCollected()) {
                     coin.draw(batch);
                     if (player.checkCollision(coin, false)) {
+                        soundId = coinCollect.play();
+                        coinCollect.setVolume(soundId, soundSlider.getValue());
+                        //System.out.println("volume set!");
                         gameplayMusic.pause();
                         newOrderNotif.pause();
-                        coinCollect.play();
+                        //coinCollect.play();
                         coin.setCollected(true);
+                        //soundPlayed = true;
                         coinCounter++;
                         coinCollectLabel.setText("Coins Collected: " + coinCounter);
                     }
@@ -476,10 +556,17 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                 mainTimer.setText(str);
                 mainTimer.setVisible(true);
                 lowTimer.setVisible(false);
+
             } else {
                 lowTimer.setText(str);
+                gameplayMusic.pause();
+                gameplayMusic = fastMusic;
+                gameplayMusic.play();
                 lowTimer.setVisible(true);
                 mainTimer.setVisible(false);
+            }
+            if (countdownMinutes == 0 && countdownSeconds == 0) {
+                gameplayMusic.pause();
             }
 
             // building collisions and transparency
@@ -518,9 +605,9 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 //                    String str2 = s[2];
 //                    String currDrop = str3.substring(0, str3.length() - 6);
 //                    String currPick = str2.substring(0, str2.length() - 3);
-                    System.out.println("pick:" + currPick);
+//                    System.out.println("pick:" + currPick);
                     for (BuildingObject building : buildings) {
-                        System.out.println("name: " + building.getName());
+//                        System.out.println("name: " + building.getName());
                         // assign the building to the correct order
                         if (building.getName().equals(currPick) && !order.isPickedUp()) {
                             building.setPickupLocation(true);
@@ -531,6 +618,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                         if (building.getName().equals(currDrop) && !order.isDroppedOff() && order.isPickedUp()) {
                             building.setDropoffLocation(true);
                             order.setDropoffBounds(building.getBounds().getX(), building.getBounds().getY(), building.getWidth(), building.getHeight());
+                            order.dropoffBuilding = building;
                         } else {
                             building.setDropoffLocation(false);
                         }
@@ -543,8 +631,10 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                                 order.setPickedUp(true);
                                 gameplayMusic.pause();
                                 newOrderNotif.pause();
+
                                 long id = pickupSuccess.play();
-                                pickupSuccess.setVolume(id, 0.3f);
+                                pickupSuccess.setVolume(id, 0.5f);
+
                                 order.setDroppedOff(false);
                                 pickupLabel.setVisible(false);
                             }
@@ -560,15 +650,26 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                                 order.setDroppedOff(true);
                                 gameplayMusic.pause();
                                 newOrderNotif.pause();
-                                long id = dropoffSuccess.play();
-                                dropoffSuccess.setVolume(id, 0.09f);
+
+                                if (order.dropoffBuilding.getName().equals("Turkstra")) {
+                                    if (playerAttributes.ordersCompleted == minOrders - 1) {
+                                        long id = pie.play();
+                                        pie.setVolume(id, .8f);
+                                    }
+                                } else {
+                                    long id = dropoffSuccess.play();
+                                    dropoffSuccess.setVolume(id, 0.5f);
+                                }
+
+
                                 playerAttributes.ordersCompleted++;
                                 minOrderLabel.setText("Orders Completed: " + playerAttributes.ordersCompleted + "/" + minOrders);
                                 totalOrdersCompleted++;
+
 //                                String orderID = playerAttributes.array.get(1).substring(4,9)/*order.getOrderString()*/;
                                 //if (!deliveredOrderIDs.contains(orderID)) {
-                                    deliveredOrderIDs.add(orderID);
-                                    System.out.println("Order " + orderID + " (before removing) has been delivered and added to the list.");
+                                deliveredOrderIDs.add(orderID);
+//                                System.out.println("Order " + orderID + " (before removing) has been delivered and added to the list.");
 
                                 //}
                                 playerAttributes.array.remove(1);
@@ -632,7 +733,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                         playerAttributes.array.remove(i);
                         messageTimer = 0.0f;
                     } else {
-                        if (!popupInAction) {
+                        if (!popupInAction && !gamePaused) {
                             if (timeCount[i - 1] % 60 == 0) {
                                 time -= 1;
                                 orderTimeLeft[i - 1] = time;
@@ -691,6 +792,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                     //if (order.isPickedUp()) {
                     font.setColor(Color.RED);
                     // }
+                } else if (i == 1 && order.isPickedUp()){
+                    font.setColor(Color.GREEN);
                 } else {
                     font.setColor(Color.WHITE);
                 }
@@ -702,6 +805,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             stage.draw();
             popup.render();
             gamepopup.render();
+            pauseScreen.render();
             batch.end();
         } else {
             gameplayMusic.pause();
@@ -735,10 +839,25 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             }
             if (playerAttributes.ordersCompleted == minOrders && keepPlaying) {
                 keepPlayingPopup();
+                //pauseScreen();
                 popupInAction = true;
             }
         }
     }
+
+//    public void pauseMusic() {
+//        if (gameplayMusic.isPlaying()) {
+//            System.out.println("Music paused");
+//            gameplayMusic.pause();
+//        }
+//    }
+//
+//    public void resumeMusic() {
+//        if (!gameplayMusic.isPlaying()) {
+//            System.out.println("Music resumed");
+//            gameplayMusic.play();
+//        }
+//    }
 
     //show game stats screen
     public void showGameResult() {
@@ -767,6 +886,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         gamepopup.showOrderCompletedList(orderIDsMessage);
         gamepopup.showOutoffTimeList(notInTimeorderIDsMessage);
         gamepopup.showLevelResultMessage(levelResult);
+        gamepopup.setWin(win);
         gamepopup.show();
         gamepopup.render();
         multiplexer.addProcessor(gamepopup.getStage());
@@ -783,6 +903,19 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         keepplayingpopup.show();
         keepplayingpopup.render();
         multiplexer.addProcessor(keepplayingpopup.getStage());
+    }
+
+    // pause screen pop up
+    public void pauseScreen() {
+        visibleText = false;
+        String message = "Game Paused!\nSettings:\n";
+        //String option = "Keep Playing or End Game?";
+        pauseScreen.setMessageLabel(message);
+        //stage.addActor(musicSlider);
+        //stage.addActor(soundSlider);
+        pauseScreen.show();
+        pauseScreen.render();
+        multiplexer.addProcessor(pauseScreen.getStage());
     }
 
     // Trigger the timed popup to show
@@ -823,16 +956,17 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         scheduler.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
-                if (!popupInAction) {
+                if (!popupInAction && !gamePaused) {
                     showTimedPopup(); // Show the popup
                     if (!outOfOrders) {
-                        long id = newOrderNotif.play();
-                        newOrderNotif.setVolume(id, 0.9f);
+                        soundId = newOrderNotif.play();
+                        //newOrderNotif.setVolume(id, 0.9f);
+                        newOrderNotif.setVolume(soundId, soundSlider.getValue());
                     }
                     scheduler.schedule(new Runnable() {
                         @Override
                         public void run() {
-                            if (!popupInAction) {
+                            if (!popupInAction && !gamePaused) {
                                 // Hide the popup
                                 hideTimedPopup();
                                 if (!popup.acceptClicked() && !popup.declineClicked() && !ordersDone) {
@@ -840,7 +974,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                                     scheduler.schedule(new Runnable() {
                                         @Override
                                         public void run() {
-                                            if (!popupInAction) {
+                                            if (!popupInAction && !gamePaused) {
                                                 autoDeclineLabel.setVisible(false); // Remove the label from the display
                                             }
                                         }
@@ -961,7 +1095,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                             // Setting the y-position is like this bc libgdx is stupid :)
                             levelHeight - (objectData[i].y + 1) * levelData.tileSize - building.getBounds().height
                     );
-                    System.out.println(objectData[i].objectID);
+//                    System.out.println(objectData[i].objectID);
                     buildings.add(building);
                 } else if (object instanceof CoinObject) {
                     CoinObject coin = new CoinObject((CoinObject) object);
