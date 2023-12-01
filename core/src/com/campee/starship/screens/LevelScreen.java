@@ -187,6 +187,7 @@ public class LevelScreen extends ScreenAdapter {
         storeButton.setSize(150, 60);
         storeButton.addListener(new InputListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                music.pause();
                 game.setScreen(new StoreScreen(game));
                 return true;
             }

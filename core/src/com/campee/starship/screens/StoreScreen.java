@@ -3,6 +3,7 @@ package com.campee.starship.screens;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
@@ -38,6 +39,7 @@ public class StoreScreen implements Screen {
     private ExtendViewport viewport;
 
     private Label shopBanner, coinLabel;
+    private Music music;
 
     public StoreScreen (final Game game) {
         this.game = game;
@@ -45,12 +47,17 @@ public class StoreScreen implements Screen {
         stage = new Stage(viewport);
         Gdx.input.setInputProcessor(stage);
 
+        music = Gdx.audio.newMusic(Gdx.files.internal("audio/menu screen sound.mp3"));
+        music.setLooping(true);
+        music.setVolume(0.35f);
+
         backButton = HoverableButton.generate("BACK", true, Color.valueOf("98FF98"), Color.BLACK, 1.5f);
         backButton.setPosition(30, Gdx.graphics.getHeight() - 80);
         backButton.setSize(150, 60);
         backButton.addListener(new ClickListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 try {
+                    music.pause();
                     game.setScreen(new LevelScreen(game));
                 } catch (FileNotFoundException e) {
                     throw new RuntimeException(e);
@@ -112,6 +119,7 @@ public class StoreScreen implements Screen {
         Gdx.gl.glClear(Gdx.gl20.GL_COLOR_BUFFER_BIT);
 
         coinLabel.setText("Coins: " + DataManager.INSTANCE.getCoinCount());
+        music.play();
 
 //        stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 80f));
         // Update and render game elements
