@@ -3,6 +3,7 @@ package com.campee.starship.screens;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
@@ -26,6 +27,7 @@ public class SettingsScreen implements Screen {
     private Stage stage;
     private ExtendViewport viewport;
     private float timer = 10; // Countdown timer in seconds
+    public Music music;
 
     public SettingsScreen(final Game game) {
         this.game = game;
@@ -35,6 +37,10 @@ public class SettingsScreen implements Screen {
         font = new BitmapFont();
         font.setColor(Color.BLACK);
         font.getData().setScale(2.0f); // Set the font scale to make the text larger
+
+        music = Gdx.audio.newMusic(Gdx.files.internal("audio/menu screen sound.mp3"));
+        music.setLooping(true);
+        music.setVolume(0.35f);
 
         viewport = new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         stage = new Stage(viewport);
@@ -55,6 +61,7 @@ public class SettingsScreen implements Screen {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 // Switch back to the title screen when the BACK button is clicked
                 try {
+                    music.pause();
                     game.setScreen(new LevelScreen(game)); // Change to the screen you want
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
@@ -96,6 +103,7 @@ public class SettingsScreen implements Screen {
         batch.end();
 
         stage.act(delta);
+        music.play();
         stage.draw();
 
         // Update countdown timer
@@ -103,6 +111,7 @@ public class SettingsScreen implements Screen {
         if (timer <= 0) {
             // When the timer reaches 0, switch back to the title screen
             try {
+                music.pause();
                 game.setScreen(new LevelScreen(game)); // Change to the screen you want
             } catch (FileNotFoundException e) {
                 e.printStackTrace();

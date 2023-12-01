@@ -3,6 +3,7 @@ package com.campee.starship.screens;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -35,12 +36,17 @@ public class TitleScreen implements Screen {
     private TextButton closeButton;
     private boolean isPlayButtonHovered = false;
     private boolean isCloseButtonHovered = false;
+    Music music;
 
     public TitleScreen(final MoonshipGame game) {
         this.game = game;
         batch = new SpriteBatch();
         font = new BitmapFont(Gdx.files.internal("fonts/moonships_font.fnt"), Gdx.files.internal("fonts/moonships_font.png"), false);
         //font = new BitmapFont();
+
+        music = Gdx.audio.newMusic(Gdx.files.internal("audio/Moon Final.mp3"));
+        music.setLooping(true);
+        music.setVolume(0.35f);
 
         // Set font color and scale
         font.setColor(1, 1, 0, 1);
@@ -83,6 +89,7 @@ public class TitleScreen implements Screen {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 // Switch to another screen when the button is clicked
                 try {
+                    music.pause();
                     game.setScreen(new LevelScreen(game)); // Change to the screen you want
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
@@ -185,6 +192,7 @@ public class TitleScreen implements Screen {
         float imgX = (viewport.getWorldWidth() - imgWidth) / 2;
         float imgY = 30; // Adjust this value to move the image up or down
         batch.draw(img, imgX, imgY, imgWidth, imgHeight);
+        music.play();
 
         batch.end();
         stage.act(delta);
