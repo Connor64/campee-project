@@ -1,5 +1,5 @@
 {
-    "coins": 7,
+    "coins": 16,
     "gameplay_sfx_volume": 0.3,
     "unlocked_levels": {
         "0": true,
@@ -11,5 +11,5 @@
     },
     "purchased_upgrades": ["speed_boost"],
     "gameplay_music_volume": 0.1,
-    "menu_music_volume": 0
+    "menu_music_volume": 0.1
 }
