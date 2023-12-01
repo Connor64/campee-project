@@ -40,12 +40,17 @@ public class StoreScreen implements Screen {
 
     private Label shopBanner, coinLabel;
     private Music music;
+    private BitmapFont font;
 
     public StoreScreen (final Game game) {
         this.game = game;
         viewport = new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         stage = new Stage(viewport);
         Gdx.input.setInputProcessor(stage);
+
+        font = new BitmapFont(Gdx.files.internal("fonts/moonships_font.fnt"), Gdx.files.internal("fonts/moonships_font.png"), false);
+        font.setColor(1, 1, 0, 1);
+        font.getData().setScale(0.8f);
 
         music = Gdx.audio.newMusic(Gdx.files.internal("audio/menu screen sound.mp3"));
         music.setLooping(true);
@@ -67,8 +72,9 @@ public class StoreScreen implements Screen {
         });
 
         Label.LabelStyle coinStyle = new Label.LabelStyle();
-        BitmapFont coinFont = new BitmapFont();
-        coinFont.getData().scale(1.5f);
+        BitmapFont coinFont = new BitmapFont(Gdx.files.internal("fonts/moonships_font.fnt"), Gdx.files.internal("fonts/moonships_font.png"), false);
+        coinFont.setColor(1, 1, 0, 1);
+        coinFont.getData().setScale(0.9f);;
         coinStyle.font = coinFont;
         coinStyle.fontColor = Color.BLACK;
 
@@ -78,8 +84,8 @@ public class StoreScreen implements Screen {
         coinLabel.setPosition(-10, Gdx.graphics.getHeight() - coinLabel.getHeight());
 
         Label.LabelStyle titleStyle = new Label.LabelStyle();
-        BitmapFont labelFont = new BitmapFont();
-        labelFont.getData().scale(5);
+        BitmapFont labelFont = font;
+        labelFont.getData().scale(1f);
         titleStyle.font = labelFont;
         titleStyle.fontColor = Color.BLACK;
 
