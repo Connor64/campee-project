@@ -74,10 +74,10 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     private final KeepPlayingPopup keepplayingpopup;
     private final PauseScreen pauseScreen;
     public int coinCounter;
+    private boolean doubleCoins;
     private boolean visibleText;
 
     private int totalOrdersCompleted;
-
 
     private GameObject log;
     private GameObject rock;
@@ -155,6 +155,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     private Stage stage;
     private KeyProcessor keyProcessor;
     private float timeSinceLastMove;
+    private boolean savedData = false;
 
     private PlayerCamera camera;
 
@@ -274,6 +275,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         sidePanelColor = new Color(0.2f, 0.2f, 0.2f, 0.5f); // Background color (RGBA)
 
         coinCounter = 0;
+        doubleCoins = DataManager.INSTANCE.isUpgradePurchased("coin_boost");
 
         visibleQ = new ArrayList<>();
         playerAttributes.setArray(visibleQ);
@@ -317,13 +319,13 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         //musicSlider = pauseScreen.getMusicSlider();
         musicSlider = new Slider(0f, 1f, 0.1f, false, skin);
-        musicSlider.setValue(1f);
+        musicSlider.setValue(DataManager.INSTANCE.getGameplayMusicVolume());
         musicSlider.setSize(250f, 25f);
         musicSlider.setPosition(200f, Gdx.graphics.getHeight() - 300f);
 
         //soundSlider = pauseScreen.getSoundSlider();
         soundSlider = new Slider(0f, 1f, 0.1f, false, skin);
-        soundSlider.setValue(1f);
+        soundSlider.setValue(DataManager.INSTANCE.getGameplaySFXVolume());
         soundSlider.setSize(250f, 25f);
         soundSlider.setPosition(200f, Gdx.graphics.getHeight() - 400f);
 
@@ -655,8 +657,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                         newOrderNotif.pause();
                         //coinCollect.play();
                         coin.setCollected(true);
-                        //soundPlayed = true;
-                        coinCounter++;
+                        coinCounter += doubleCoins ? 2 : 1;
                         coinCollectLabel.setText("Coins Collected: " + coinCounter);
                     }
                 }
@@ -1002,6 +1003,16 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
         String levelResult;
         if (win) {
+            // TODO: rewrite this to not rely on file name
+            if (!savedData) {
+                int num = Character.getNumericValue(LevelScreen.nameOfFile.charAt(LevelScreen.nameOfFile.length() - 1));
+                num++;
+                DataManager.INSTANCE.setClearStatus(String.valueOf(num), true, false);
+                DataManager.INSTANCE.addCoins(coinCounter, true);
+
+                savedData = true;
+            }
+
             levelResult = "Congrats, level completed!";
         } else {
             levelResult = "Game Over! :(";
@@ -1262,8 +1273,10 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                     building.setPosition(
                             objectData[i].x * levelData.tileSize,
                             // Setting the y-position is like this bc libgdx is stupid :)
-                            levelHeight - (objectData[i].y + 1) * levelData.tileSize - building.getBounds().height
+                            levelHeight - (objectData[i].y - 1) * levelData.tileSize - building.getHeight()
                     );
+
+                    System.out.println("Height: " + building.getHeight());
 //                    System.out.println(objectData[i].objectID);
                     buildings.add(building);
                 } else if (object instanceof CoinObject) {

@@ -1,9 +1,15 @@
-{"UnlockedLevels": {
-    "0": true,
-    "1": true,
-    "2": true,
-    "3": true,
-    "4": true,
-    "5": true,
-    "6": true
-}}
+{
+    "coins": 7,
+    "gameplay_sfx_volume": 0.3,
+    "unlocked_levels": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": true,
+        "4": true,
+        "5": true
+    },
+    "purchased_upgrades": ["speed_boost"],
+    "gameplay_music_volume": 0.1,
+    "menu_music_volume": 0.1
+}

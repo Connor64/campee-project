@@ -1,0 +1,53 @@
+{
+  "level_1": {
+    "name": "Level 1",
+    "time": 100,
+    "prev": "none",
+    "orders": [
+      {
+        "pickup": "HAAS",
+        "dropoff": "MSEE",
+        "time": 20
+      },
+      {
+        "pickup": "HAAS",
+        "dropoff": "MSEE",
+        "time": 20
+      }
+    ]
+  },
+  "level_2": {
+    "name": "Level 2",
+    "time": 100,
+    "prev": "level_1",
+    "orders": [
+      {
+        "pickup": "HAAS",
+        "dropoff": "MSEE",
+        "time": 20
+      },
+      {
+        "pickup": "HAAS",
+        "dropoff": "MSEE",
+        "time": 20
+      }
+    ]
+  },
+  "level_3": {
+    "name": "Level 3",
+    "time": 100,
+    "prev": "level_2",
+    "orders": [
+      {
+        "pickup": "HAAS",
+        "dropoff": "MSEE",
+        "time": 20
+      },
+      {
+        "pickup": "HAAS",
+        "dropoff": "MSEE",
+        "time": 20
+      }
+    ]
+  }
+}

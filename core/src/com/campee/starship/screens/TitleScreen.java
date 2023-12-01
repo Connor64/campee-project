@@ -21,6 +21,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.campee.starship.managers.DataManager;
 
 import java.io.FileNotFoundException;
 
@@ -49,7 +50,7 @@ public class TitleScreen implements Screen {
 
         music = Gdx.audio.newMusic(Gdx.files.internal("audio/Moon Final.mp3"));
         music.setLooping(true);
-        music.setVolume(0.35f);
+        music.setVolume(DataManager.INSTANCE.getMenuMusicVolume());
 
         // Set font color and scale
         font.setColor(1, 1, 0, 1);
