@@ -1,1 +1,2 @@
 TUT0R|Banera|Protima|40
+D3BUG|Banera|Protima|40
