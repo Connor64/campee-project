@@ -1,16 +1,24 @@
 package com.campee.starship.managers;
 
+import Serial.LevelData;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.campee.starship.objects.*;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 
+import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.lang.reflect.Array;
+import java.nio.file.Files;
+import java.util.*;
 
 public class AssetManager {
     public static final AssetManager INSTANCE;
@@ -25,19 +33,26 @@ public class AssetManager {
 
     private HashMap<String, TextureRegion[]> tilesets;
     private HashMap<String, GameObject> gameObjects;
-
-    public final BitmapFont BUTTON_FONT, TITLE_FONT, GAMEPLAY_FONT;
+    private HashMap<String, LevelData> levels;
+    private HashMap<String, Upgrade> upgrades;
 
     public final int TILE_SIZE = 16;
 
     private AssetManager() throws IOException {
         tilesets = new HashMap<>();
         gameObjects = new HashMap<>();
+        levels = new HashMap<>();
+        upgrades = new HashMap<>();
+
+        /* ================== Load in tilesets ================== */
         
         loadTileset("1_terrain.png", "tileset_test_1");
         loadTileset("street.png", "modern_tileset");
         loadTileset("caves.png", "caves_tileset");
 
+        /* ================== Load and create custom game objects ================== */
+
+        // Buildings (and people I guess lol)
         gameObjects.put("building_haas", new BuildingObject("sprites/buildings/haas.png", "HAAS", 0, 0, 0.5f, 0.75f));
         gameObjects.put("building_pmu", new BuildingObject("sprites/buildings/pmu.png", "PMU", 0, 0, 0.5f, 0.75f));
         gameObjects.put("building_msee", new BuildingObject("sprites/buildings/msee.png", "MSEE", 0, 0, 0.5f, 0.75f));
@@ -47,19 +62,66 @@ public class AssetManager {
         gameObjects.put("building_kola", new BuildingObject("sprites/buildings/koca_kola_machine.png", "Kola Machine", 0, 0, 0.5f, 0.75f));
         gameObjects.put("building_turkstra", new BuildingObject("sprites/buildings/prof_turkstra.png", "Turkstra", 0, 0, 0.5f, 0.75f));
         gameObjects.put("building_police", new BuildingObject("sprites/buildings/police_officer.png", "Officer", 0, 0, 0.5f, 0.75f));
+
+        // Other game objects
         gameObjects.put("coin", new CoinObject(0, 0));
 
-        BUTTON_FONT = new BitmapFont();
-        BUTTON_FONT.getData().scale(3);
+        /* ================== Load in the upgrades from JSON file ================== */
 
-        TITLE_FONT = new BitmapFont(Gdx.files.internal("fonts/moonships_font.fnt"),
-                                    Gdx.files.internal("fonts/moonships_font.png"), false);
-        TITLE_FONT.setColor(1, 1, 0, 1);
-        TITLE_FONT.getData().scale(3);
+        File file = Gdx.files.local("upgrades.json").file();
+        JSONTokener tokener = new JSONTokener(file.toURI().toURL().openStream());
+        JSONObject root = new JSONObject(tokener);
 
-        GAMEPLAY_FONT = new BitmapFont();
-        GAMEPLAY_FONT.getData().scale(1.5f);
-        GAMEPLAY_FONT.setColor(Color.BLACK);
+        Iterator<String> upgradeKeys = root.keys();
+        while (upgradeKeys.hasNext()) {
+            String key = upgradeKeys.next();
+            System.out.println("Key: " + key);
+            JSONObject upgradeJson = root.getJSONObject(key);
+
+            Upgrade upgrade = new Upgrade(
+                    key,
+                    upgradeJson.getString("name"),
+                    upgradeJson.getInt("cost"),
+                    upgradeJson.getString("desc")
+            );
+
+            upgrades.put(key, upgrade);
+        }
+
+        /* ================== Load level data from files ================== */
+
+        FileHandle levelsFolder = Gdx.files.internal("levels");
+        FileHandle[] levelFiles = levelsFolder.list();
+
+        for (int i = 0; i < levelFiles.length; i++) {
+            String[] nameFields = levelFiles[i].nameWithoutExtension().split("_");
+
+            InputStream fileStream = Files.newInputStream(new File(levelFiles[i].path()).toPath());
+            ObjectInputStream inputStream = new ObjectInputStream(fileStream);
+
+            try {
+                LevelData levelData = (LevelData) inputStream.readObject();
+                levels.put(nameFields[1], levelData);
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    public Set<Map.Entry<String, LevelData>> getLevels() {
+        return levels.entrySet();
+    }
+
+    public LevelData getLevel(String key) {
+        return levels.get(key);
+    }
+
+    public int getNumLevels() {
+        return levels.size();
+    }
+
+    public Set<Map.Entry<String, Upgrade>> getUpgrades() {
+        return upgrades.entrySet();
     }
 
     /**

@@ -1,0 +1,17 @@
+{
+    "unlocked_levels": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false,
+        "4": false,
+        "5": true,
+        "6": false
+    },
+    "purchased_upgrades": [
+        "speed_boost",
+        "coin_boost",
+        "time_extension"
+    ],
+    "coins": 50
+}

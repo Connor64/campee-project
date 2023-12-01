@@ -1,9 +1,9 @@
 package com.campee.starship.screens;
 
+import Serial.LevelData;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
@@ -14,15 +14,19 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.campee.starship.managers.AssetManager;
+import com.campee.starship.managers.DataManager;
 import com.campee.starship.userinterface.CustomScrollPane;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Map;
+import java.util.Set;
 
 public class LevelScreen extends ScreenAdapter {
+    public static String nameOfFile;
     private final Game game;
     private Stage stage;
-    private ScrollPane scrollPane;
     private CustomScrollPane scrollBar;
     private BitmapFont font;
     private TextButton backButton; // Add a TextButton for the "BACK" button
@@ -31,6 +35,7 @@ public class LevelScreen extends ScreenAdapter {
     private TextButton levelButton;
     private ExtendViewport viewport;
     private Stage stage2;
+    //private String prevLevelName;
 
     public LevelScreen(final Game game) {
         this.game = game;
@@ -40,6 +45,8 @@ public class LevelScreen extends ScreenAdapter {
         font.setColor(Color.BLACK);
         viewport = new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
+        DataManager.INSTANCE.isLevelUnlocked("0");
+
         Table outerTable = new Table();
         outerTable.setFillParent(true);
         stage.addActor(outerTable);
@@ -47,27 +54,31 @@ public class LevelScreen extends ScreenAdapter {
         Table innerTable = new Table();
         outerTable.add(innerTable).center();
 
-        FileHandle levelsFolder = Gdx.files.internal("levels");
-        FileHandle[] levelFiles = levelsFolder.list();
-
         Label titleLabel = new Label("LEVEL SELECT SCREEN", createTitleLabelStyle(Color.BLACK));
 
         // Add title label to the top of the window with some padding
         innerTable.add(titleLabel).padTop(50).colspan(3).center().row();
 
-        for (int i = 0; i < levelFiles.length; i += 3) {
-            Table rowTable = new Table(); // Create a new table for each row
+        int index = 0;
+        Set<Map.Entry<String, LevelData>> levelSet = AssetManager.INSTANCE.getLevels();
+        Table rowTable = new Table(); // Create a new table for each row
+
+        for (Map.Entry<String, LevelData> entry : levelSet) {
+            Table levelWidget = createLevelWidget(entry.getKey());
+            rowTable.add(levelWidget).pad(40).center();
+
+            index++;
 
             // Add up to three level widgets in this row
-            for (int j = i; j < Math.min(i + 3, levelFiles.length); j++) {
-                String[] level_name = levelFiles[j].nameWithoutExtension().split("_");
-                Table levelWidget = createLevelWidget(level_name[1]);
-                rowTable.add(levelWidget).pad(40).center();
+            if (index >= 3) {
+                // Add the rowTable to the innerTable
+                innerTable.add(rowTable).row();
+                rowTable = new Table();
+                index = 0;
             }
-
-            // Add the rowTable to the innerTable
-            innerTable.add(rowTable).row();
         }
+
+        if (index != 0) innerTable.add(rowTable).row();
 
         CustomScrollPane customScrollPane = new CustomScrollPane(innerTable, stage);
         customScrollPane.setScrollingDisabled(true, false);
@@ -76,7 +87,7 @@ public class LevelScreen extends ScreenAdapter {
         //customScrollPane.setTouchable(Touchable.enabled);
 
         stage.addActor(customScrollPane);
-        stage.setScrollFocus(scrollPane);
+        stage.setScrollFocus(customScrollPane);
         Gdx.input.setInputProcessor(stage);
 
         BitmapFont buttonFont = new BitmapFont();
@@ -92,6 +103,7 @@ public class LevelScreen extends ScreenAdapter {
         backButton.addListener(new InputListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 // Switch back to the title screen when the BACK button is clicked
+
                 game.setScreen(new TitleScreen((MoonshipGame) game)); // Change to the screen you want
                 return true;
             }
@@ -120,11 +132,13 @@ public class LevelScreen extends ScreenAdapter {
                 game.setScreen(new SettingsScreen(game));
                 return true;
             }
+
             @Override
             public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
                 super.enter(event, x, y, pointer, fromActor);
                 settingsButton.setColor(Color.LIGHT_GRAY);
             }
+
             @Override
             public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
                 super.exit(event, x, y, pointer, toActor);
@@ -173,6 +187,7 @@ public class LevelScreen extends ScreenAdapter {
         style.fontColor = color;
         return style;
     }
+
     private Table createLevelWidget(final String levelNumber) {
         Table levelWidget = new Table();
 //        levelWidget.setBackground(new TextureRegionDrawable(new TextureRegion(new Texture(createPixmap(new Color(0.8f, 0.6f, 1f, 1f))))));
@@ -186,22 +201,56 @@ public class LevelScreen extends ScreenAdapter {
         orderLabel.setFontScale(1f);
 
         // Create a button
-        TextButton.TextButtonStyle levelButtonStyle = new TextButton.TextButtonStyle();
+        final TextButton.TextButtonStyle levelButtonStyle = new TextButton.TextButtonStyle();
         BitmapFont levelButtonFont = new BitmapFont();
         levelButtonFont.getData().setScale(1f);
         levelButtonStyle.font = levelButtonFont;
         levelButtonStyle.fontColor = Color.BLACK;
-        levelButtonStyle.up = new TextureRegionDrawable(new TextureRegion(new Texture(createRoundedRectanglePixmap(100, 45, 15, Color.YELLOW))));
-        //levelButtonStyle.down = new TextureRegionDrawable(new TextureRegion(new Texture(createRoundedRectanglePixmap(150, 60, 15, Color.YELLOW))));
+        levelButtonStyle.up = new TextureRegionDrawable(new TextureRegion(new Texture(createRoundedRectanglePixmap(100, 45, 15, Color.DARK_GRAY))));
+        //levelButtonStyle.down = new TextureRegionDrawable(new TextureRegion(new Texture(createRoundedRectanglePixmap(150, 60, 15, Color.YELLOW))))
 
-        final TextButton levelButton = new TextButton("UNLOCKED", levelButtonStyle);
+
+        ImageButton.ImageButtonStyle lockButtonStyle = new ImageButton.ImageButtonStyle();
+        lockButtonStyle.imageUp = new TextureRegionDrawable(new TextureRegion(new Texture("sprites/lock_icon.png")));
+        ImageButton lockButton = new ImageButton(lockButtonStyle);
+        lockButton.getImageCell().size(20, 30);
+
+        ImageButton.ImageButtonStyle unlockButtonStyle = new ImageButton.ImageButtonStyle();
+        unlockButtonStyle.imageUp = new TextureRegionDrawable(new TextureRegion(new Texture("sprites/unlock_icon.png")));
+        ImageButton unlockButton = new ImageButton(unlockButtonStyle);
+        unlockButton.getImageCell().size(30, 40);
+
+
+        boolean isLocked = false;
+        final TextButton levelButton = new TextButton("LOCKED", levelButtonStyle);
+
+        if (DataManager.INSTANCE.levelExists(levelNumber)) {
+            if (DataManager.INSTANCE.isLevelUnlocked(levelNumber)) {
+                levelButtonStyle.up = new TextureRegionDrawable(
+                        new TextureRegion(new Texture(createRoundedRectanglePixmap(100, 45, 15, Color.GREEN))));
+                levelButton.setText("UNLOCKED");
+                levelWidget.add(unlockButton).padBottom(5).colspan(3).center().row();
+            } else {
+                levelButtonStyle.up = new TextureRegionDrawable(
+                        new TextureRegion(new Texture(createRoundedRectanglePixmap(100, 45, 15, Color.DARK_GRAY))));
+                levelButton.setText("LOCKED");
+                levelWidget.add(lockButton).padBottom(5).colspan(3).center().row();
+                isLocked = true;
+            }
+        }
+        //final TextButton levelButton = new TextButton("LOCKED", levelButtonStyle);
+
         levelButton.setSize(10, 20);
         levelButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 try {
-                    game.setScreen(new GameplayScreen((MoonshipGame) game, "level_" + levelNumber));
-                    //System.out.println("hereeee");
+                    if (levelButton.getText().toString().equals("UNLOCKED")) {
+                        nameOfFile = "Level " + levelNumber;
+//                        game.setScreen(new GameplayScreen((MoonshipGame) game, levelName));
+                        game.setScreen(new GameplayScreen((MoonshipGame) game, "level_" + levelNumber));
+                        //System.out.println("hereeee");
+                    }
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
@@ -214,12 +263,20 @@ public class LevelScreen extends ScreenAdapter {
             @Override
             public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
                 super.enter(event, x, y, pointer, fromActor);
-                levelButton.setColor(Color.LIGHT_GRAY);
+//                isButtonHovered = true;
+                //levelButton.setColor(Color.LIGHT_GRAY);
+                if (levelButton.getText().toString().equals("UNLOCKED")) {
+                    levelButton.setColor(Color.LIGHT_GRAY);
+                }
             }
             @Override
             public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
                 super.exit(event, x, y, pointer, toActor);
-                levelButton.setColor(Color.WHITE);
+//                isButtonHovered = false;
+                //levelButton.setColor(Color.WHITE);
+                if (levelButton.getText().toString().equals("UNLOCKED")) {
+                    levelButton.setColor(Color.WHITE);
+                }
             }
         });
 
@@ -236,6 +293,7 @@ public class LevelScreen extends ScreenAdapter {
         levelWidget.pad(30);
 
         return levelWidget;
+
     }
 
     private Label.LabelStyle createLabelStyle(Color color) {

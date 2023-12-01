@@ -90,11 +90,17 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     // Declare variables for the countdown timer
     public int countdownMinutes = 3; // 2 minutes
     public int countdownSeconds = 0;
+    int printcounter = 0;
     private Timer countdownTimer = new Timer();
 
     // music and sound
     Music gameplayMusic;
     Sound coinCollect;
+    Sound dropoffSuccess;
+    Sound pickupSuccess;
+    Sound levelWin;
+    Sound levelFail;
+    Sound newOrderNotif;
 
 
     // Create a TimerTask to decrement the countdown timer
@@ -222,8 +228,10 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         gameplayMusic = Gdx.audio.newMusic(Gdx.files.internal("audio/music_demo.mp3"));
         gameplayMusic.setLooping(true);
         gameplayMusic.setVolume(0.5f);
+        dropoffSuccess = Gdx.audio.newSound(Gdx.files.internal("audio/successful dropoff.mp3"));
+        pickupSuccess = Gdx.audio.newSound(Gdx.files.internal("audio/pickup success.wav"));
+        newOrderNotif = Gdx.audio.newSound(Gdx.files.internal("audio/new order notification.mp3"));
         coinCollect = Gdx.audio.newSound(Gdx.files.internal("audio/coin_collect.mp3"));
-
         gamepopup = new GamePopup(this, "", game, fileName);
         keepplayingpopup = new KeepPlayingPopup(this, "", game, fileName);
 
@@ -425,6 +433,11 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             // start music
             gameplayMusic.play();
 
+            if (keepplayingpopup.isVisible()) {
+                gameplayMusic.pause();
+                newOrderNotif.pause();
+            }
+
             // coin collision
             for (CoinObject coin : coins) {
                 if (!coin.isCollected()) {
@@ -515,6 +528,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                             pickupLabel.setVisible(true);
                             if (keyProcessor.pPressed) {
                                 order.setPickedUp(true);
+                                long id = pickupSuccess.play();
+                                pickupSuccess.setVolume(id, 0.3f);
                                 order.setDroppedOff(false);
                                 pickupLabel.setVisible(false);
                             }
@@ -528,6 +543,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                             if (keyProcessor.oPressed) {
                                 order.setPickedUp(false);
                                 order.setDroppedOff(true);
+                                long id = dropoffSuccess.play();
+                                dropoffSuccess.setVolume(id, 0.09f);
                                 playerAttributes.ordersCompleted++;
                                 minOrderLabel.setText("Orders Completed: " + playerAttributes.ordersCompleted + "/" + minOrders);
                                 totalOrdersCompleted++;
@@ -657,6 +674,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                     //if (order.isPickedUp()) {
                     font.setColor(Color.RED);
                     // }
+                } else if (i == 1 && order.isPickedUp()){
+                    font.setColor(Color.GREEN);
                 } else {
                     font.setColor(Color.WHITE);
                 }
@@ -671,6 +690,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             batch.end();
         } else {
             gameplayMusic.pause();
+            newOrderNotif.pause();
         }
         boolean timeLeft = true;
         if (countdownSeconds == 0 && countdownMinutes == 0) {
@@ -748,6 +768,21 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         keepplayingpopup.show();
         keepplayingpopup.render();
         multiplexer.addProcessor(keepplayingpopup.getStage());
+
+        if (printcounter == 0) {
+            int num = Character.getNumericValue(LevelScreen.nameOfFile.charAt(LevelScreen.nameOfFile.length() - 1));
+            num++;
+
+            DataManager.INSTANCE.setClearStatus(String.valueOf(num), true, true);
+//            String fileName = "playerdata.txt";
+//            try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, true))) {
+//                writer.write(LevelScreen.nameOfFile + ":passed\n");
+//            } catch (IOException e) {
+//                e.printStackTrace(); // Handle the exception appropriately
+//            }
+
+            printcounter = 1;
+        }
     }
 
     // Trigger the timed popup to show
@@ -789,6 +824,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             public void run() {
                 if (!popupInAction) {
                     showTimedPopup(); // Show the popup
+                    long id = newOrderNotif.play();
+                    newOrderNotif.setVolume(id, 0.9f);
                     scheduler.schedule(new Runnable() {
                         @Override
                         public void run() {
@@ -894,7 +931,6 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         for (int layerNum = 0; layerNum < levelData.tileData.size(); layerNum++) {
             LevelData.TileData[] tileData = levelData.tileData.get(layerNum);
 
-            // TODO: spawn in the objects
             LevelData.ObjectData[] objectData = levelData.objectData.get(layerNum);
 
             Tile[] tiles = new Tile[tileData.length];

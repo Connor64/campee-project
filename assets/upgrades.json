@@ -1,0 +1,17 @@
+{
+  "speed_boost": {
+    "name": "Speed Boost",
+    "cost": 25,
+    "desc": "you go fast like holy shit zooooooommmm"
+  },
+  "coin_boost": {
+    "name": "Coin Boost",
+    "cost": 75,
+    "desc": "like so many fuckin coins"
+  },
+  "time_extension": {
+    "name": "Time Extension",
+    "cost": 1000,
+    "desc": "more time maybe probably not lmao"
+  }
+}

@@ -13,17 +13,29 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.campee.starship.managers.AssetManager;
+import com.campee.starship.objects.Upgrade;
+import com.campee.starship.userinterface.CustomScrollPane;
+import com.campee.starship.userinterface.HoverableButton;
+import com.campee.starship.userinterface.UpgradePanel;
+
+import java.util.Map;
+import java.util.Set;
 
 public class StoreScreen implements Screen {
     private final Game game;
     private Stage stage;
     private BitmapFont font;
-    private TextButton backButton;
+    private HoverableButton backButton;
     private ExtendViewport viewport;
+
+    private Label shopBanner;
 
     public StoreScreen (final Game game) {
         this.game = game;
@@ -31,31 +43,13 @@ public class StoreScreen implements Screen {
         stage = new Stage(viewport);
         Gdx.input.setInputProcessor(stage);
 
-        BitmapFont buttonFont = new BitmapFont();
-        TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
-        buttonFont.getData().setScale(1.5f);
-        textButtonStyle.font = buttonFont;
-        textButtonStyle.fontColor = Color.BLACK;
-        Pixmap backgroundPixmap = createRoundedRectanglePixmap(150, 60, 15, Color.valueOf("98FF98"));
-        textButtonStyle.up = new TextureRegionDrawable(new TextureRegion(new Texture(backgroundPixmap)));
-
-        backButton = new TextButton("BACK", textButtonStyle);
+        backButton = HoverableButton.generate("BACK", true, Color.valueOf("98FF98"), Color.BLACK, 1.5f);
         backButton.setPosition(30, Gdx.graphics.getHeight() - 80);
         backButton.setSize(150, 60);
-        backButton.addListener(new InputListener() {
+        backButton.addListener(new ClickListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 game.setScreen(new LevelScreen(game));
                 return true;
-            }
-            @Override
-            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
-                super.enter(event, x, y, pointer, fromActor);
-                backButton.setColor(Color.LIGHT_GRAY);
-            }
-            @Override
-            public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
-                super.exit(event, x, y, pointer, toActor);
-                backButton.setColor(Color.WHITE);
             }
         });
 
@@ -65,13 +59,26 @@ public class StoreScreen implements Screen {
         labelStyle.font = labelFont;
         labelStyle.fontColor = Color.BLACK;
 
-        Label shopBanner = new Label("The Bits Shop", labelStyle);
+        shopBanner = new Label("The Bits Shop", labelStyle);
         shopBanner.setAlignment(Align.center);
-        shopBanner.setSize(300, 90);
-        shopBanner.setPosition(0, 0);
+        shopBanner.setSize(Gdx.graphics.getWidth(), 240);
+        shopBanner.setPosition(0, Gdx.graphics.getHeight() - shopBanner.getHeight());
 
-        stage.addActor(backButton);
+        Table upgradeRow = new Table();
+
+        Set<Map.Entry<String, Upgrade>> upgradeSet = AssetManager.INSTANCE.getUpgrades();
+        for (Map.Entry<String, Upgrade> entry : upgradeSet) {
+            UpgradePanel panel = new UpgradePanel("sprites/coin.png", entry.getValue());
+            upgradeRow.add(panel).pad(15);
+        }
+
+        CustomScrollPane customScrollPane = new CustomScrollPane(upgradeRow, stage);
+        customScrollPane.setScrollingDisabled(false, true);
+        customScrollPane.setFillParent(true);
+
+        stage.addActor(customScrollPane);
         stage.addActor(shopBanner);
+        stage.addActor(backButton);
     }
 
     @Override
@@ -118,6 +125,12 @@ public class StoreScreen implements Screen {
     public void resize(int width, int height) {
         viewport.update(width, height, true);
         backButton.setPosition(30, viewport.getWorldHeight() - 80); // Update button position on resize
+
+        shopBanner.setPosition(
+                Math.max(0.0f, (viewport.getWorldWidth() - shopBanner.getWidth()) / 2.0f),
+                viewport.getWorldHeight() - shopBanner.getHeight()
+        );
+
         stage.getViewport().update(width, height, true);
     }
 
