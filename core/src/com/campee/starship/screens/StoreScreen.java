@@ -92,13 +92,14 @@ public class StoreScreen implements Screen {
 
         Set<Map.Entry<String, Upgrade>> upgradeSet = AssetManager.INSTANCE.getUpgrades();
         for (Map.Entry<String, Upgrade> entry : upgradeSet) {
-            UpgradePanel panel = new UpgradePanel("sprites/coin.png", entry.getValue());
+            UpgradePanel panel = new UpgradePanel(entry.getValue());
             upgradeRow.add(panel).pad(15);
         }
 
         CustomScrollPane customScrollPane = new CustomScrollPane(upgradeRow, stage);
         customScrollPane.setScrollingDisabled(false, true);
         customScrollPane.setFillParent(true);
+        customScrollPane.setPosition(customScrollPane.getX(), customScrollPane.getY() - 80);
 
         stage.addActor(customScrollPane);
         stage.addActor(shopBanner);

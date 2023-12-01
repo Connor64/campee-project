@@ -45,7 +45,7 @@ public class AssetManager {
         upgrades = new HashMap<>();
 
         /* ================== Load in tilesets ================== */
-        
+
         loadTileset("1_terrain.png", "tileset_test_1");
         loadTileset("street.png", "modern_tileset");
         loadTileset("caves.png", "caves_tileset");
@@ -60,6 +60,7 @@ public class AssetManager {
         gameObjects.put("building_panera", new BuildingObject("sprites/buildings/panera.png", "Banera", 0, 0, 0.5f, 0.75f));
         gameObjects.put("building_bepsi", new BuildingObject("sprites/buildings/bepsi_machine.png", "Bepsi Machine", 0, 0, 0.5f, 0.75f));
         gameObjects.put("building_kola", new BuildingObject("sprites/buildings/koca_kola_machine.png", "Kola Machine", 0, 0, 0.5f, 0.75f));
+        gameObjects.put("building_silver", new BuildingObject("sprites/buildings/silver dipper.png", "Dilver Sipper", 0, 0, 0.5f, 0.75f));
 
         // People (technically still buildings)
         gameObjects.put("building_turkstra", new BuildingObject("sprites/buildings/prof_turkstra.png", "Turkstra", 0, 0, 0.5f, 0.75f));
@@ -70,30 +71,55 @@ public class AssetManager {
         gameObjects.put("building_megan", new BuildingObject("sprites/buildings/megan.png", "Megan", 0, 0, 0.5f, 0.75f));
         gameObjects.put("building_protima", new BuildingObject("sprites/buildings/protima.png", "Protima", 0, 0, 0.5f, 0.75f));
         gameObjects.put("building_thor", new BuildingObject("sprites/buildings/thor.png", "Thor", 0, 0, 0.5f, 0.75f));
+        gameObjects.put("building_emma", new BuildingObject("sprites/buildings/emma.png", "Emma", 0, 0, 0.5f, 0.75f));
+
 
         // Other game objects
         gameObjects.put("coin", new CoinObject(0, 0));
 
         /* ================== Load in the upgrades from JSON file ================== */
 
-        File file = Gdx.files.local("upgrades.json").file();
-        JSONTokener tokener = new JSONTokener(file.toURI().toURL().openStream());
-        JSONObject root = new JSONObject(tokener);
+        File upgradesFile = Gdx.files.local("upgrades.json").file();
+        JSONTokener upgradeTokener = new JSONTokener(upgradesFile.toURI().toURL().openStream());
+        JSONObject upgradesRoot = new JSONObject(upgradeTokener);
 
-        Iterator<String> upgradeKeys = root.keys();
+        Iterator<String> upgradeKeys = upgradesRoot.keys();
         while (upgradeKeys.hasNext()) {
             String key = upgradeKeys.next();
             System.out.println("Key: " + key);
-            JSONObject upgradeJson = root.getJSONObject(key);
+            JSONObject upgradeJson = upgradesRoot.getJSONObject(key);
 
             Upgrade upgrade = new Upgrade(
                     key,
                     upgradeJson.getString("name"),
                     upgradeJson.getInt("cost"),
-                    upgradeJson.getString("desc")
+                    upgradeJson.getString("icon")
             );
 
             upgrades.put(key, upgrade);
+        }
+
+        /* ================== Load in the customizations from JSON file ================== */
+
+        File customizeFile = Gdx.files.local("customizations.json").file();
+        JSONTokener customizeTokener = new JSONTokener(customizeFile.toURI().toURL().openStream());
+        JSONObject customizeRoot = new JSONObject(customizeTokener);
+
+        Iterator<String> customizeKeys = customizeRoot.keys();
+        while (customizeKeys.hasNext()) {
+            String key = customizeKeys.next();
+            System.out.println("Key: " + key);
+            JSONObject customJson = customizeRoot.getJSONObject(key);
+
+            Customization custom = new Customization(
+                    key,
+                    customJson.getString("name"),
+                    customJson.getInt("cost"),
+                    customJson.getString("icon"),
+                    customJson.getString("suffix")
+            );
+
+            upgrades.put(key, custom);
         }
 
         /* ================== Load level data from files ================== */

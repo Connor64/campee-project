@@ -268,7 +268,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         }
 
         // Define side panel properties
-        sidePanelWidth = Gdx.graphics.getWidth() / 5; // Width
+        sidePanelWidth = (Gdx.graphics.getWidth() / 4) + 10; // Width
         sidePanelX = Gdx.graphics.getWidth() - sidePanelWidth; // Position the panel on the right side
         sidePanelY = 100; // Y position
         sidePanelHeight = Gdx.graphics.getHeight() - 110; // Height
@@ -1008,6 +1008,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                 int num = Character.getNumericValue(LevelScreen.nameOfFile.charAt(LevelScreen.nameOfFile.length() - 1));
                 num++;
                 DataManager.INSTANCE.setClearStatus(String.valueOf(num), true, false);
+                DataManager.INSTANCE.setHighScore(String.valueOf(num - 1), totalOrdersCompleted, false);
                 DataManager.INSTANCE.addCoins(coinCounter, true);
 
                 savedData = true;

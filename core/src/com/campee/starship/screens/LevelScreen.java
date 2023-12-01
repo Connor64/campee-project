@@ -68,7 +68,7 @@ public class LevelScreen extends ScreenAdapter {
 //        FileHandle levelsFolder = Gdx.files.internal("levels");
 //        FileHandle[] levelFiles = levelsFolder.list();
 
-        Label titleLabel = new Label("LEVEL SELECT SCREEN", createTitleLabelStyle(Color.BLACK));
+        Label titleLabel = new Label("SELECT LEVEL       ", createTitleLabelStyle(Color.BLACK));
         titleLabel.setFontScale(0.8f);
 
         // Add title label to the top of the window with some padding
@@ -259,7 +259,7 @@ public class LevelScreen extends ScreenAdapter {
         );
         Texture thumbTexture = new Texture(pix_small);
         Image thumbnail = new Image(thumbTexture);
-        thumbnail.setScaling(Scaling.fit);
+//        thumbnail.setScaling(Scaling.fit);
 
         // time limits
         Label timeLabel;
