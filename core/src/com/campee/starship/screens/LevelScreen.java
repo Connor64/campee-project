@@ -236,7 +236,7 @@ public class LevelScreen extends ScreenAdapter {
         );
         Texture thumbTexture = new Texture(pix_small);
         Image thumbnail = new Image(thumbTexture);
-        thumbnail.setScaling(Scaling.fit);
+//        thumbnail.setScaling(Scaling.fit);
 
         // time limits
         Label timeLabel;
