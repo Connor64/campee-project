@@ -16,11 +16,13 @@ public class DataManager {
     private final String GAMEPLAY_MUSIC = "gameplay_music_volume";
     private final String GAMEPLAY_SFX = "gameplay_sfx_volume";
     private final String MENU_MUSIC = "menu_music_volume";
+    private final String HIGH_SCORES = "high_scores";
     private final String FILE_NAME = "save_data.json";
 
     public static final DataManager INSTANCE = new DataManager();
 
     private HashMap<String, Boolean> levelUnlocks;
+    private HashMap<String, Integer> highScores;
     private ArrayList<String> purchasedUpgrades;
     private int coinCount;
 
@@ -30,6 +32,7 @@ public class DataManager {
 
     private DataManager() {
         levelUnlocks = new HashMap<>();
+        highScores = new HashMap<>();
         purchasedUpgrades = new ArrayList<>();
         coinCount = 0;
 
@@ -48,6 +51,14 @@ public class DataManager {
             while (levelKeys.hasNext()) {
                 String key = levelKeys.next();
                 levelUnlocks.put(key, unlockedLevelsObj.getBoolean(key));
+            }
+
+            // Load in the level high scores
+            JSONObject highScoresObj = root.getJSONObject(HIGH_SCORES);
+            Iterator<String> scoreKeys = highScoresObj.keys();
+            while (scoreKeys.hasNext()) {
+                String key = scoreKeys.next();
+                highScores.put(key, highScoresObj.getInt(key));
             }
 
             // Load in the purchased upgrades
@@ -72,6 +83,7 @@ public class DataManager {
         Set<Map.Entry<String, LevelData>> levelSet = AssetManager.INSTANCE.getLevels();
         for (Map.Entry<String, LevelData> entry : levelSet) {
             levelUnlocks.put(entry.getKey(), false);
+            highScores.put(entry.getKey(), 0);
         }
 
         purchasedUpgrades.clear(); // just in case
@@ -91,6 +103,12 @@ public class DataManager {
             unlockedLevelsObj.put(entry.getKey(), entry.getValue());
         }
 
+        // Make JSON object containing level high scores
+        JSONObject highScoresObj = new JSONObject();
+        for (Map.Entry<String, Integer> entry : highScores.entrySet()) {
+            highScoresObj.put(entry.getKey(), entry.getValue());
+        }
+
         // Make JSON array to store all purchased upgrades
         JSONArray purchasedUpgradesObj = new JSONArray();
         for (String upgrade : purchasedUpgrades) {
@@ -99,6 +117,7 @@ public class DataManager {
 
         // Write to JSON outer JSON object
         obj.put(UNLOCKED_LEVELS, unlockedLevelsObj);
+        obj.put(HIGH_SCORES, highScoresObj);
         obj.put(PURCHASED_UPGRADES, purchasedUpgradesObj);
         obj.put(COIN_COUNT, coinCount);
         obj.put(GAMEPLAY_MUSIC, gameplayMusicVolume);
@@ -136,10 +155,25 @@ public class DataManager {
         }
     }
 
+    public int getHighScore(String levelID) {
+        return highScores.get(levelID);
+    }
+
+    public void setHighScore(String levelID, int score, boolean diskWrite) {
+        if (!highScores.containsKey(levelID)) return;
+
+        if (highScores.get(levelID) < score) {
+            highScores.put(levelID, score);
+        }
+
+        if (diskWrite) {
+            saveProgress();
+        }
+    }
+
     public boolean isUpgradePurchased(String upgradeID) {
         return purchasedUpgrades.contains(upgradeID);
     }
-
 
     public void addCoins(int coinDiff, boolean diskWrite) {
         System.out.println("adding coins!! current: " + coinCount + "  diff: " + coinDiff);

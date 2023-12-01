@@ -9,6 +9,14 @@
         "4": true,
         "5": true
     },
+    "high_scores": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+    },
     "purchased_upgrades": ["speed_boost"],
     "gameplay_music_volume": 0.1,
     "menu_music_volume": 0.1
