@@ -126,7 +126,9 @@ public class StoreScreen implements Screen {
         Gdx.gl.glClear(Gdx.gl20.GL_COLOR_BUFFER_BIT);
 
         coinLabel.setText("Coins: " + DataManager.INSTANCE.getCoinCount());
-        music.play();
+        if (SettingsScreen.instantiated) {
+            music.setVolume(SettingsScreen.settingsMusicSlider.getValue());
+        }music.play();
 
 //        stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 80f));
         // Update and render game elements
