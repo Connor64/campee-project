@@ -30,6 +30,8 @@ public class Popup implements Screen {
     private Label messageLabel;
     public boolean acceptClicked;
     public boolean declineClicked;
+    public int nothingClicked;
+    public int declineCount;
     private boolean isAcceptButtonHovered = false;
     private boolean isDeclineButtonHovered = false;
     public TextButton acceptButton;
@@ -53,6 +55,8 @@ public class Popup implements Screen {
         visible = false;
         acceptClicked = false;
         declineClicked = false;
+        nothingClicked = 0;
+        declineCount = 0;
 
         font = new BitmapFont(Gdx.files.internal("fonts/moonships_font.fnt"), Gdx.files.internal("fonts/moonships_font.png"), false);;
 
@@ -144,6 +148,8 @@ public class Popup implements Screen {
                 public void clicked(InputEvent event, float x, float y) {
                     if (visible) {
                         declineClicked = true;
+                        declineCount++;
+                        //System.out.print(declineCount);
                         if (screen.playerAttributes.array.size() <= 1) {
                             screen.playerAttributes.orderInProgress = false;
                         }

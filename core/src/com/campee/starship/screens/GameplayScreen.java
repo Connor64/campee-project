@@ -20,6 +20,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
+import com.campee.starship.userinterface.TutorialPopups;
 import com.campee.starship.objects.*;
 import com.campee.starship.managers.*;
 import com.campee.starship.userinterface.*;
@@ -35,6 +36,7 @@ import java.util.concurrent.TimeUnit;
 public class GameplayScreen extends ApplicationAdapter implements Screen {
 
     private TextButton backButton;
+    public TextButton doneButton;
     private TextButton nextOrderButton;
     private TextButton gameStatsButton;
 
@@ -65,6 +67,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
 
     private final Popup popup;
     private final GamePopup gamepopup;
+    public TutorialPopups tutorialPopups;
+    public boolean isTutorialPopupsVisible;
     private ArrayList<BuildingObject> buildings;
     public ArrayList<CoinObject> coins;
     private final KeepPlayingPopup keepplayingpopup;
@@ -117,13 +121,14 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     Sound levelWin;
     Sound levelFail;
     Sound newOrderNotif;
+    int hide_popup;
 
 
     // Create a TimerTask to decrement the countdown timer
     private TimerTask countdownTask = new TimerTask() {
         @Override
         public void run() {
-            if (!popupInAction && !gamePaused) {
+            if (!popupInAction && !gamePaused && !isTutorialPopupsVisible) {
                 if (countdownSeconds > 0) {
                     countdownSeconds--;
                 } else {
@@ -149,11 +154,13 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     private SpriteBatch batch;
     private Stage stage;
     private KeyProcessor keyProcessor;
+    private float timeSinceLastMove;
 
     private PlayerCamera camera;
 
     private ShapeRenderer shapeRenderer;
     private boolean isBackButtonHovered = false;
+    private boolean isDoneButtonHovered = false;
     private boolean isOrderButtonHovered = false;
     float screenWidth;
     float screenHeight;
@@ -175,7 +182,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
     public Order order;
     private String[] orderA;
     private ArrayList<Tile[]> layers;
-//    private AssetManager assetManager;
+    private AssetManager assetManager;
 
     public GameplayScreen(final MoonshipGame game, String fileName) throws IOException, ClassNotFoundException {
         this.GAME = game;
@@ -211,8 +218,43 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         loadLevel(fileName);
 //        System.out.println(fileName);
 
-        minOrders = getMinOrders(fileName);
-        goalTime = 300/*levelData.goalTime*/;
+        //Level information
+
+        if ("level_1".equals(fileName)) {
+            GameDifficulty.easy = true;
+            //System.out.println("easy");
+        }
+
+        if ("level_3".equals(fileName)) {
+            GameDifficulty.medium = true;
+            //System.out.println("medium");
+        }
+        if ("level_4".equals(fileName)) {
+            GameDifficulty.hard = true;
+            //System.out.println("hard");
+        }
+
+        if (GameDifficulty.tutorial) {
+            minOrders = 2   /*levelData.minOrders*/;
+            goalTime = 300 /*levelData.goalTime*/;
+            countdownMinutes = 15;
+        }
+
+        if (GameDifficulty.easy) {
+            minOrders = 2;
+            goalTime = 400;
+            countdownMinutes = 3;
+        }
+        if (GameDifficulty.medium) {
+            minOrders = 3;
+            goalTime = 500;
+            countdownMinutes = 4;
+        }
+        if (GameDifficulty.hard) {
+            minOrders = 5;
+            goalTime = 300;
+            countdownMinutes = 6;
+        }
 
         // Define side panel properties
         sidePanelWidth = Gdx.graphics.getWidth() / 5; // Width
@@ -234,7 +276,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         orderArray = new ArrayList<>();
         order.setArray(orderArray, fileName + "_orders");
         Collections.shuffle(orderArray);
-        System.out.println(orderArray);
+        //System.out.println(orderArray);
         orderA = order.arrayToArray();
         order.seti(order.i++);
         int time = Integer.parseInt(orderA[3]);
@@ -260,6 +302,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         coinCollect = Gdx.audio.newSound(Gdx.files.internal("audio/coin_collect.mp3"));
         gamepopup = new GamePopup(this, "", game, fileName);
         keepplayingpopup = new KeepPlayingPopup(this, "", game, fileName);
+        int hide_popup = 0;
         skin = new Skin(Gdx.files.internal("uiskin.json"));
 
         //musicSlider = pauseScreen.getMusicSlider();
@@ -289,6 +332,53 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         buttonStyle.font = buttonFont;
         buttonStyle.fontColor = Color.BLACK;
 
+        if ("level_0".equals(fileName)) {
+            //System.out.println("in tutorial");
+            tutorialPopups = new TutorialPopups(this);
+            //isTutorialPopupsVisible = true;
+            GameDifficulty.tutorial = true;
+            minOrders = 1;
+            countdownMinutes = 15;
+
+            //make done button
+            doneButton = new TextButton("Done!", buttonStyle);
+            doneButton.setVisible(false);
+            doneButton.setPosition(0, 30); // Adjust the position as necessary
+            doneButton.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    //System.out.println("clicked back");
+                    isTutorialPopupsVisible = true;
+                    doneButton.setVisible(false);
+                }
+
+                @Override
+                public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+                    super.enter(event, x, y, pointer, fromActor);
+                    isDoneButtonHovered = true;
+                    doneButton.setColor(Color.LIGHT_GRAY);
+                }
+
+                @Override
+                public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
+                    super.exit(event, x, y, pointer, toActor);
+                    isDoneButtonHovered = false;
+                    doneButton.setColor(Color.WHITE);
+                }
+            });
+
+            if(tutorialPopups.OKClicked) {
+                doneButton.setVisible(true);
+            }
+            stage.addActor(doneButton);
+
+        } else {
+            tutorialPopups = null; // If fileName is not "Level 5", set tutorialPopups to null
+            //isTutorialPopupsVisible = false;
+        }
+
+
+
         // Make back button
         backButton = new TextButton("Back", buttonStyle);
         backButton.setPosition(10, Gdx.graphics.getHeight() - 60); // Adjust the position as necessary
@@ -317,6 +407,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                 backButton.setColor(Color.WHITE);
             }
         });
+
 
         // Make pause button
         pauseButton = new TextButton("| |", buttonStyle);
@@ -382,7 +473,9 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         multiplexer.addProcessor(stage);
         multiplexer.addProcessor(keyProcessor);
         multiplexer.addProcessor(popup.getStage());
-
+        if (tutorialPopups != null) {
+            multiplexer.addProcessor(tutorialPopups.getStage());
+        }
 
         Gdx.input.setInputProcessor(multiplexer);
 
@@ -451,7 +544,10 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         autoDeclineLabel.setSize(font.getScaleX() * 16, font.getScaleY() * 16);
 
         schedulePopupDisplay();
-
+        if (tutorialPopups != null) {
+            tutorialPopups.scheduleStepDelay();
+        }
+        //tutorialPopups.scheduleStep();
 
     }
 
@@ -467,6 +563,16 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         // Set font color and scale
         font.setColor(1, 1, 0, 1);
         font.getData().setScale(0.5f);
+
+    }
+
+
+    public boolean isTutorialPopupsVisible() {
+        return isTutorialPopupsVisible;
+    }
+
+    public void setTutorialPopupsVisible(boolean visible) {
+        isTutorialPopupsVisible = visible;
     }
 
     @Override
@@ -484,13 +590,15 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         gameplayMusic.setVolume(musicSlider.getValue());
 
         if (!gamepopup.isVisible()) {
-            if (!gamePaused) {
+            if (!isTutorialPopupsVisible && !gamePaused){
+
                 player.update(delta, keyProcessor);
             }
             player.checkBounds(levelWidth, levelHeight);
             for (BuildingObject buildingObject : buildings) {
                 player.checkCollision(buildingObject, true);
             }
+
             world.step(1 / 60f, 6, 2); // Physics calculations
 
             camera.follow(player.getPosition(), levelWidth, levelHeight);
@@ -544,7 +652,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                 }
             }
 
-            // Inside the render metho
+            // Inside the render method
             String sec;
             if (countdownSeconds < 10) {
                 sec = "0" + String.valueOf(countdownSeconds);
@@ -733,7 +841,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                         playerAttributes.array.remove(i);
                         messageTimer = 0.0f;
                     } else {
-                        if (!popupInAction && !gamePaused) {
+                        if (!popupInAction && !isTutorialPopupsVisible && !gamePaused) {
+
                             if (timeCount[i - 1] % 60 == 0) {
                                 time -= 1;
                                 orderTimeLeft[i - 1] = time;
@@ -805,12 +914,16 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
             stage.draw();
             popup.render();
             gamepopup.render();
+            if (this.tutorialPopups != null) {
+                tutorialPopups.render();
+            }
             pauseScreen.render();
             batch.end();
         } else {
             gameplayMusic.pause();
             newOrderNotif.pause();
         }
+
         boolean timeLeft = true;
         if (countdownSeconds == 0 && countdownMinutes == 0) {
             if (playerAttributes.orderInProgress) {
@@ -950,13 +1063,29 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         popup.hide(); // Display the popup
     }
 
+
     // Schedule the popup to display every 1 minute
     private void schedulePopupDisplay() {
+        //System.out.println("hi in schedule");
         final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+//        int hide_popup = 0;
+        //int show_popup = 0;
+
         scheduler.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
-                if (!popupInAction && !gamePaused) {
+                if (GameDifficulty.tutorial || GameDifficulty.easy || GameDifficulty.medium) {
+                    hide_popup = 5;
+                    //show_popup = 10;
+                } else if (GameDifficulty.hard) {
+                    hide_popup = new Random().nextInt(6)+1;
+                    System.out.println("random num: "+hide_popup);
+                    //show_popup = 10;
+//            show_popup = new Random().nextInt(5) + 6;
+                    //System.out.println("random num2: "+show_popup);
+                }
+                if (!popupInAction && !isTutorialPopupsVisible && !gamePaused) {
+
                     showTimedPopup(); // Show the popup
                     if (!outOfOrders) {
                         soundId = newOrderNotif.play();
@@ -966,27 +1095,54 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
                     scheduler.schedule(new Runnable() {
                         @Override
                         public void run() {
-                            if (!popupInAction && !gamePaused) {
+                            if (!popupInAction && !isTutorialPopupsVisible && !gamePaused) {
+
                                 // Hide the popup
                                 hideTimedPopup();
                                 if (!popup.acceptClicked() && !popup.declineClicked() && !ordersDone) {
+                                    //lose coins if do not manually accept or decline 3 times
+                                    if(GameDifficulty.hard) {
+                                        popup.nothingClicked++;
+                                        if (popup.nothingClicked >= 3) {
+                                            if (coinCounter > 1) {
+                                                coinCounter -= 2;
+                                            }
+                                            else if (coinCounter == 1) {
+                                                coinCounter -= 1;
+                                            }
+                                            coinCollectLabel.setText("Coins Collected: " + coinCounter);
+                                        }
+                                    }
                                     autoDeclineLabel.setVisible(true);
                                     scheduler.schedule(new Runnable() {
                                         @Override
                                         public void run() {
-                                            if (!popupInAction && !gamePaused) {
+                                            if (!popupInAction && !isTutorialPopupsVisible && !gamePaused) {
+
                                                 autoDeclineLabel.setVisible(false); // Remove the label from the display
                                             }
                                         }
                                     }, 4, TimeUnit.SECONDS);
                                 }
+                                if(GameDifficulty.hard) {
+                                    if (popup.declineCount == 3) {
+                                        if (coinCounter > 1) {
+                                            coinCounter -= 2;
+                                        }
+                                        if (coinCounter == 1) {
+                                            coinCounter -= 1;
+                                        }
+                                    }
+                                    coinCollectLabel.setText("Coins Collected: " + coinCounter);
+                                }
                             }
                         }
-                    }, 5, TimeUnit.SECONDS); // Schedule to hide the popup after 10 seconds
+                    }, hide_popup, TimeUnit.SECONDS); // Schedule to hide the popup after _ seconds
                 }
             }
-        }, 0, 10, TimeUnit.SECONDS); // Schedule the next popup 15 seconds after the first one
+        }, 0, 10, TimeUnit.SECONDS); // Schedule the next popup _ seconds after the first one
     }
+
 
     @Override
     public void resize(int width, int height) {
