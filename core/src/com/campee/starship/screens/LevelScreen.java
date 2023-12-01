@@ -17,6 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.campee.starship.managers.AssetManager;
 import com.campee.starship.managers.DataManager;
@@ -71,7 +72,7 @@ public class LevelScreen extends ScreenAdapter {
 //        FileHandle[] levelFiles = levelsFolder.list();
 
         Label titleLabel = new Label("LEVEL SELECT SCREEN", createTitleLabelStyle(Color.BLACK));
-        titleLabel.setFontScale(2.5f);
+        titleLabel.setFontScale(0.8f);
 
         // Add title label to the top of the window with some padding
         innerTable.add(titleLabel).padTop(50).colspan(3).center().row();
@@ -191,7 +192,10 @@ public class LevelScreen extends ScreenAdapter {
 
     private Label.LabelStyle createTitleLabelStyle(Color color) {
         Label.LabelStyle style = new Label.LabelStyle();
-        style.font = new BitmapFont();
+        BitmapFont font = new BitmapFont(Gdx.files.internal("fonts/moonships_font.fnt"), Gdx.files.internal("fonts/moonships_font.png"), false);
+        font.setColor(0, 0, 0, 1);
+        font.getData().setScale(0.2f, 0.5f);
+        style.font = font;
         style.fontColor = color;
         return style;
     }
@@ -201,7 +205,6 @@ public class LevelScreen extends ScreenAdapter {
 
         // Create a label
         Label label = new Label("Level " + levelNumber, createLabelStyle(Color.BLACK));
-        label.setFontScale(1.2f);
 
 
         // read in a thumbnail and time limit
@@ -210,6 +213,7 @@ public class LevelScreen extends ScreenAdapter {
         int timeMinutes = Integer.parseInt(scanner.nextLine());
         int timeSeconds = Integer.parseInt(scanner.nextLine());
         String levelTitle = scanner.nextLine();
+        String difficulty = scanner.nextLine();
         int numOrders = Integer.parseInt(scanner.nextLine());
 
         if ((!DataManager.INSTANCE.isLevelUnlocked(levelNumber))) {
@@ -220,6 +224,8 @@ public class LevelScreen extends ScreenAdapter {
             label = new Label(levelTitle, createLabelStyle(Color.BLACK));
         }
 
+        label.setFontScale(0.5f);
+
         // thumbnail
         Pixmap pix_big = new Pixmap(Gdx.files.internal(thumbnailPath));
         Pixmap pix_small = new Pixmap(300, 300, pix_big.getFormat());
@@ -229,6 +235,7 @@ public class LevelScreen extends ScreenAdapter {
         );
         Texture thumbTexture = new Texture(pix_small);
         Image thumbnail = new Image(thumbTexture);
+        thumbnail.setScaling(Scaling.fit);
 
         // time limits
         Label timeLabel;
@@ -237,26 +244,40 @@ public class LevelScreen extends ScreenAdapter {
         } else {
             timeLabel = new Label("Time Limit: " + timeMinutes + ":" + timeSeconds, createLabelStyle(Color.BLACK));
         }
-        timeLabel.setFontScale(1f);
+        timeLabel.setFontScale(0.45f);
 
 
         // number of orders
         Label ordersLabel;
         if ((DataManager.INSTANCE.isLevelUnlocked(levelNumber))) {
-            // set thumbnail to lock icon
-            ordersLabel = new Label(numOrders + " orders", createLabelStyle(Color.BLACK));
+            if (numOrders == 1) {
+                ordersLabel = new Label(numOrders + " order", createLabelStyle(Color.BLACK));
+            } else {
+                ordersLabel = new Label(numOrders + " orders", createLabelStyle(Color.BLACK));
+            }
         } else {
             ordersLabel = new Label("   ", createLabelStyle(Color.BLACK));
         }
 
-        ordersLabel.setFontScale(1f);
+        ordersLabel.setFontScale(0.45f);
+
+        Label difficultyLabel;
+        if ((DataManager.INSTANCE.isLevelUnlocked(levelNumber))) {
+            // set thumbnail to lock icon
+            difficultyLabel = new Label(difficulty, createLabelStyle(Color.BLACK));
+        } else {
+            difficultyLabel = new Label("   ", createLabelStyle(Color.BLACK));
+        }
+
+        difficultyLabel.setFontScale(0.45f);
 
 
 
         // Create a button
         TextButton.TextButtonStyle levelButtonStyle = new TextButton.TextButtonStyle();
-        BitmapFont levelButtonFont = new BitmapFont();
-        levelButtonFont.getData().setScale(1f);
+        BitmapFont font = new BitmapFont(Gdx.files.internal("fonts/moonships_font.fnt"), Gdx.files.internal("fonts/moonships_font.png"), false);
+        BitmapFont levelButtonFont = font;
+        levelButtonFont.getData().setScale(0.38f);
         levelButtonStyle.font = levelButtonFont;
         levelButtonStyle.fontColor = Color.BLACK;
         levelButtonStyle.up = new TextureRegionDrawable(new TextureRegion(new Texture(createRoundedRectanglePixmap(100, 45, 15, Color.YELLOW))));
@@ -281,7 +302,7 @@ public class LevelScreen extends ScreenAdapter {
             if (DataManager.INSTANCE.isLevelUnlocked(levelNumber)) {
                 levelButtonStyle.up = new TextureRegionDrawable(
                         new TextureRegion(new Texture(createRoundedRectanglePixmap(100, 45, 15, Color.GREEN))));
-                levelButton.setText("UNLOCKED");
+                levelButton.setText("PLAY");
                 levelWidget.add(unlockButton).padBottom(5).colspan(3).center().row();
             } else {
                 levelButtonStyle.up = new TextureRegionDrawable(
@@ -297,7 +318,7 @@ public class LevelScreen extends ScreenAdapter {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 try {
-                    if (levelButton.getText().toString().equals("UNLOCKED")) {
+                    if (levelButton.getText().toString().equals("PLAY")) {
                         nameOfFile = "Level " + levelNumber;
 //                        game.setScreen(new GameplayScreen((MoonshipGame) game, levelName));
                         music.pause();
@@ -318,7 +339,7 @@ public class LevelScreen extends ScreenAdapter {
                 super.enter(event, x, y, pointer, fromActor);
                 isButtonHovered = true;
                 //levelButton.setColor(Color.LIGHT_GRAY);
-                if (levelButton.getText().toString().equals("UNLOCKED")) {
+                if (levelButton.getText().toString().equals("PLAYGIT ")) {
                     levelButton.setColor(Color.LIGHT_GRAY);
                 }
             }
@@ -333,8 +354,10 @@ public class LevelScreen extends ScreenAdapter {
             }
         });
 
+
         // Add the label to the top center of the table
-        levelWidget.add(label).padBottom(30).colspan(3).center().row();
+        levelWidget.add(label).padBottom(20).colspan(3).center().row();
+        levelWidget.add(difficultyLabel).padBottom(20).colspan(3).center().row();
         levelWidget.add(thumbnail).padBottom(30).colspan(3).center().row();
         levelWidget.add(ordersLabel).padBottom(10).colspan(3).center().row();
         if ((DataManager.INSTANCE.isLevelUnlocked(levelNumber))) {
@@ -361,14 +384,21 @@ public class LevelScreen extends ScreenAdapter {
 
     private Label.LabelStyle createLabelStyle(Color color) {
         Label.LabelStyle style = new Label.LabelStyle();
-        style.font = new BitmapFont();
+
+        BitmapFont font = new BitmapFont(Gdx.files.internal("fonts/moonships_font.fnt"), Gdx.files.internal("fonts/moonships_font.png"), false);
+        font.setColor(0, 0, 0, 1);
+        font.getData().setScale(0.2f, 0.5f);
+        style.font = font;
         style.fontColor = color;
         return style;
     }
 
     private TextButton.TextButtonStyle createButtonStyle(Color upColor, Color downColor) {
         TextButton.TextButtonStyle style = new TextButton.TextButtonStyle();
-        style.font = new BitmapFont();
+        BitmapFont font = new BitmapFont(Gdx.files.internal("fonts/moonships_font.fnt"), Gdx.files.internal("fonts/moonships_font.png"), false);
+        font.setColor(0, 0, 0, 1);
+        font.getData().setScale(0.2f, 0.2f);
+        style.font = font;
         style.up = new TextureRegionDrawable(new TextureRegion(new Texture(createPixmap(upColor))));
         style.down = new TextureRegionDrawable(new TextureRegion(new Texture(createPixmap(downColor))));
         return style;
