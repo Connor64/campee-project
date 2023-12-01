@@ -28,6 +28,7 @@ public class TitleScreen implements Screen {
     private MoonshipGame game;
     private SpriteBatch batch;
     private BitmapFont font;
+    private BitmapFont buttonFont;
     private GlyphLayout glyphLayout;
     private Texture img;
     private Stage stage;
@@ -42,6 +43,8 @@ public class TitleScreen implements Screen {
         this.game = game;
         batch = new SpriteBatch();
         font = new BitmapFont(Gdx.files.internal("fonts/moonships_font.fnt"), Gdx.files.internal("fonts/moonships_font.png"), false);
+        buttonFont = new BitmapFont(Gdx.files.internal("fonts/moonships_font.fnt"), Gdx.files.internal("fonts/moonships_font.png"), false);
+
         //font = new BitmapFont();
 
         music = Gdx.audio.newMusic(Gdx.files.internal("audio/Moon Final.mp3"));
@@ -61,10 +64,10 @@ public class TitleScreen implements Screen {
 
         ScreenUtils.clear(1, 0.8f, 1, 1);
 
-        BitmapFont buttonFont = new BitmapFont();
+//        BitmapFont buttonFont = new BitmapFont();
         TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
 
-        buttonFont.getData().setScale(1.5f);
+        buttonFont.getData().setScale(3f);
         textButtonStyle.font = buttonFont;
         textButtonStyle.fontColor = Color.BLACK;
 
@@ -112,14 +115,14 @@ public class TitleScreen implements Screen {
 
         stage.addActor(button);
 
-        BitmapFont closeFont = new BitmapFont();
+        BitmapFont closeFont = buttonFont;
         TextButton.TextButtonStyle closeButtonStyle = new TextButton.TextButtonStyle();
-        buttonFont.getData().setScale(1.5f);
-        textButtonStyle.font = closeFont;
-        textButtonStyle.fontColor = Color.BLACK;
+        closeFont.getData().setScale(0.55f);
+        closeButtonStyle.font = closeFont;
+        closeButtonStyle.fontColor = Color.BLACK;
         //Pixmap backgroundPixmap = createRoundedRectanglePixmap(150, 60, 15, Color.valueOf("98FF98"));
-        textButtonStyle.up = new TextureRegionDrawable(new TextureRegion(new Texture(backgroundPixmap)));
-        closeButton = new TextButton("CLOSE", textButtonStyle);
+        closeButtonStyle.up = new TextureRegionDrawable(new TextureRegion(new Texture(backgroundPixmap)));
+        closeButton = new TextButton("CLOSE", closeButtonStyle);
         closeButton.setPosition(10, Gdx.graphics.getHeight() - 50);
         closeButton.setSize(100, 30);
         closeButton.addListener(new InputListener() {
@@ -192,6 +195,9 @@ public class TitleScreen implements Screen {
         float imgX = (viewport.getWorldWidth() - imgWidth) / 2;
         float imgY = 30; // Adjust this value to move the image up or down
         batch.draw(img, imgX, imgY, imgWidth, imgHeight);
+        if (SettingsScreen.instantiated) {
+            music.setVolume(SettingsScreen.settingsMusicSlider.getValue());
+        }
         music.play();
 
         batch.end();

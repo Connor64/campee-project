@@ -12,6 +12,9 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
@@ -26,8 +29,11 @@ public class SettingsScreen implements Screen {
     private TextButton backButton;
     private Stage stage;
     private ExtendViewport viewport;
-    private float timer = 10; // Countdown timer in seconds
+    //private float timer = 10; // Countdown timer in seconds
     public Music music;
+    Skin skin;
+    public static boolean instantiated;
+    public static Slider settingsMusicSlider;
 
     public SettingsScreen(final Game game) {
         this.game = game;
@@ -41,14 +47,25 @@ public class SettingsScreen implements Screen {
         music = Gdx.audio.newMusic(Gdx.files.internal("audio/menu screen sound.mp3"));
         music.setLooping(true);
         music.setVolume(0.35f);
+        skin = new Skin(Gdx.files.internal("uiskin.json"));
+
+//musicSlider = pauseScreen.getMusicSlider();
+        settingsMusicSlider = new Slider(0f, 1f, 0.1f, false, skin);
+
+        /*****************************************************/
+        //set value to saved volume value from data file (which is initialized to 1f for the first time and saves updated volume value using getValue())
+        settingsMusicSlider.setValue(1f);
+        /*****************************************************/
+        settingsMusicSlider.setSize(500f, 250f);
+        settingsMusicSlider.setPosition(160f, Gdx.graphics.getHeight() - 400f);
 
         viewport = new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         stage = new Stage(viewport);
         Gdx.input.setInputProcessor(stage);
 
-        BitmapFont buttonFont = new BitmapFont();
+        BitmapFont buttonFont = new BitmapFont(Gdx.files.internal("fonts/moonships_font.fnt"), Gdx.files.internal("fonts/moonships_font.png"), false);
         TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
-        buttonFont.getData().setScale(1.5f);
+        buttonFont.getData().setScale(0.8f);
         textButtonStyle.font = buttonFont;
         textButtonStyle.fontColor = Color.BLACK;
         Pixmap backgroundPixmap = createRoundedRectanglePixmap(150, 60, 15, Color.valueOf("98FF98"));
@@ -69,7 +86,7 @@ public class SettingsScreen implements Screen {
                 return true;
             }
         });
-
+        stage.addActor(settingsMusicSlider);
         stage.addActor(backButton);
     }
 
@@ -93,30 +110,39 @@ public class SettingsScreen implements Screen {
         float textY = camera.viewportHeight - 50;
         font.draw(batch, "SETTINGS", textX, textY);
 
+        // Draw the text "MUSIC VOLUME" at the top of the screen
+        GlyphLayout volumeLayout = new GlyphLayout();
+        volumeLayout.setText(font, "MUSIC VOLUME");
+        //add camera stuff so that the extending works
+        float volumeX = (camera.viewportWidth - volumeLayout.width) / 2;
+        float volumeY = camera.viewportHeight - 190;
+        font.draw(batch, "MUSIC VOLUME", volumeX, volumeY);
+
         // Draw countdown timer
-        GlyphLayout timerLayout = new GlyphLayout();
-        timerLayout.setText(font, "Time Left: " + (int) timer);
-        float timerX = (camera.viewportWidth - timerLayout.width) / 2;
-        float timerY = textY - 50;
-        font.draw(batch, "Time Left: " + (int) timer, timerX, timerY);
+//        GlyphLayout timerLayout = new GlyphLayout();
+//        timerLayout.setText(font, "Time Left: " + (int) timer);
+//        float timerX = (camera.viewportWidth - timerLayout.width) / 2;
+//        float timerY = textY - 50;
+//        font.draw(batch, "Time Left: " + (int) timer, timerX, timerY);
 
         batch.end();
 
         stage.act(delta);
+        music.setVolume(settingsMusicSlider.getValue());
         music.play();
         stage.draw();
 
         // Update countdown timer
-        timer -= delta;
-        if (timer <= 0) {
-            // When the timer reaches 0, switch back to the title screen
-            try {
-                music.pause();
-                game.setScreen(new LevelScreen(game)); // Change to the screen you want
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-        }
+//        timer -= delta;
+//        if (timer <= 0) {
+//            // When the timer reaches 0, switch back to the title screen
+//            try {
+//                music.pause();
+//                game.setScreen(new LevelScreen(game)); // Change to the screen you want
+//            } catch (FileNotFoundException e) {
+//                e.printStackTrace();
+//            }
+//        }
     }
 
     @Override

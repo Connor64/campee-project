@@ -328,8 +328,8 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         Pixmap backgroundPixmap = createRoundedRectanglePixmap(100, 50, 10, new Color(0.9f, 0, 0.9f, 0.6f)); // Adjust size and color
         TextButton.TextButtonStyle buttonStyle = new TextButton.TextButtonStyle();
         buttonStyle.up = new TextureRegionDrawable(new TextureRegion(new Texture(backgroundPixmap)));
-        BitmapFont buttonFont = new BitmapFont();
-        buttonFont.getData().setScale(1.5f);
+        BitmapFont buttonFont = new BitmapFont(Gdx.files.internal("fonts/moonships_font.fnt"), Gdx.files.internal("fonts/moonships_font.png"), false);
+        buttonFont.getData().setScale(0.6f);
         buttonStyle.font = buttonFont;
         buttonStyle.fontColor = Color.BLACK;
 
