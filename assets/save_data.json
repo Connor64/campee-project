@@ -7,7 +7,7 @@
         "4": 4,
         "5": 4
     },
-    "coins": 2,
+    "coins": 25,
     "gameplay_sfx_volume": 1,
     "menu_sfx_volume": 0,
     "unlocked_levels": {
@@ -18,7 +18,11 @@
         "4": true,
         "5": true
     },
-    "purchased_upgrades": {"purdue": true},
+    "purchased_upgrades": {
+        "speed_boost": true,
+        "purdue": false,
+        "grass": false
+    },
     "gameplay_music_volume": 0.1,
     "menu_music_volume": 0.2
 }

@@ -29,6 +29,7 @@ import com.campee.starship.userinterface.UpgradePanel;
 
 import javax.xml.crypto.Data;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 
@@ -42,11 +43,15 @@ public class StoreScreen implements Screen {
     private Music music;
     private BitmapFont font;
 
+    private ArrayList<UpgradePanel> panels;
+
     public StoreScreen (final Game game) {
         this.game = game;
         viewport = new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         stage = new Stage(viewport);
         Gdx.input.setInputProcessor(stage);
+
+        panels = new ArrayList<>();
 
         font = new BitmapFont(Gdx.files.internal("fonts/moonships_font.fnt"), Gdx.files.internal("fonts/moonships_font.png"), false);
         font.setColor(1, 1, 0, 1);
@@ -98,7 +103,8 @@ public class StoreScreen implements Screen {
 
         Set<Map.Entry<String, Upgrade>> upgradeSet = AssetManager.INSTANCE.getUpgrades();
         for (Map.Entry<String, Upgrade> entry : upgradeSet) {
-            UpgradePanel panel = new UpgradePanel(entry.getValue());
+            UpgradePanel panel = new UpgradePanel(entry.getValue(), panels);
+            panels.add(panel);
             upgradeRow.add(panel).pad(15);
         }
 
@@ -128,7 +134,7 @@ public class StoreScreen implements Screen {
         coinLabel.setText("Coins: " + DataManager.INSTANCE.getCoinCount());
         if (SettingsScreen.instantiated) {
             music.setVolume(SettingsScreen.settingsMusicSlider.getValue());
-        }music.play();
+        } music.play();
 
 //        stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 80f));
         // Update and render game elements
