@@ -7,23 +7,23 @@
         "4": 0,
         "5": 0
     },
-    "coins": 1,
+    "coins": 13,
     "gameplay_sfx_volume": 0.3,
     "menu_sfx_volume": 0,
     "unlocked_levels": {
         "0": true,
         "1": true,
         "2": true,
-        "3": true,
-        "4": true,
-        "5": true
+        "3": false,
+        "4": false,
+        "5": false
     },
     "purchased_upgrades": {
         "speed_boost": true,
         "purdue": true,
-        "grass": true,
+        "grass": false,
         "sparkle_purple": false
     },
-    "gameplay_music_volume": 0.90000004,
+    "gameplay_music_volume": 0.3,
     "menu_music_volume": 0.90000004
 }
