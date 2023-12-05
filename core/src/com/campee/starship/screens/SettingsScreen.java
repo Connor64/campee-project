@@ -67,7 +67,7 @@ public class SettingsScreen implements Screen {
 
         settingsSoundSlider = new Slider(0f, 1f, 0.1f, false, skin);
         /*****************************************************/
-        settingsSoundSlider.setValue(DataManager.INSTANCE.getMenuSFXVolume());
+        settingsSoundSlider.setValue(DataManager.INSTANCE.getGameplaySFXVolume());
         /*****************************************************/
         settingsSoundSlider.setSize(500f, 250f);
         settingsSoundSlider.setPosition(160f, Gdx.graphics.getHeight() - 550f);
