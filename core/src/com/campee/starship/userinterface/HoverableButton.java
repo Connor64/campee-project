@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 public class HoverableButton extends TextButton {
 
     private boolean hoverable = false;
+    private Color background;
 
     public static HoverableButton generate(String text, boolean hoverable, Color background, Color textColor, float textScale) {
         BitmapFont buttonFont = new BitmapFont();
@@ -32,6 +33,8 @@ public class HoverableButton extends TextButton {
 
         setColor(Color.WHITE);
         hoverable = _hoverable;
+
+        this.background = background;
 
         addListener(new InputListener() {
             @Override
@@ -76,8 +79,16 @@ public class HoverableButton extends TextButton {
         setDisabled(disabled);
 
         if (disabled) {
-            Pixmap backgroundPixmap = createRoundedRectanglePixmap(150, 60, 15, Color.DARK_GRAY);
-            getStyle().up = new TextureRegionDrawable(new TextureRegion(new Texture(backgroundPixmap)));
+            setBackground(Color.DARK_GRAY);
+        } else {
+            setBackground(background);
         }
+    }
+
+    public void setBackground(Color color) {
+        this.background = color;
+
+        Pixmap backgroundPixmap = createRoundedRectanglePixmap(150, 60, 15, color);
+        getStyle().up = new TextureRegionDrawable(new TextureRegion(new Texture(backgroundPixmap)));
     }
 }

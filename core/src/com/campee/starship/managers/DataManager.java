@@ -191,10 +191,12 @@ public class DataManager {
     public void toggleUpgrade(String upgradeID, boolean diskWrite) {
         if (!activeUpgrades.containsKey(upgradeID)) return;
 
-        if (activeUpgrades.get(upgradeID) && AssetManager.INSTANCE.getUpgrade(upgradeID) instanceof Customization) {
+        if (activeUpgrades.get(upgradeID) && (AssetManager.INSTANCE.getUpgrade(upgradeID) instanceof Customization)) {
             for (Map.Entry<String, Boolean> entry : activeUpgrades.entrySet()) {
                 if (AssetManager.INSTANCE.getUpgrade(entry.getKey()) instanceof Customization) {
+                    System.out.println(upgradeID + "  vs  " + entry.getKey());
                     if (!entry.getKey().equals(upgradeID)) {
+                        System.out.println("NOT the upgrade");
                         activeUpgrades.put(entry.getKey(), false);
                     }
                 }
