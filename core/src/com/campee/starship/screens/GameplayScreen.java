@@ -254,7 +254,7 @@ public class GameplayScreen extends ApplicationAdapter implements Screen {
         if (GameDifficulty.easy) {
             minOrders = 2;
             goalTime = 400;
-            countdownMinutes = 3;
+            countdownMinutes = 2;
         }
         if (GameDifficulty.medium) {
             minOrders = 3;

@@ -1,6 +1,6 @@
 level_6_thumbnail.png
-3
-0
+2
+15
 The Tunnels
 [EASY]
 2
