@@ -1,10 +1,6 @@
-01|Panera|Windsor|3
-02|Panera|Walc|5
-03|Cosi|Honors|1
-04|Starbucks|CL50|4
-05|Third St|Union|5
-06|Sushi Boss|Meredith|4
-07|Pete's Za|Beering|5
-08|Franks|Owen|2
-09|Jersey Mike's|Haas|5
-10|Starbucks|Union|2
+24601|PMU|HAAS|40
+D3BU6|MSEE|HAAS|30
+P1X3L|MSEE|PMU|45
+L0OP5|PMU|MSEE|25
+TUR5Y|HAAS|MSEE|50
+5T4CK|HAAS|PMU|40

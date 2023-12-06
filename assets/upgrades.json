@@ -1,0 +1,12 @@
+{
+  "speed_boost": {
+    "name": "Speed Boost",
+    "cost": 25,
+    "icon": "speed_boost_icon.PNG"
+  },
+  "coin_boost": {
+    "name": "Coin Boost",
+    "cost": 75,
+    "icon": "coin_boost_icon.png"
+  }
+}
