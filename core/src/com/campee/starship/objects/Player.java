@@ -15,6 +15,9 @@ import com.badlogic.gdx.physics.box2d.*;
 import com.campee.starship.managers.*;
 import com.campee.starship.screens.GameplayScreen;
 
+import javax.xml.crypto.Data;
+import java.util.Map;
+
 public class Player extends GameObject {
     private Body body;
     private final TextureRegion[] directionalSprites;
@@ -31,6 +34,17 @@ public class Player extends GameObject {
 
         sound = Gdx.audio.newSound(Gdx.files.internal("audio/ping.mp3"));
 
+        String custom = null;
+        for (Map.Entry<String, Boolean> entry : DataManager.INSTANCE.getPurchases()) {
+            if (entry.getValue()) {
+                for (Map.Entry<String, Upgrade> asset : AssetManager.INSTANCE.getUpgrades()) {
+                    if (asset.getKey().equals(entry.getKey()) && (asset.getValue() instanceof Customization)) {
+                        custom = entry.getKey();
+                    }
+                }
+            }
+        }
+
         // Set up directional sprites
         Texture upTexture = new Texture(Gdx.files.internal("sprites/moonship_up.png"));
         upTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
@@ -38,10 +52,17 @@ public class Player extends GameObject {
         Texture downTexture = new Texture(Gdx.files.internal("sprites/moonship_down.png"));
         downTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
 
-        Texture leftTexture = new Texture(Gdx.files.internal("sprites/moonship_left.png"));
-        leftTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        Texture leftTexture, rightTexture;
+        if (custom != null && DataManager.INSTANCE.isUpgradeActive(custom)) {
+            Customization obj = (Customization) AssetManager.INSTANCE.getUpgrade(custom);
+            leftTexture = new Texture(Gdx.files.internal("sprites/customizations/moonship_left_" + obj.getSuffix() + ".PNG"));
+            rightTexture = new Texture(Gdx.files.internal("sprites/customizations/moonship_right_" + obj.getSuffix() + ".PNG"));
+        } else {
+            leftTexture = new Texture(Gdx.files.internal("sprites/moonship_left.png"));
+            rightTexture = new Texture(Gdx.files.internal("sprites/moonship_right.png"));
+        }
 
-        Texture rightTexture = new Texture(Gdx.files.internal("sprites/moonship_right.png"));
+        leftTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         rightTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
 
         // Get regions and put them into the array

@@ -1,0 +1,32 @@
+{
+  "pika": {
+    "name": "PikaMon",
+    "cost": 5,
+    "icon": "customizations/moonship_right_pika.PNG",
+    "suffix": "pika"
+  },
+  "grass": {
+    "name": "Grass",
+    "cost": 5,
+    "icon": "customizations/moonship_right_grass.PNG",
+    "suffix": "grass"
+  },
+  "purdue": {
+    "name": "Purdue",
+    "cost": 5,
+    "icon": "customizations/moonship_right_purdue.PNG",
+    "suffix": "purdue"
+  },
+  "sparkle_pink": {
+    "name": "Pink Sparkle",
+    "cost": 5,
+    "icon": "customizations/moonship_right_sparklepink.PNG",
+    "suffix": "sparklepink"
+  },
+  "sparkle_purple": {
+    "name": "Purple Sparkle",
+    "cost": 5,
+    "icon": "customizations/moonship_right_sparklepurple.PNG",
+    "suffix": "sparklepurple"
+  }
+}

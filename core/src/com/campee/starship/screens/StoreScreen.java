@@ -29,6 +29,7 @@ import com.campee.starship.userinterface.UpgradePanel;
 
 import javax.xml.crypto.Data;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 
@@ -40,6 +41,9 @@ public class StoreScreen implements Screen {
 
     private Label shopBanner, coinLabel;
     private Music music;
+    private BitmapFont font;
+
+    private ArrayList<UpgradePanel> panels;
 
     public StoreScreen (final Game game) {
         this.game = game;
@@ -47,9 +51,15 @@ public class StoreScreen implements Screen {
         stage = new Stage(viewport);
         Gdx.input.setInputProcessor(stage);
 
+        panels = new ArrayList<>();
+
+        font = new BitmapFont(Gdx.files.internal("fonts/moonships_font.fnt"), Gdx.files.internal("fonts/moonships_font.png"), false);
+        font.setColor(1, 1, 0, 1);
+        font.getData().setScale(0.8f);
+
         music = Gdx.audio.newMusic(Gdx.files.internal("audio/menu screen sound.mp3"));
         music.setLooping(true);
-        music.setVolume(0.35f);
+        music.setVolume(DataManager.INSTANCE.getMenuSFXVolume());
 
         backButton = HoverableButton.generate("BACK", true, Color.valueOf("98FF98"), Color.BLACK, 1.5f);
         backButton.setPosition(30, Gdx.graphics.getHeight() - 80);
@@ -67,8 +77,9 @@ public class StoreScreen implements Screen {
         });
 
         Label.LabelStyle coinStyle = new Label.LabelStyle();
-        BitmapFont coinFont = new BitmapFont();
-        coinFont.getData().scale(1.5f);
+        BitmapFont coinFont = new BitmapFont(Gdx.files.internal("fonts/moonships_font.fnt"), Gdx.files.internal("fonts/moonships_font.png"), false);
+        coinFont.setColor(1, 1, 0, 1);
+        coinFont.getData().setScale(0.9f);;
         coinStyle.font = coinFont;
         coinStyle.fontColor = Color.BLACK;
 
@@ -78,8 +89,8 @@ public class StoreScreen implements Screen {
         coinLabel.setPosition(-10, Gdx.graphics.getHeight() - coinLabel.getHeight());
 
         Label.LabelStyle titleStyle = new Label.LabelStyle();
-        BitmapFont labelFont = new BitmapFont();
-        labelFont.getData().scale(5);
+        BitmapFont labelFont = font;
+        labelFont.getData().scale(1f);
         titleStyle.font = labelFont;
         titleStyle.fontColor = Color.BLACK;
 
@@ -92,13 +103,15 @@ public class StoreScreen implements Screen {
 
         Set<Map.Entry<String, Upgrade>> upgradeSet = AssetManager.INSTANCE.getUpgrades();
         for (Map.Entry<String, Upgrade> entry : upgradeSet) {
-            UpgradePanel panel = new UpgradePanel("sprites/coin.png", entry.getValue());
+            UpgradePanel panel = new UpgradePanel(entry.getValue(), panels);
+            panels.add(panel);
             upgradeRow.add(panel).pad(15);
         }
 
         CustomScrollPane customScrollPane = new CustomScrollPane(upgradeRow, stage);
         customScrollPane.setScrollingDisabled(false, true);
         customScrollPane.setFillParent(true);
+        customScrollPane.setPosition(customScrollPane.getX(), customScrollPane.getY() - 80);
 
         stage.addActor(customScrollPane);
         stage.addActor(shopBanner);
@@ -119,7 +132,9 @@ public class StoreScreen implements Screen {
         Gdx.gl.glClear(Gdx.gl20.GL_COLOR_BUFFER_BIT);
 
         coinLabel.setText("Coins: " + DataManager.INSTANCE.getCoinCount());
-        music.play();
+        if (SettingsScreen.instantiated) {
+            music.setVolume(SettingsScreen.settingsMusicSlider.getValue());
+        } music.play();
 
 //        stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 80f));
         // Update and render game elements

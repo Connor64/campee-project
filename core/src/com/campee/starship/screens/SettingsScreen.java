@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -36,15 +37,18 @@ public class SettingsScreen implements Screen {
     Skin skin;
     public static boolean instantiated;
     public static Slider settingsMusicSlider;
+    public static Slider settingsSoundSlider;
 
     public SettingsScreen(final Game game) {
         this.game = game;
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 800, 600); // Set the camera dimensions as per your requirement
         batch = new SpriteBatch();
-        font = new BitmapFont();
+        font = new BitmapFont(Gdx.files.internal("fonts/moonships_font.fnt"), Gdx.files.internal("fonts/moonships_font.png"), false);
         font.setColor(Color.BLACK);
-        font.getData().setScale(2.0f); // Set the font scale to make the text larger
+        font.getData().setScale(0.8f);
+//        font.setColor(Color.BLACK);
+//        font.getData().setScale(2.0f); // Set the font scale to make the text larger
 
         music = Gdx.audio.newMusic(Gdx.files.internal("audio/menu screen sound.mp3"));
         music.setLooping(true);
@@ -60,6 +64,13 @@ public class SettingsScreen implements Screen {
         /*****************************************************/
         settingsMusicSlider.setSize(500f, 250f);
         settingsMusicSlider.setPosition(160f, Gdx.graphics.getHeight() - 400f);
+
+        settingsSoundSlider = new Slider(0f, 1f, 0.1f, false, skin);
+        /*****************************************************/
+        settingsSoundSlider.setValue(DataManager.INSTANCE.getGameplaySFXVolume());
+        /*****************************************************/
+        settingsSoundSlider.setSize(500f, 250f);
+        settingsSoundSlider.setPosition(160f, Gdx.graphics.getHeight() - 550f);
 
         viewport = new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         stage = new Stage(viewport);
@@ -82,14 +93,27 @@ public class SettingsScreen implements Screen {
                 try {
                     music.pause();
                     DataManager.INSTANCE.setMenuMusicVolume(settingsMusicSlider.getValue(), true);
+                    DataManager.INSTANCE.setGameplaySFXVolume(settingsSoundSlider.getValue(), true);
                     game.setScreen(new LevelScreen(game)); // Change to the screen you want
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }
                 return true;
             }
+            @Override
+            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+                super.enter(event, x, y, pointer, fromActor);
+                backButton.setColor(Color.LIGHT_GRAY);
+            }
+            @Override
+            public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
+                super.exit(event, x, y, pointer, toActor);
+//                isPlayButtonHovered = false;
+                backButton.setColor(Color.WHITE);
+            }
         });
         stage.addActor(settingsMusicSlider);
+        stage.addActor(settingsSoundSlider);
         stage.addActor(backButton);
     }
 
@@ -120,6 +144,14 @@ public class SettingsScreen implements Screen {
         float volumeX = (camera.viewportWidth - volumeLayout.width) / 2;
         float volumeY = camera.viewportHeight - 190;
         font.draw(batch, "MUSIC VOLUME", volumeX, volumeY);
+
+        // Draw the text "MUSIC VOLUME" at the top of the screen
+        GlyphLayout soundLayout = new GlyphLayout();
+        soundLayout.setText(font, "SOUND EFFECTS VOLUME");
+        //add camera stuff so that the extending works
+        float soundX = (camera.viewportWidth - soundLayout.width) / 2;
+        float soundY = camera.viewportHeight - 340;
+        font.draw(batch, "SOUND EFFECTS VOLUME", soundX, soundY);
 
         // Draw countdown timer
 //        GlyphLayout timerLayout = new GlyphLayout();
